@@ -20,6 +20,6 @@ object ScoverageSettings {
     ScoverageKeys.coverageMinimumStmtTotal := 90,
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true,
-    ScoverageKeys.coverageEnabled := true
+    ScoverageKeys.coverageEnabled := false
   )
 }
