@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package controllers
+package config
 
-import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.Future
+import com.google.inject.AbstractModule
+import services.upscan.{MongoBackedUploadProgressTracker, UploadProgressTracker}
 
-@Singleton()
-class MicroserviceHelloWorldController @Inject()(cc: ControllerComponents)
-  extends BackendController(cc) {
+class Module extends AbstractModule {
 
-  def hello(): Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok("Hello world"))
+  override def configure() = {
+    bind(classOf[UploadProgressTracker]).to(
+      classOf[MongoBackedUploadProgressTracker]
+    )
+    () //Suppress discarded non-unit value warning
   }
 }
