@@ -16,20 +16,25 @@
 
 package schemas
 
+import com.google.inject.ImplementedBy
 import org.codehaus.stax2.validation.{XMLValidationSchema, XMLValidationSchemaFactory}
 
 import java.io.File
 import javax.inject.{Inject, Singleton}
 
+trait XMLSchema {
+  def xmlValidationSchema: XMLValidationSchema
+}
+
 @Singleton
-class DAC6XMLSchema @Inject() () {
+class DAC6XMLSchema @Inject() () extends XMLSchema {
 
   val xmlValidationSchemaFactory: XMLValidationSchemaFactory =
     XMLValidationSchemaFactory.newInstance(
       XMLValidationSchema.SCHEMA_ID_W3C_SCHEMA
     )
 
-  lazy val xmlValidationSchema = {
+  override val xmlValidationSchema: XMLValidationSchema = {
     val schemaFile: File = new File(s"conf/schemas/UKDac6XSD_v0.5.xsd")
     xmlValidationSchemaFactory.createSchema(schemaFile)
   }
