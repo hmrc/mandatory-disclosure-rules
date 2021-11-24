@@ -1,2 +1,6 @@
 # microservice specific routes
 
+POST       /callback                                    controllers.upscan.UploadCallbackController.callback
+GET        /upscan/details/:uploadId                    controllers.upscan.UploadFormController.getDetails(uploadId: String)
+GET        /upscan/status/:uploadId                     controllers.upscan.UploadFormController.getStatus(uploadId: String)
+POST       /upscan/upload                               controllers.upscan.UploadFormController.requestUpload
