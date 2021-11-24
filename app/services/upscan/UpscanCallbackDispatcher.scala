@@ -22,8 +22,7 @@ import play.api.Logging
 
 import scala.concurrent.Future
 
-class UpscanCallbackDispatcher @Inject() (sessionStorage: UploadProgressTracker)
-    extends Logging {
+class UpscanCallbackDispatcher @Inject() (sessionStorage: UploadProgressTracker) extends Logging {
 
   def handleCallback(callback: CallbackBody): Future[Boolean] = {
     logger.debug("\n\nHandling the callback\n\n")
@@ -36,12 +35,10 @@ class UpscanCallbackDispatcher @Inject() (sessionStorage: UploadProgressTracker)
           s.downloadUrl,
           Some(s.uploadDetails.size)
         )
-      case s: FailedCallbackBody
-          if s.failureDetails.failureReason == "QUARANTINE" =>
+      case s: FailedCallbackBody if s.failureDetails.failureReason == "QUARANTINE" =>
         logger.debug(s"FailedCallbackBody, QUARANTINE: $s")
         Quarantined
-      case s: FailedCallbackBody
-          if s.failureDetails.failureReason == "REJECTED" =>
+      case s: FailedCallbackBody if s.failureDetails.failureReason == "REJECTED" =>
         logger.debug(s"FailedCallbackBody, REJECTED: $s")
         UploadRejected(s.failureDetails)
       case f: FailedCallbackBody =>

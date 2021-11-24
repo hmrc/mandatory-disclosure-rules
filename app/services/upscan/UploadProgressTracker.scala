@@ -16,13 +16,7 @@
 
 package services.upscan
 
-import models.upscan.{
-  InProgress,
-  Reference,
-  UploadId,
-  UploadSessionDetails,
-  UploadStatus
-}
+import models.upscan.{InProgress, Reference, UploadId, UploadSessionDetails, UploadStatus}
 import org.bson.types.ObjectId
 import play.api.Logging
 import repositories.upscan.UploadSessionRepository
@@ -33,13 +27,13 @@ import scala.concurrent.{ExecutionContext, Future}
 trait UploadProgressTracker {
 
   def requestUpload(
-      uploadId: UploadId,
-      fileReference: Reference
+    uploadId: UploadId,
+    fileReference: Reference
   ): Future[Boolean]
 
   def registerUploadResult(
-      reference: Reference,
-      uploadStatus: UploadStatus
+    reference: Reference,
+    uploadStatus: UploadStatus
   ): Future[Boolean]
 
   def getUploadResult(id: UploadId): Future[Option[UploadStatus]]
@@ -47,22 +41,22 @@ trait UploadProgressTracker {
 }
 
 class MongoBackedUploadProgressTracker @Inject() (
-    repository: UploadSessionRepository
+  repository: UploadSessionRepository
 )(implicit ec: ExecutionContext)
     extends UploadProgressTracker
     with Logging {
 
   override def requestUpload(
-      uploadId: UploadId,
-      fileReference: Reference
+    uploadId: UploadId,
+    fileReference: Reference
   ): Future[Boolean] =
     repository.insert(
       UploadSessionDetails(ObjectId.get(), uploadId, fileReference, InProgress)
     )
 
   override def registerUploadResult(
-      fileReference: Reference,
-      uploadStatus: UploadStatus
+    fileReference: Reference,
+    uploadStatus: UploadStatus
   ): Future[Boolean] = {
     logger.debug(
       "In the register " + fileReference.toString + "   " + uploadStatus.toString

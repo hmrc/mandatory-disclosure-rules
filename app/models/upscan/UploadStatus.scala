@@ -25,17 +25,19 @@ case object Failed extends UploadStatus
 case object Quarantined extends UploadStatus
 
 case class UploadedSuccessfully(
-    name: String,
-    mimeType: String,
-    downloadUrl: String,
-    size: Option[Long]
+  name: String,
+  mimeType: String,
+  downloadUrl: String,
+  size: Option[Long]
 ) extends UploadStatus
 
 case class UploadRejected(details: ErrorDetails) extends UploadStatus
 
 object UploadStatus {
+
   implicit val uploadedSuccessfullyFormat: OFormat[UploadedSuccessfully] =
     Json.format[UploadedSuccessfully]
+
   implicit val uploadRejectedFormat: OFormat[UploadRejected] =
     Json.format[UploadRejected]
 

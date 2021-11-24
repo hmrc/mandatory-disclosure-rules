@@ -21,11 +21,7 @@ import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.Updates.set
-import org.mongodb.scala.model.{
-  FindOneAndUpdateOptions,
-  IndexModel,
-  IndexOptions
-}
+import org.mongodb.scala.model.{FindOneAndUpdateOptions, IndexModel, IndexOptions}
 import play.api.Configuration
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
@@ -50,8 +46,8 @@ object UploadSessionRepository {
 }
 
 class UploadSessionRepository @Inject() (
-    val mongo: MongoComponent,
-    config: Configuration
+  val mongo: MongoComponent,
+  config: Configuration
 )(implicit ec: ExecutionContext)
     extends PlayMongoRepository[UploadSessionDetails](
       mongoComponent = mongo,
@@ -66,12 +62,13 @@ class UploadSessionRepository @Inject() (
       .find(equal("uploadId", Codecs.toBson(uploadId)))
       .first()
       .toFutureOption()
+
   def updateStatus(
-      reference: Reference,
-      newStatus: UploadStatus
+    reference: Reference,
+    newStatus: UploadStatus
   ): Future[Boolean] = {
 
-    val filter: Bson = equal("reference.value", Codecs.toBson(reference.value))
+    val filter: Bson   = equal("reference.value", Codecs.toBson(reference.value))
     val modifier: Bson = set("status", Codecs.toBson(newStatus))
     val options: FindOneAndUpdateOptions =
       FindOneAndUpdateOptions().upsert(true)

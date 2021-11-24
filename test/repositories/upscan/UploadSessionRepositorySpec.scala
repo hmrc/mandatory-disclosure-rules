@@ -24,7 +24,8 @@ import java.util.UUID
 
 class UploadSessionRepositorySpec extends SpecBase {
   lazy val uploadRep = app.injector.instanceOf[UploadSessionRepository]
-  val uploadId = UploadId(UUID.randomUUID().toString)
+  val uploadId       = UploadId(UUID.randomUUID().toString)
+
   val uploadDetails = UploadSessionDetails(
     ObjectId.get(),
     uploadId,

@@ -17,16 +17,7 @@
 package services.upscan
 
 import base.SpecBase
-import models.upscan.{
-  ErrorDetails,
-  FailedCallbackBody,
-  Quarantined,
-  ReadyCallbackBody,
-  Reference,
-  UploadDetails,
-  UploadRejected,
-  UploadedSuccessfully
-}
+import models.upscan.{ErrorDetails, FailedCallbackBody, Quarantined, ReadyCallbackBody, Reference, UploadDetails, UploadRejected, UploadedSuccessfully}
 import play.api.Application
 import play.api.inject.bind
 import models.upscan.Failed
@@ -90,7 +81,7 @@ class UpscanCallbackDispatcherSpec extends SpecBase {
     }
 
     "handleCallback must return Quarantined for the input FailedCallbackBody" in {
-      val reference = Reference("ref")
+      val reference    = Reference("ref")
       val errorDetails = ErrorDetails("QUARANTINE", "message")
 
       val readyCallbackBody = FailedCallbackBody(reference, errorDetails)
@@ -111,7 +102,7 @@ class UpscanCallbackDispatcherSpec extends SpecBase {
     }
 
     "handleCallback must return REJECTED for the input FailedCallbackBody" in {
-      val reference = Reference("ref")
+      val reference    = Reference("ref")
       val errorDetails = ErrorDetails("REJECTED", "message")
 
       val readyCallbackBody = FailedCallbackBody(reference, errorDetails)
@@ -132,7 +123,7 @@ class UpscanCallbackDispatcherSpec extends SpecBase {
     }
 
     "handleCallback must return Failed for the input FailedCallbackBody" in {
-      val reference = Reference("ref")
+      val reference    = Reference("ref")
       val errorDetails = ErrorDetails("Failed", "message")
 
       val readyCallbackBody = FailedCallbackBody(reference, errorDetails)
