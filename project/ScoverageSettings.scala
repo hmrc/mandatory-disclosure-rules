@@ -18,7 +18,6 @@ object ScoverageSettings {
     ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
     ScoverageKeys.coverageMinimumStmtTotal := 90,
     ScoverageKeys.coverageFailOnMinimum := true,
-    ScoverageKeys.coverageHighlighting := true,
-    ScoverageKeys.coverageEnabled := true
+    ScoverageKeys.coverageHighlighting := true
   )
 }
