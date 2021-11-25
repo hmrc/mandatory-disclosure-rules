@@ -27,12 +27,12 @@ class XMLValidatorSpec extends SpecBase {
   val application = applicationBuilder()
     .configure(
       Configuration(
-        "metrics.enabled" -> "false",
+        "metrics.enabled"           -> "false",
         "xml.validation.max-errors" -> 3
       )
     )
     .build()
-  val service = application.injector.instanceOf[XMLValidator]
+  val service   = application.injector.instanceOf[XMLValidator]
   val xmlSchema = application.injector.instanceOf[DAC6XMLSchema]
 
   "XMLValidator" - {
@@ -65,10 +65,10 @@ class XMLValidatorSpec extends SpecBase {
   "XmlErrorHandler" - {
 
     def addException(
-        errorMessage: String,
-        line: Int,
-        column: Int,
-        severity: Int
+      errorMessage: String,
+      line: Int,
+      column: Int,
+      severity: Int
     ) =
       new XMLValidationProblem(
         new ImmutableLocation(0, column, line, "", ""),

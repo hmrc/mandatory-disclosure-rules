@@ -16,10 +16,7 @@
 
 package schemas
 
-import org.codehaus.stax2.validation.{
-  XMLValidationSchema,
-  XMLValidationSchemaFactory
-}
+import org.codehaus.stax2.validation.{XMLValidationSchema, XMLValidationSchemaFactory}
 
 import java.io.File
 import javax.inject.{Inject, Singleton}

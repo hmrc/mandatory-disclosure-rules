@@ -32,4 +32,6 @@ class AppConfig @Inject() (
 
   val graphiteHost: String =
     config.get[String]("microservice.metrics.graphite.host")
+
+  val maxValidationErrors: Int = config.get[Int]("xml.validation.max-errors")
 }

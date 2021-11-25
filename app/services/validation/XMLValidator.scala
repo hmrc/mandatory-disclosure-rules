@@ -19,11 +19,7 @@ package services.validation
 import com.ctc.wstx.exc.WstxException
 import com.google.inject.Inject
 import config.AppConfig
-import org.codehaus.stax2.validation.{
-  ValidationProblemHandler,
-  XMLValidationProblem,
-  XMLValidationSchema
-}
+import org.codehaus.stax2.validation.{ValidationProblemHandler, XMLValidationProblem, XMLValidationSchema}
 import org.codehaus.stax2.{XMLInputFactory2, XMLStreamReader2}
 import play.api.Logging
 
@@ -47,8 +43,8 @@ class XMLValidator @Inject() (config: AppConfig) extends Logging {
   )
 
   def validateSchema(
-      input: URL,
-      xmlValidationSchema: XMLValidationSchema
+    input: URL,
+    xmlValidationSchema: XMLValidationSchema
   ): XmlErrorHandler = {
     val xmlErrorHandler = new XmlErrorHandler(config.maxValidationErrors)
 
@@ -78,23 +74,22 @@ class XMLValidator @Inject() (config: AppConfig) extends Logging {
   }
 }
 
-class XmlErrorHandler(val errorMessageLimit: Int)
-    extends ValidationProblemHandler {
+class XmlErrorHandler(val errorMessageLimit: Int) extends ValidationProblemHandler {
 
   override def reportProblem(problem: XMLValidationProblem): Unit =
     captureError(problem)
 
-  private val errorsListBuffer: ListBuffer[String] = new ListBuffer[String]()
+  private val errorsListBuffer: ListBuffer[String]   = new ListBuffer[String]()
   private val warningsListBuffer: ListBuffer[String] = new ListBuffer[String]()
   private val fatalErrorsListBuffer: ListBuffer[String] =
     new ListBuffer[String]()
 
-  def hasErrors: Boolean = errorsCollection.nonEmpty
+  def hasErrors: Boolean      = errorsCollection.nonEmpty
   def hasFatalErrors: Boolean = fatalErrorsCollection.nonEmpty
-  def hasWarnings: Boolean = warningsCollection.nonEmpty
+  def hasWarnings: Boolean    = warningsCollection.nonEmpty
 
-  def errorsCollection: List[String] = errorsListBuffer.toList
-  def warningsCollection: List[String] = warningsListBuffer.toList
+  def errorsCollection: List[String]      = errorsListBuffer.toList
+  def warningsCollection: List[String]    = warningsListBuffer.toList
   def fatalErrorsCollection: List[String] = fatalErrorsListBuffer.toList
 
   private def captureError(problem: XMLValidationProblem) = {
@@ -107,9 +102,7 @@ class XmlErrorHandler(val errorMessageLimit: Int)
 
     if (listBuffer.size < errorMessageLimit) {
       val lineNumber = nonFatalCatch opt problem.getLocation.getLineNumber
-      listBuffer += lineNumber.fold(s"${problem.getMessage}")(line =>
-        s"${problem.getMessage} on line $line"
-      )
+      listBuffer += lineNumber.fold(s"${problem.getMessage}")(line => s"${problem.getMessage} on line $line")
     } else {
       fatalErrorsListBuffer += s"Number of errors exceeding limit ($errorMessageLimit), aborting validation.."
       throw ErrorLimitExceededException
