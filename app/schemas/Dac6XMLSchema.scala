@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package config
+package schemas
 
+import org.codehaus.stax2.validation.{XMLValidationSchema, XMLValidationSchemaFactory}
+
+import java.io.File
 import javax.inject.{Inject, Singleton}
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 @Singleton
-class AppConfig @Inject() (
-  config: Configuration,
-  servicesConfig: ServicesConfig
-) {
+class DAC6XMLSchema @Inject() () {
 
-  val authBaseUrl: String = servicesConfig.baseUrl("auth")
+  val xmlValidationSchemaFactory: XMLValidationSchemaFactory =
+    XMLValidationSchemaFactory.newInstance(
+      XMLValidationSchema.SCHEMA_ID_W3C_SCHEMA
+    )
 
-  val auditingEnabled: Boolean = config.get[Boolean]("auditing.enabled")
+  lazy val xmlValidationSchema = {
+    val schemaFile: File = new File(s"conf/schemas/UKDac6XSD_v0.5.xsd")
+    xmlValidationSchemaFactory.createSchema(schemaFile)
+  }
 
-  val graphiteHost: String =
-    config.get[String]("microservice.metrics.graphite.host")
-
-  val maxValidationErrors: Int = config.get[Int]("xml.validation.max-errors")
 }

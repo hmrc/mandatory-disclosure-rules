@@ -1,0 +1,742 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:dac6="urn:ukdac6:v0.1"
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			xmlns:iso="urn:ukdac6:isotypes:v1"
+			targetNamespace="urn:ukdac6:v0.1"
+			elementFormDefault="qualified"
+			attributeFormDefault="unqualified" version="3.0">
+	<xsd:import namespace="urn:ukdac6:isotypes:v1" schemaLocation="IsoTypes_v1.01.xsd"/>
+	<!-- -->
+	<!--+++++++++++++++++++++++  String length types ++++++++++++++++++++++++++++++++++++++ -->
+	<!-- -->
+	<!-- Defines a string with minimum length 1 and maximum length of 200 -->
+	<xsd:simpleType name="StringMin1Max200_Type">
+		<xsd:annotation>
+			<xsd:documentation>Defines a string with minimum length 1 and maximum length of 200</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="200"/>
+			<xsd:whiteSpace value="collapse"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- -->
+	<!-- Defines a string with minimum length 1 and maximum length of 200 -->
+	<xsd:simpleType name="StringMin2Max200_Type">
+		<xsd:annotation>
+			<xsd:documentation>Defines a string with minimum length 2 and maximum length of 200</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="2"/>
+			<xsd:maxLength value="200"/>
+			<xsd:whiteSpace value="collapse"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- -->
+	<!-- Defines a string with minimum length 1 and maximum length of 400 -->
+	<xsd:simpleType name="StringMin1Max400_Type">
+		<xsd:annotation>
+			<xsd:documentation>Defines a string with minimum length 1 and maximum length of 400</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="400"/>
+			<xsd:whiteSpace value="collapse"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- -->
+	<!-- Defines a string with minimum length 1 and maximum length of 4000 -->
+	<xsd:simpleType name="StringMin1Max4000_Type">
+		<xsd:annotation>
+			<xsd:documentation>Defines a string with minimum length 1 and maximum length of 4000</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="4000"/>
+			<xsd:whiteSpace value="collapse"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- -->
+	<!--+++++++++++++++++++++++  Reusable Simple types ++++++++++++++++++++++++++++++++++++++ -->
+	<!--  -->
+	<!-- Capacity of disclosing Intermediary -->
+	<xsd:simpleType name="IntermediaryCapacity_EnumType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Capacity of Intermediary</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="DAC61101">
+				<xsd:annotation>
+					<xsd:documentation>Designer / Promoter / Implementation (managing/organising/executing)</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC61102">
+				<xsd:annotation>
+					<xsd:documentation>Service Provider / Assistant</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--  -->
+	<!-- Capacity of disclosing Relevant Taxpayer -->
+	<xsd:simpleType name="TaxpayerCapacity_EnumType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Capacity of Taxpayer</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="DAC61104">
+				<xsd:annotation>
+					<xsd:documentation>Professional secrecy of intermediary</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC61105">
+				<xsd:annotation>
+					<xsd:documentation>Intermediary in non-EU country</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC61106">
+				<xsd:annotation>
+					<xsd:documentation>In-house Arrangement</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--  -->
+	<!-- Reason for disclosure -->
+	<xsd:simpleType name="DisclosureReason_EnumType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Reason for disclosure</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="DAC6701">
+				<xsd:annotation>
+					<xsd:documentation>Arrangement is made available for implementation</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6702">
+				<xsd:annotation>
+					<xsd:documentation>Arrangement is ready for implementation</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6703">
+				<xsd:annotation>
+					<xsd:documentation>First step in the implementation of the Arrangement has been made or will be made.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6704">
+				<xsd:annotation>
+					<xsd:documentation>Provision of aid, assistance or advice.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!---->
+	<xsd:simpleType name="DisclosureVersion_EnumType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Enumerations describing message type</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="DAC6NEW">
+				<xsd:annotation>
+					<xsd:documentation>Submit a new disclosure (No submitted version of this Arrangement or Disclosure already exists). The ArrangementID and DisclosureID should be blank in the case of a DAC6NEW.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6ADD">
+				<xsd:annotation>
+					<xsd:documentation>Submit an additional disclosure for an existing valid Arrangement. The relevant ArrangementID must be provided and the DisclosureID must be blank in the case of a DAC6ADD.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6REP">
+				<xsd:annotation>
+					<xsd:documentation>Submit a complete replacement for a previously submitted valid DAC6NEW / DAC6ADD / DAC6REP. The entire existing submitted Disclosure will be overwritten when identified by ArrangementID/DisclosureID where DAC6REP is used. The relevant ArrangementID, DisclosureID must be provided in the case of a DAC6REP.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6DEL">
+				<xsd:annotation>
+					<xsd:documentation>Submit a deletion of an existing submitted Disclosure. The entire existing submitted Disclosure will be deleted when identified by ArrangementID/DisclosureID where DAC6DEL is used. Default values should be used in mandatory data elements. The relevant ArrangementID and the DisclosureID must be provided in the case of a DAC6DEL.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- -->
+	<!--DAC6 Hallmark Type-->
+	<xsd:simpleType name="HallmarkEnum_Type">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Categories of hallmarks</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="DAC6A1">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark A1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6A2a">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark A2a</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6A2b">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark A2b</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6A3">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark A3</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6B1">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark B1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6B2">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark B2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6B3">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark B3</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6C1a">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark C1a</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6C1bi">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark C1bi</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6C1bii">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark C1bii</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6C1c">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark C1c</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6C1d">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark C1d</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6C2">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark C2</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6C3">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark C3</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6C4">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark C4</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6D1Other">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark D1 - Other</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6D1a">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark D1a</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6D1b">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark D1b</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6D1c">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark D1c</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6D1d">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark D1d</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6D1e">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark D1e</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6D1f">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark D1f</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6D2">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark D2a, D2b and D2c</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6E1">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark E1</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6E2">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark E2a and E2b</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="DAC6E3">
+				<xsd:annotation>
+					<xsd:documentation>Hallmark E3</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- -->
+	<!--Nexus of the Relevant Taxpayer-->
+	<xsd:simpleType name="RelevantTaxpayerNexus_EnumType">
+		<xsd:annotation>
+			<xsd:documentation>Categories of Nexus of Taxpayer</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="RTNEXa">
+				<xsd:annotation>
+					<xsd:documentation>The Member State where the relevant taxpayer is resident for tax purposes</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="RTNEXb">
+				<xsd:annotation>
+					<xsd:documentation>The Member State where the relevant taxpayer has a permanent establishment benefiting from the arrangement</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="RTNEXc">
+				<xsd:annotation>
+					<xsd:documentation>The Member State where the relevant taxpayer receives income or generates profits, although the relevant taxpayer is not resident for tax purposes and has no permanent establishment in any Member State.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="RTNEXd">
+				<xsd:annotation>
+					<xsd:documentation>The Member State where the relevant taxpayer carries on an activity, although the relevant taxpayer is not resident for tax purposes and has no permanent establishment in any Member State</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!---->
+	<!--Nexus of the Intermediary-->
+	<xsd:simpleType name="IntermediaryNexus_EnumType">
+		<xsd:annotation>
+			<xsd:documentation>Categories of Nexus of Intermediary</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="INEXa">
+				<xsd:annotation>
+					<xsd:documentation>The Member State where the intermediary is resident for tax purposes</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="INEXb">
+				<xsd:annotation>
+					<xsd:documentation>The Member State where the intermediary has a permanent establishment through which the services with respect to the arrangement are provided</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="INEXc">
+				<xsd:annotation>
+					<xsd:documentation>The Member State where the intermediary is incorporated in or governed by the laws of</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="INEXd">
+				<xsd:annotation>
+					<xsd:documentation>The Member State where the intermediary is registered with a professional association related to legal, taxation or consultancy services</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!---->
+	<!--++++++++++++++++++ Reusable Complex types +++++++++++++++++++++++++++++++++++++ -->
+	<!---->
+	<!--Address-->
+	<xsd:complexType name="Address_Type">
+		<xsd:sequence>
+			<xsd:element name="Street" type="dac6:StringMin1Max400_Type" minOccurs="0"/>
+			<xsd:element name="BuildingIdentifier" type="dac6:StringMin1Max400_Type" minOccurs="0"/>
+			<xsd:element name="SuiteIdentifier" type="dac6:StringMin1Max400_Type" minOccurs="0"/>
+			<xsd:element name="FloorIdentifier" type="dac6:StringMin1Max400_Type" minOccurs="0"/>
+			<xsd:element name="DistrictName" type="dac6:StringMin1Max400_Type" minOccurs="0"/>
+			<xsd:element name="POB" type="dac6:StringMin1Max400_Type" minOccurs="0"/>
+			<xsd:element name="PostCode" type="dac6:StringMin1Max400_Type" minOccurs="0"/>
+			<xsd:element name="City" type="dac6:StringMin1Max400_Type"/>
+			<xsd:element name="Country" type="iso:CountryCode_Type"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- -->
+	<!--Capacity of the Discloser-->
+	<xsd:complexType name="Liability_Type">
+		<xsd:choice>
+			<xsd:element name="IntermediaryDiscloser">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="IntermediaryNexus" type="dac6:IntermediaryNexus_EnumType" minOccurs="1"/>
+						<xsd:element name="Capacity" type="dac6:IntermediaryCapacity_EnumType" minOccurs="0"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="RelevantTaxpayerDiscloser">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="RelevantTaxpayerNexus" type="dac6:RelevantTaxpayerNexus_EnumType" minOccurs="1"/>
+						<xsd:element name="Capacity" type="dac6:TaxpayerCapacity_EnumType" minOccurs="0"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:choice>
+	</xsd:complexType>
+	<!---->
+	<!--Disclosing Person / Entity -->
+	<xsd:complexType name="Discloser">
+		<xsd:complexContent>
+			<xsd:extension base="dac6:Disclosing_Type"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- -->
+	<!-- Relevant Tax Payer -->
+	<xsd:complexType name="TaxPayer_Type">
+		<xsd:sequence>
+			<xsd:element name="ID" type="dac6:PersonOrOrganisation_Type"/>
+			<xsd:element name="TaxpayerImplementingDate" type="xsd:date" minOccurs="0" maxOccurs="1"/>
+			<xsd:element name="AssociatedEnterprises" type="dac6:AssociatedEnterprises_Type" minOccurs="0" maxOccurs="1"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!---->
+	<!--Associated Enterprise-->
+	<xsd:complexType name="AssociatedEnterprises_Type">
+		<xsd:sequence>
+			<xsd:element name="AssociatedEnterprise" type="dac6:AssociatedEnterprise_Type" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AssociatedEnterprise_Type">
+		<xsd:sequence>
+			<xsd:element name="AssociatedEnterpriseID" type="dac6:PersonOrOrganisation_Type"/>
+			<xsd:element name="AffectedPerson" type="xsd:boolean"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!---->
+	<!--Other Affected Person-->
+	<xsd:complexType name="AffectedPerson_Type">
+		<xsd:sequence>
+			<xsd:element name="AffectedPersonID" type="dac6:PersonOrOrganisation_Type"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- -->
+	<!-- Organisation name -->
+	<xsd:complexType name="NameOrganisation_Type">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Name of organisation</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="dac6:StringMin1Max200_Type"/>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- -->
+	<!-- General Type for Monetary values -->
+	<xsd:complexType name="Amount_Type">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+				This data type is to be used whenever monetary amounts are to be communicated. Such amounts shall be given in full units, i.e. without decimals. The code for the currency in which the value is expressed has to be taken from the ISO codelist 4217 and added in attribute currCode.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:integer">
+				<xsd:attribute name="currCode" type="iso:currCode_Type" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!--  -->
+	<!-- TIN -->
+	<xsd:complexType name="TIN_Type">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">The identification number/identification code for the party in question. As the identifier may be not strictly numeric, it is just defined as a string of characters. Attribute 'issuedBy' is required to designate the issuer of the identifier. </xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="dac6:StringMin1Max200_Type">
+				<xsd:attribute name="issuedBy" type="iso:CountryCode_Type" use="optional">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">Country code of issuing country, indicating country of Residence (to taxes and other)</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!--  -->
+	<!-- Intermediaries -->
+	<xsd:complexType name="Intermediary_Type">
+		<xsd:sequence>
+			<xsd:element name="ID" type="dac6:PersonOrOrganisation_Type"/>
+			<xsd:element name="Capacity" type="dac6:IntermediaryCapacity_EnumType" minOccurs="0"/>
+			<xsd:element name="NationalExemption" type="dac6:NationalExemption_Type" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!---->
+	<!--National Exemption-->
+	<xsd:complexType name="NationalExemption_Type">
+		<xsd:sequence>
+			<xsd:element name="Exemption" type="xsd:boolean"/>
+			<xsd:element name="CountryExemptions" type="dac6:CountryExemptions_Type" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- -->
+	<xsd:complexType name="CountryExemptions_Type">
+		<xsd:sequence>
+			<xsd:element name="CountryExemption" type="iso:CountryCode_Type" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- -->
+	<!-- Message specification: Data identifying and describing the message as a whole -->
+	<xsd:complexType name="Header_Type">
+		<xsd:sequence>
+			<xsd:element name="MessageRefId" type="dac6:StringMin2Max200_Type">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">MessageRefID must be unique in time and space for DAC6NEW / DAC6ADD / DAC6REP / DAC6DEL. MessageRefID must begin "GB", relevant UserID then "XXX" to ensure uniqueness.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Timestamp" type="xsd:dateTime"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- -->
+	<!-- Collection of all Data describing an organisation as stakeholder-->
+	<xsd:complexType name="Organisation_Type">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="OrganisationName" type="dac6:NameOrganisation_Type" maxOccurs="unbounded"/>
+			<xsd:element name="TIN" type="dac6:TIN_Type" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Tax Identification Number</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Address" type="dac6:Address_Type" minOccurs="0"/>
+			<xsd:element name="EmailAddress" type="dac6:StringMin1Max400_Type" minOccurs="0"/>
+			<xsd:element name="ResCountryCode" type="iso:CountryCode_Type" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- -->
+	<!--Summary-->
+	<xsd:complexType name="Summary_Type">
+		<xsd:sequence>
+			<xsd:element name="Disclosure_Name" type="dac6:StringMin1Max400_Type"/>
+			<xsd:element name="Disclosure_Description" type="dac6:StringMin1Max4000_Type" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- -->
+	<!-- Collection of all Data describing a person as a  stakeholder-->
+	<xsd:complexType name="Person_Type">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+				This container brings together all data about a person as a stakeholder. Name and country of residency are required components and each can
+				be present more than once to enable as complete a description as possible. Whenever possible one or more identifiers (TIN) should be added. Additional data that describes and identifies the party must be given, as Birth date and Birth place.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="IndividualName" type="dac6:NamePerson_Type"/>
+			<xsd:element name="BirthDate" type="xsd:date"/>
+			<xsd:element name="BirthPlace" type="dac6:StringMin1Max200_Type"/>
+			<xsd:element name="TIN" type="dac6:TIN_Type" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation>Tax Identification Number</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Address" type="dac6:Address_Type" minOccurs="0"/>
+			<xsd:element name="EmailAddress" type="dac6:StringMin1Max400_Type" minOccurs="0"/>
+			<xsd:element name="ResCountryCode" type="iso:CountryCode_Type" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- -->
+	<!-- The Name of a Party, given in fixed Form -->
+	<xsd:complexType name="NamePerson_Type">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Fixed format of the name of a party over up to six elements. The container element for this will be 'NameFix'. </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="PrecedingTitle" type="dac6:StringMin1Max200_Type" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Excellency,Estate of the Late ...</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Title" type="dac6:StringMin1Max200_Type" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Greeting title. Example: Mr, Dr, Ms, Herr, etc.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="FirstName" type="dac6:StringMin1Max200_Type">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">First Name of the person</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MiddleName" type="dac6:StringMin1Max200_Type" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Middle name (essential part of the name for many nationalities). Example: Sakthi in "Nivetha Sakthi Shantha".</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="NamePrefix" type="dac6:StringMin1Max200_Type" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">de, van, van de, von, etc. Example: Derick de Clarke</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="LastName" type="dac6:StringMin1Max200_Type">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Last Name of the person. Use the attribute "NameType" to define what type this name is. In case of a company, this field can be used for the company name.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="GenerationIdentifier" type="dac6:StringMin1Max200_Type" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Jnr, Thr Third, III</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Suffix" type="dac6:StringMin1Max200_Type" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Abbreviation - PhD, VC, QC</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="GeneralSuffix" type="dac6:StringMin1Max200_Type" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Deceased, Retired ...</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!---->
+	<!-- Person or Organisation -->
+	<xsd:complexType name="PersonOrOrganisation_Type">
+		<xsd:sequence>
+			<xsd:choice>
+				<xsd:element name="Individual" type="dac6:Person_Type"/>
+				<xsd:element name="Organisation" type="dac6:Organisation_Type"/>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!---->
+	<!-- List of hallmarks of a Disclosure -->
+	<xsd:complexType name="ListHallmarks_Type">
+		<xsd:sequence>
+			<xsd:element name="Hallmark" type="dac6:HallmarkEnum_Type" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Top level types  ++++++++++++++++++++++++++++++++++++++++++++ -->
+	<!---->
+	<!-- Disclosing Person / Entity -->
+	<xsd:complexType name="Disclosing_Type">
+		<xsd:sequence>
+			<xsd:element name="ID" type="dac6:PersonOrOrganisation_Type"/>
+			<xsd:element name="Liability" type="dac6:Liability_Type" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- -->
+	<!--Reportable Tax Payer -->
+	<xsd:complexType name="TaxPayer">
+		<xsd:complexContent>
+			<xsd:extension base="dac6:TaxPayer_Type"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!---->
+	<!--Intermediaries -->
+	<xsd:complexType name="Intermediary">
+		<xsd:complexContent>
+			<xsd:extension base="dac6:Intermediary_Type"/>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- -->
+	<!-- Information within the knowledge of a taxpayer or intermediary -->
+	<xsd:complexType name="DisclosureInformation_Type">
+		<xsd:sequence>
+			<xsd:element name="ImplementingDate" type="xsd:date"/>
+			<xsd:element name="Reason" type="dac6:DisclosureReason_EnumType" minOccurs="0"/>
+			<xsd:element name="Summary" type="dac6:Summary_Type"/>
+			<xsd:element name="NationalProvision" type="dac6:StringMin1Max4000_Type" maxOccurs="unbounded"/>
+			<xsd:element name="Amount" type="dac6:Amount_Type"/>
+			<xsd:element name="ConcernedMSs" type="dac6:ConcernedMSs_Type"/>
+			<xsd:element name="MainBenefitTest1" type="xsd:boolean" default="false"/>
+			<xsd:element name="Hallmarks" type="dac6:Hallmarks_Type"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- -->
+	<!-- Hallmarks type - Defining the hallmarks of the disclosure and containing the additional information to be provided if DAC6D1Other is selected. -->
+	<xsd:complexType name="Hallmarks_Type">
+		<xsd:sequence>
+			<xsd:element name="ListHallmarks" type="dac6:ListHallmarks_Type"/>
+			<xsd:element name="DAC6D1OtherInfo" type="dac6:StringMin1Max4000_Type" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- -->
+	<!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Body type  ++++++++++++++++++++++++++++++++++++++++++++ -->
+	<!-- DAC6 Body Type  -->
+	<xsd:complexType name="DAC6Disclosure_Type">
+		<xsd:sequence>
+			<xsd:element name="DisclosureID" minOccurs="0">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:whiteSpace value="collapse"/>
+						<xsd:pattern value="[A-Z]{2}[D]([2]\d{3}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01]))([A-Z0-9]{6})"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:element>
+			<xsd:element name="DisclosureImportInstruction" type="dac6:DisclosureVersion_EnumType"/>
+			<xsd:element name="Disclosing" type="dac6:Discloser"/>
+			<xsd:element name="InitialDisclosureMA" type="xsd:boolean" default="false"/>
+			<xsd:element name="RelevantTaxPayers" type="dac6:RelevantTaxpayers_Type" minOccurs="0"/>
+			<xsd:element name="Intermediaries" type="dac6:Intermediaries_Type" minOccurs="0"/>
+			<xsd:element name="AffectedPersons" type="dac6:AffectedPersons_Type" minOccurs="0"/>
+			<xsd:element name="DisclosureInformation" type="dac6:DisclosureInformation_Type" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!--  -->
+	<!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Schema top element ++++++++++++++++++++++++++++++++++++++++++++ -->
+	<!-- DAC6 disclosure structure  -->
+	<xsd:element name="DAC6_Arrangement">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="Header" type="dac6:Header_Type"/>
+				<xsd:element name="ArrangementID" minOccurs="0">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:whiteSpace value="collapse"/>
+							<xsd:pattern value="[A-Z]{2}[A]([2]\d{3}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01]))([A-Z0-9]{6})"/>
+						</xsd:restriction>
+					</xsd:simpleType>
+				</xsd:element>
+				<xsd:element name="DAC6Disclosures" type="dac6:DAC6Disclosure_Type" maxOccurs="1"/>
+			</xsd:sequence>
+			<xsd:attribute name="version" type="xsd:string">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">DAC6 Version</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	<!---->
+	<xsd:complexType name="Intermediaries_Type">
+		<xsd:sequence>
+			<xsd:element name="Intermediary" type="dac6:Intermediary" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="AffectedPersons_Type">
+		<xsd:sequence>
+			<xsd:element name="AffectedPerson" type="dac6:AffectedPerson_Type" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="ConcernedMSs_Type">
+		<xsd:sequence>
+			<xsd:element name="ConcernedMS" type="iso:MSCountryCode_Type" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="RelevantTaxpayers_Type">
+		<xsd:sequence>
+			<xsd:element name="RelevantTaxpayer" type="dac6:TaxPayer_Type" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+</xsd:schema>
