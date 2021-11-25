@@ -32,6 +32,7 @@ class UploadFormControllerSpec extends SpecBase with BeforeAndAfterEach {
 
   val mockUploadSessionRepository: UploadSessionRepository =
     mock[UploadSessionRepository]
+
   val mockUploadProgressTracker: UploadProgressTracker =
     mock[UploadProgressTracker]
 

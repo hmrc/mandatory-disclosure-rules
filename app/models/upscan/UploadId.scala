@@ -27,7 +27,7 @@ object UploadId {
   def generate = UploadId(UUID.randomUUID().toString)
 
   implicit def queryBinder(implicit
-      stringBinder: QueryStringBindable[String]
+    stringBinder: QueryStringBindable[String]
   ): QueryStringBindable[UploadId] =
     stringBinder.transform(UploadId(_), _.value)
 

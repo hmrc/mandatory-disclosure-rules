@@ -33,6 +33,7 @@ lazy val microservice = Project(appName, file("."))
     libraryDependencies              ++= AppDependencies.compile ++ AppDependencies.test,
     scalafmtOnCompile in Compile := true,
     scalafmtOnCompile in Test := true,
+    scalafmtOnCompile in ThisBuild := true,
     scalacOptions ++= scalaCompilerOptions,
     // ***************
     // Use the silencer plugin to suppress warnings

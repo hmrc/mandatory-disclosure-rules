@@ -22,9 +22,9 @@ import play.api.libs.json._
 import java.time.Instant
 
 case class UpscanInitiateResponse(
-    fileReference: Reference,
-    postTarget: String,
-    formFields: Map[String, String]
+  fileReference: Reference,
+  postTarget: String,
+  formFields: Map[String, String]
 )
 
 object UpscanInitiateResponse {
@@ -36,6 +36,7 @@ case class Reference(value: String) extends AnyVal
 case class UploadForm(href: String, fields: Map[String, String])
 
 object Reference {
+
   implicit val referenceReader: Reads[Reference] =
     Reads.StringReads.map(Reference(_))
 
@@ -47,15 +48,15 @@ case class PreparedUpload(reference: Reference, uploadRequest: UploadForm) {
 
   def toUpscanInitiateResponse: UpscanInitiateResponse = {
     val fileReference = reference
-    val postTarget = uploadRequest.href
-    val formFields = uploadRequest.fields
+    val postTarget    = uploadRequest.href
+    val formFields    = uploadRequest.fields
     UpscanInitiateResponse(fileReference, postTarget, formFields)
   }
 }
 
 object PreparedUpload {
   implicit val uploadFormFormat: Format[UploadForm] = Json.format[UploadForm]
-  implicit val format: Format[PreparedUpload] = Json.format[PreparedUpload]
+  implicit val format: Format[PreparedUpload]       = Json.format[PreparedUpload]
 }
 
 sealed trait CallbackBody {
@@ -83,11 +84,11 @@ object CallbackBody {
 }
 
 case class UploadDetails(
-    uploadTimestamp: Instant,
-    checksum: String,
-    fileMimeType: String,
-    fileName: String,
-    size: Long
+  uploadTimestamp: Instant,
+  checksum: String,
+  fileMimeType: String,
+  fileName: String,
+  size: Long
 )
 
 object UploadDetails {
@@ -95,25 +96,24 @@ object UploadDetails {
 }
 
 case class ReadyCallbackBody(
-    reference: Reference,
-    downloadUrl: String,
-    uploadDetails: UploadDetails
+  reference: Reference,
+  downloadUrl: String,
+  uploadDetails: UploadDetails
 ) extends CallbackBody
 
 object ReadyCallbackBody {
   // must be in scope to create Reads for ReadyCallbackBody
 
-  implicit val writes: OWrites[ReadyCallbackBody] = OWrites {
-    readyCallbackBody =>
-      Json.obj(
-        "reference" -> Json.toJsFieldJsValueWrapper(
-          readyCallbackBody.reference
-        ),
-        "downloadUrl" -> readyCallbackBody.downloadUrl,
-        "uploadDetails" -> Json.toJsFieldJsValueWrapper(
-          readyCallbackBody.uploadDetails
-        )
+  implicit val writes: OWrites[ReadyCallbackBody] = OWrites { readyCallbackBody =>
+    Json.obj(
+      "reference" -> Json.toJsFieldJsValueWrapper(
+        readyCallbackBody.reference
+      ),
+      "downloadUrl" -> readyCallbackBody.downloadUrl,
+      "uploadDetails" -> Json.toJsFieldJsValueWrapper(
+        readyCallbackBody.uploadDetails
       )
+    )
   }
 
   implicit val reads: Reads[ReadyCallbackBody] = (
@@ -124,6 +124,6 @@ object ReadyCallbackBody {
 }
 
 case class FailedCallbackBody(
-    reference: Reference,
-    failureDetails: ErrorDetails
+  reference: Reference,
+  failureDetails: ErrorDetails
 ) extends CallbackBody
