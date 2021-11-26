@@ -18,7 +18,7 @@ package services.validation
 
 import models.validation._
 import play.api.Logging
-import schemas.{DAC6XMLSchema, XMLSchema}
+import schemas.XMLSchema
 import uk.gov.hmrc.http.HeaderCarrier
 
 import java.net.{ConnectException, URL}

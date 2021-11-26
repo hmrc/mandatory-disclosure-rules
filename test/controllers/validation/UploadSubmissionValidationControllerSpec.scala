@@ -17,27 +17,16 @@
 package controllers.validation
 
 import base.SpecBase
-import controllers.upscan.routes
-import models.validation.{
-  UploadSubmissionValidationFailure,
-  UploadSubmissionValidationInvalid,
-  UploadSubmissionValidationResult,
-  UploadSubmissionValidationSuccess,
-  ValidationErrors
-}
+import models.validation.{UploadSubmissionValidationFailure, UploadSubmissionValidationInvalid, UploadSubmissionValidationSuccess, ValidationErrors}
 import org.mockito.ArgumentMatchers.any
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.inject.bind
-import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import play.api.test.Helpers.POST
-import repositories.upscan.UploadSessionRepository
-import services.upscan.UploadProgressTracker
+import play.api.test.Helpers.{status, POST, _}
+import schemas.{DAC6XMLSchema, XMLSchema}
 import services.validation.UploadSubmissionValidationEngine
 import uk.gov.hmrc.http.HeaderCarrier
-import play.api.test.Helpers.{status, _}
-import schemas.{DAC6XMLSchema, XMLSchema}
 
 import scala.concurrent.{ExecutionContext, Future}
 
