@@ -7,7 +7,7 @@ val silencerVersion = "1.7.3"
 
 
 lazy val scalaCompilerOptions = Seq(
-  "-Xfatal-warnings",
+  //"-Xfatal-warnings",
   "-Xlint:-missing-interpolator,_",
   "-Yno-adapted-args",
   "-Ywarn-unused:imports",

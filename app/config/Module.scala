@@ -17,13 +17,17 @@
 package config
 
 import com.google.inject.AbstractModule
+import schemas.{DAC6XMLSchema, XMLSchema}
 import services.upscan.{MongoBackedUploadProgressTracker, UploadProgressTracker}
 
 class Module extends AbstractModule {
 
-  override def configure() = {
+  override def configure(): Unit = {
     bind(classOf[UploadProgressTracker]).to(
       classOf[MongoBackedUploadProgressTracker]
+    )
+    bind(classOf[XMLSchema]).to(
+      classOf[DAC6XMLSchema]
     )
     () //Suppress discarded non-unit value warning
   }
