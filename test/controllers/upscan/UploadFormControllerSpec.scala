@@ -17,15 +17,18 @@
 package controllers.upscan
 
 import base.SpecBase
-import models.upscan.{InProgress, Reference, UploadId, UploadSessionDetails}
+import models.upscan._
 import org.bson.types.ObjectId
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.inject.bind
+import play.api.libs.json.Json
 import play.api.test.FakeRequest
+import play.api.test.Helpers._
 import repositories.upscan.UploadSessionRepository
 import services.upscan.UploadProgressTracker
-import play.api.test.Helpers._
+
+import java.util.UUID
 import scala.concurrent.Future
 
 class UploadFormControllerSpec extends SpecBase with BeforeAndAfterEach {
@@ -43,6 +46,33 @@ class UploadFormControllerSpec extends SpecBase with BeforeAndAfterEach {
         bind[UploadSessionRepository].toInstance(mockUploadSessionRepository)
       )
       .build()
+
+  "requestUpload" - {
+    "must return Ok when valid details sent" in {
+
+      val uploadId    = UploadId(UUID.randomUUID().toString)
+      val identifiers = UpscanIdentifiers(uploadId, Reference("xxxx"))
+
+      val request =
+        FakeRequest(POST, routes.UploadFormController.requestUpload().url).withJsonBody(Json.toJson(identifiers))
+
+      when(mockUploadProgressTracker.requestUpload(identifiers.uploadId, identifiers.fileReference)).thenReturn(Future.successful(true))
+
+      val result = route(application, request).value
+
+      status(result) mustEqual OK
+    }
+    "must return Bad_Request when invalid details sent" in {
+
+      val json = Json.parse("""{"aString": "a"}""")
+      val request =
+        FakeRequest(POST, routes.UploadFormController.requestUpload().url).withJsonBody(json)
+
+      val result = route(application, request).value
+
+      status(result) mustEqual BAD_REQUEST
+    }
+  }
 
   "getDetails" - {
     "must return ok with status" in {

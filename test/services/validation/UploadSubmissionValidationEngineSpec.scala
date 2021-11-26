@@ -17,17 +17,18 @@
 package services.validation
 
 import base.SpecBase
-import models.validation.{UploadSubmissionValidationFailure, UploadSubmissionValidationSuccess, ValidationErrors}
+import models.validation.{UploadSubmissionValidationFailure, UploadSubmissionValidationInvalid, UploadSubmissionValidationSuccess, ValidationErrors}
 import org.codehaus.stax2.validation.XMLValidationSchema
 import org.mockito.ArgumentMatchers.any
+import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.inject.bind
 import schemas.{DAC6XMLSchema, XMLSchema}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import java.net.URL
+import java.net.{ConnectException, URL}
 
-class UploadSubmissionValidationEngineSpec extends SpecBase {
+class UploadSubmissionValidationEngineSpec extends SpecBase with BeforeAndAfterEach {
 
   val mockXmlValidation = mock[XMLValidator]
   val mockXMLSchema     = mock[DAC6XMLSchema]
@@ -39,6 +40,11 @@ class UploadSubmissionValidationEngineSpec extends SpecBase {
         bind[XMLSchema].toInstance(mockXMLSchema)
       )
       .build()
+
+  override def beforeEach(): Unit = {
+    reset(mockXmlValidation)
+    reset(mockXMLSchema)
+  }
 
   val uploadSubmissionValidationEngine: UploadSubmissionValidationEngine = application.injector.instanceOf[UploadSubmissionValidationEngine]
 
@@ -77,7 +83,29 @@ class UploadSubmissionValidationEngineSpec extends SpecBase {
 
     }
   }
+
   //ToDo implement when errors are implemented
-  "must return UploadSubmissionValidationInvalid otherwise" in {}
+  "must return UploadSubmissionValidationInvalid otherwise" ignore {}
+
+  "must return UploadSubmissionValidationInvalid when unknown exception occurs" in {
+
+    val url = "http:/localhost/"
+
+    when(mockXmlValidation.validateSchema(any[URL], any[XMLValidationSchema])).thenThrow(new RuntimeException())
+
+    val result = uploadSubmissionValidationEngine.validateUploadSubmission(Some(url))
+
+    result.futureValue mustBe Some(UploadSubmissionValidationInvalid())
+  }
+
+  "must return None when a ConnectionException occurs" in {
+    val url = "http:/localhost/"
+
+    when(mockXmlValidation.validateSchema(any[URL], any[XMLValidationSchema])).thenThrow(new ConnectException())
+
+    val result = uploadSubmissionValidationEngine.validateUploadSubmission(Some(url))
+
+    result.futureValue mustBe None
+  }
 
 }

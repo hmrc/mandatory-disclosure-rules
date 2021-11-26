@@ -57,19 +57,12 @@ class MongoBackedUploadProgressTracker @Inject() (
   override def registerUploadResult(
     fileReference: Reference,
     uploadStatus: UploadStatus
-  ): Future[Boolean] = {
-    logger.debug(
-      "In the register " + fileReference.toString + "   " + uploadStatus.toString
-    )
+  ): Future[Boolean] =
     repository.updateStatus(fileReference, uploadStatus)
-  }
 
-  override def getUploadResult(id: UploadId): Future[Option[UploadStatus]] = {
-    logger.debug("Getting the upload result from the database")
+  override def getUploadResult(id: UploadId): Future[Option[UploadStatus]] =
     for (result <- repository.findByUploadId(id)) yield result map { x =>
-      logger.debug("The status is " + x.status)
       x.status
     }
-  }
 
 }
