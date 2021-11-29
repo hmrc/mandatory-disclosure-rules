@@ -16,7 +16,6 @@
 
 package schemas
 
-import com.google.inject.ImplementedBy
 import org.codehaus.stax2.validation.{XMLValidationSchema, XMLValidationSchemaFactory}
 
 import java.io.File
