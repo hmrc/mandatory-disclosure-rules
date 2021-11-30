@@ -25,10 +25,8 @@ import scala.concurrent.Future
 class UpscanCallbackDispatcher @Inject() (sessionStorage: UploadProgressTracker) extends Logging {
 
   def handleCallback(callback: CallbackBody): Future[Boolean] = {
-    logger.debug("\n\nHandling the callback\n\n")
     val uploadStatus = callback match {
       case s: ReadyCallbackBody =>
-        logger.debug(s"ReadyCallbackBody: $s")
         UploadedSuccessfully(
           s.uploadDetails.fileName,
           s.uploadDetails.fileMimeType,
@@ -36,13 +34,13 @@ class UpscanCallbackDispatcher @Inject() (sessionStorage: UploadProgressTracker)
           Some(s.uploadDetails.size)
         )
       case s: FailedCallbackBody if s.failureDetails.failureReason == "QUARANTINE" =>
-        logger.debug(s"FailedCallbackBody, QUARANTINE: $s")
+        logger.warn(s"FailedCallbackBody, QUARANTINE: $s")
         Quarantined
       case s: FailedCallbackBody if s.failureDetails.failureReason == "REJECTED" =>
-        logger.debug(s"FailedCallbackBody, REJECTED: $s")
+        logger.warn(s"FailedCallbackBody, REJECTED: $s")
         UploadRejected(s.failureDetails)
       case f: FailedCallbackBody =>
-        logger.debug(s"FailedCallbackBody: $f")
+        logger.warn(s"FailedCallbackBody: $f")
         Failed
     }
     sessionStorage.registerUploadResult(callback.reference, uploadStatus)

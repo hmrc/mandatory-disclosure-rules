@@ -17,10 +17,12 @@
 package repositories.upscan
 
 import base.SpecBase
-import models.upscan.{Quarantined, Reference, UploadId, UploadSessionDetails}
+import models.upscan.{Failed, Quarantined, Reference, UploadId, UploadSessionDetails}
 import org.bson.types.ObjectId
 
 import java.util.UUID
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationInt
 
 class UploadSessionRepositorySpec extends SpecBase {
   lazy val uploadRep = app.injector.instanceOf[UploadSessionRepository]
@@ -54,6 +56,12 @@ class UploadSessionRepositorySpec extends SpecBase {
           result.status mustBe (uploadDetails.status)
         case _ => true
       }
+    }
+  }
+  "Update" - {
+    "must update a status" in {
+      val result1: Boolean = Await.result(uploadRep.updateStatus(Reference("xxxx"), Failed), 5.seconds)
+      result1 mustBe true
     }
   }
 }
