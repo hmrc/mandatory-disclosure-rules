@@ -5,4 +5,4 @@ GET        /upscan/details/:uploadId                    controllers.upscan.Uploa
 GET        /upscan/status/:uploadId                     controllers.upscan.UploadFormController.getStatus(uploadId: String)
 POST       /upscan/upload                               controllers.upscan.UploadFormController.requestUpload
 
-POST       /validate-upload-submission                  controllers.validation.SubmissionValidationController.validateSubmission
+POST       /validate-submission                  controllers.validation.SubmissionValidationController.validateSubmission
