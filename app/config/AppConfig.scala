@@ -34,4 +34,11 @@ class AppConfig @Inject() (
     config.get[String]("microservice.metrics.graphite.host")
 
   val maxValidationErrors: Int = config.get[Int]("xml.validation.max-errors")
+
+  def baseUrl(serviceName: String): String =
+    s"${servicesConfig.baseUrl(serviceName)}${servicesConfig.getString(s"microservice.services.$serviceName.context")}"
+
+  val bearerToken: String => String = (serviceName: String) => config.get[String](s"microservice.services.$serviceName.bearer-token")
+  val environment: String => String = (serviceName: String) => config.get[String](s"microservice.services.$serviceName.environment")
+
 }
