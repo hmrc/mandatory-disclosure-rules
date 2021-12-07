@@ -16,31 +16,25 @@
 
 package services.validation
 
+import helpers.XmlErrorMessageHelper
 import models.validation._
 import play.api.Logging
-import schemas.XMLSchema
-import uk.gov.hmrc.http.HeaderCarrier
 
-import java.net.{ConnectException, URL}
+import java.net.ConnectException
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
-class UploadSubmissionValidationEngine @Inject() (xmlValidator: XMLValidator, xmlSchema: XMLSchema) extends Logging {
+class SubmissionValidationEngine @Inject() (xmlValidationService: XMLValidationService, xmlErrorMessageHelper: XmlErrorMessageHelper) extends Logging {
 
-  def validateUploadSubmission(upScanUrl: Option[String])(implicit
-    hc: HeaderCarrier,
-    ec: ExecutionContext
-  ): Future[Option[UploadSubmissionValidationResult]] = {
+  def validateUploadSubmission(upScanUrl: Option[String]): Future[Option[UploadSubmissionValidationResult]] = {
 
     val xmlUrl = upScanUrl.fold(throw new Exception("Unable to retrieve XML from Upscan URL"))(xmlLocation => xmlLocation)
 
     try performXmlValidation(xmlUrl) match {
       case Seq() =>
         Future.successful(Some(UploadSubmissionValidationSuccess(true)))
-      case errors: Seq[String] =>
+      case errors =>
         Future.successful(Some(UploadSubmissionValidationFailure(ValidationErrors(errors))))
-      case _ =>
-        Future.successful(Some(UploadSubmissionValidationInvalid())) //ToDo not yet implemented in this skeleton
     } catch {
       case e: ConnectException =>
         logger.warn(s"XML parsing failed. The XML parser has thrown the exception: $e")
@@ -51,16 +45,8 @@ class UploadSubmissionValidationEngine @Inject() (xmlValidator: XMLValidator, xm
     }
   }
 
-  def performXmlValidation(xmlUrl: String): Seq[String] = {
-
-    //ToDo update when errors finalised
-    val xmlErrors = xmlValidator.validateSchema(new URL(xmlUrl), xmlSchema.xmlValidationSchema)
-
-    if (xmlErrors.hasErrors || xmlErrors.hasFatalErrors || xmlErrors.hasWarnings) {
-      xmlErrors.errorsCollection ++ xmlErrors.fatalErrorsCollection ++ xmlErrors.warningsCollection
-    } else {
-      Nil
-    }
+  def performXmlValidation(xmlURL: String): Seq[GenericError] = {
+    val xmlErrors = xmlValidationService.validateXML(xmlURL)
+    if (xmlErrors.isEmpty) Seq() else xmlErrorMessageHelper.generateErrorMessages(xmlErrors)
   }
-
 }

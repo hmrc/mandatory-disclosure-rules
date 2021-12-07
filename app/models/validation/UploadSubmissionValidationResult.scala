@@ -16,7 +16,7 @@
 
 package models.validation
 
-import play.api.libs.json.{Format, JsResult, JsValue, Json, OFormat}
+import play.api.libs.json._
 
 sealed trait UploadSubmissionValidationResult
 
@@ -38,7 +38,7 @@ object UploadSubmissionValidationResult {
   }
 }
 
-case class ValidationErrors(errors: Seq[String]) //ToDo change to proper error class when errors agreed
+case class ValidationErrors(errors: Seq[GenericError])
 
 object ValidationErrors {
   implicit val format = Json.format[ValidationErrors]

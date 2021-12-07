@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package config
+package models.validation
 
-import com.google.inject.AbstractModule
-import services.upscan.{MongoBackedUploadProgressTracker, UploadProgressTracker}
+import play.api.libs.json.{Json, OFormat}
 
-class Module extends AbstractModule {
+case class GenericError(lineNumber: Int, messageKey: String)
 
-  override def configure(): Unit =
-    bind(classOf[UploadProgressTracker]).to(classOf[MongoBackedUploadProgressTracker])
+object GenericError {
+
+  implicit def orderByLineNumber[A <: GenericError]: Ordering[A] =
+    Ordering.by(ge => (ge.lineNumber, ge.messageKey))
+
+  implicit val format: OFormat[GenericError] = Json.format[GenericError]
 }

@@ -17,29 +17,25 @@
 package controllers.validation
 
 import base.SpecBase
-import models.validation.{UploadSubmissionValidationFailure, UploadSubmissionValidationInvalid, UploadSubmissionValidationSuccess, ValidationErrors}
+import models.validation._
 import org.mockito.ArgumentMatchers.any
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{status, POST, _}
-import schemas.{DAC6XMLSchema, XMLSchema}
-import services.validation.UploadSubmissionValidationEngine
-import uk.gov.hmrc.http.HeaderCarrier
+import services.validation.SubmissionValidationEngine
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
-class UploadSubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEach {
+class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEach {
 
-  val mockUploadSubmissionValidationEngine = mock[UploadSubmissionValidationEngine]
-  val mockXMLSChema                        = mock[DAC6XMLSchema]
+  val mockUploadSubmissionValidationEngine = mock[SubmissionValidationEngine]
 
   val application: Application =
     applicationBuilder()
       .overrides(
-        bind[UploadSubmissionValidationEngine].toInstance(mockUploadSubmissionValidationEngine),
-        bind[XMLSchema].toInstance(mockXMLSChema)
+        bind[SubmissionValidationEngine].toInstance(mockUploadSubmissionValidationEngine)
       )
       .build()
 
@@ -47,10 +43,10 @@ class UploadSubmissionValidationControllerSpec extends SpecBase with BeforeAndAf
 
     "must return 200 and a sequence of errors when a validation error occurs" in {
 
-      when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[Option[String]]())(any[HeaderCarrier](), any[ExecutionContext]()))
-        .thenReturn(Future.successful(Some(UploadSubmissionValidationFailure(ValidationErrors(Seq("Error1", "Error2"))))))
+      when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[Option[String]]()))
+        .thenReturn(Future.successful(Some(UploadSubmissionValidationFailure(ValidationErrors(Seq(GenericError(1, "Error2")))))))
 
-      val request = FakeRequest(POST, routes.UploadSubmissionValidationController.validateUploadSubmission().url)
+      val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url)
       val result  = route(application, request).value
 
       status(result) mustBe OK
@@ -58,30 +54,30 @@ class UploadSubmissionValidationControllerSpec extends SpecBase with BeforeAndAf
     }
 
     "must return 200 and Validation success object " in {
-      when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[Option[String]]())(any[HeaderCarrier](), any[ExecutionContext]()))
+      when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[Option[String]]()))
         .thenReturn(Future.successful(Some(UploadSubmissionValidationSuccess(true))))
 
-      val request = FakeRequest(POST, routes.UploadSubmissionValidationController.validateUploadSubmission().url)
+      val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url)
       val result  = route(application, request).value
 
       status(result) mustBe OK
     }
 
     "must return 400 and a bad request when validation fails" in {
-      when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[Option[String]]())(any[HeaderCarrier](), any[ExecutionContext]()))
+      when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[Option[String]]()))
         .thenReturn(Future.successful(Some(UploadSubmissionValidationInvalid())))
 
-      val request = FakeRequest(POST, routes.UploadSubmissionValidationController.validateUploadSubmission().url)
+      val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url)
       val result  = route(application, request).value
 
       status(result) mustBe BAD_REQUEST
     }
 
     "must return 400 and a bad request when None returns from validation engine" in {
-      when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[Option[String]]())(any[HeaderCarrier](), any[ExecutionContext]()))
+      when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[Option[String]]()))
         .thenReturn(Future.successful(None))
 
-      val request = FakeRequest(POST, routes.UploadSubmissionValidationController.validateUploadSubmission().url)
+      val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url)
       val result  = route(application, request).value
 
       status(result) mustBe BAD_REQUEST
