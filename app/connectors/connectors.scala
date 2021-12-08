@@ -69,10 +69,10 @@ package object connectors {
     }
 
     def withContentType(value: Option[String] = None): Seq[(String, String)] =
-      seq :+ ("content-type" -> value.getOrElse("application/xml"))
+      seq :+ ("content-type" -> value.getOrElse("application/json"))
 
     def withAccept(value: Option[String] = None): Seq[(String, String)] =
-      seq :+ ("accept" -> value.getOrElse("application/xml"))
+      seq :+ ("accept" -> value.getOrElse("application/json"))
 
     def withEnvironment(value: Option[String] = None): Seq[(String, String)] =
       seq :+ ("Environment" -> s"${value.getOrElse("")}")
