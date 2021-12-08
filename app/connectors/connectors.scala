@@ -30,8 +30,7 @@
  * limitations under the License.
  */
 
-import config.AppConfig
-import uk.gov.hmrc.http.{Authorization, HeaderCarrier, HeaderNames, HttpReads, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpReads, HttpResponse}
 
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -46,10 +45,10 @@ package object connectors {
 
   implicit class SeqOps(val seq: Seq[(String, String)]) {
 
-    def withBearerToken(bearerToken: String)(implicit headerCarrier: HeaderCarrier): Seq[(String, String)] =
+    def withBearerToken(bearerToken: String): Seq[(String, String)] =
       seq :+ (HeaderNames.authorisation -> s"Bearer $bearerToken")
 
-    def withXForwardedHost(value: Option[String] = None)(implicit headerCarrier: HeaderCarrier): Seq[(String, String)] =
+    def withXForwardedHost(value: Option[String] = None): Seq[(String, String)] =
       seq :+ ("x-forwarded-host" -> s"${value.getOrElse("mdtp")}")
 
     def withXCorrelationId(value: Option[String] = None)(implicit headerCarrier: HeaderCarrier): Seq[(String, String)] = {
@@ -62,20 +61,20 @@ package object connectors {
       seq :+ ("x-conversation-id" -> s"$xConversationId")
     }
 
-    def withDate(value: Option[String] = None)(implicit headerCarrier: HeaderCarrier): Seq[(String, String)] = {
+    def withDate(value: Option[String] = None): Seq[(String, String)] = {
       //HTTP-date format defined by RFC 7231 e.g. Fri, 01 Aug 2020 15:51:38 GMT+1
       val formatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss O")
       val date      = ZonedDateTime.now().format(formatter)
       seq :+ ("date" -> s"${value.getOrElse(date)}")
     }
 
-    def withContentType(value: Option[String] = None)(implicit headerCarrier: HeaderCarrier): Seq[(String, String)] =
+    def withContentType(value: Option[String] = None): Seq[(String, String)] =
       seq :+ ("content-type" -> value.getOrElse("application/xml"))
 
-    def withAccept(value: Option[String] = None)(implicit headerCarrier: HeaderCarrier): Seq[(String, String)] =
+    def withAccept(value: Option[String] = None): Seq[(String, String)] =
       seq :+ ("accept" -> value.getOrElse("application/xml"))
 
-    def withEnvironment(value: Option[String] = None)(implicit headerCarrier: HeaderCarrier): Seq[(String, String)] =
+    def withEnvironment(value: Option[String] = None): Seq[(String, String)] =
       seq :+ ("Environment" -> s"${value.getOrElse("")}")
 
   }
