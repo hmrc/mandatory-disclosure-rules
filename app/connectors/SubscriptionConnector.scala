@@ -44,7 +44,6 @@ class SubscriptionConnector @Inject() (
       .withAccept(Some("application/json"))
       .withEnvironment(Some(config.environment(serviceName)))
     logger.info(s"ExtraHeaders size = ${extraHeaders.size}")
-    logger.debug(s"ExtraHeaders = $extraHeaders")
 
     http.POST[DisplaySubscriptionForMDRRequest, HttpResponse](
       config.serviceUrl(serviceName),
