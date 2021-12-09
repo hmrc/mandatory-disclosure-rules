@@ -16,44 +16,33 @@
 
 package connectors
 
-import com.google.inject.Inject
 import config.AppConfig
-import models.subscription.DisplaySubscriptionForMDRRequest
 import play.api.Logging
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.xml.NodeSeq
 
-class SubscriptionConnector @Inject() (
+class SubmissionConnector @Inject() (
   val config: AppConfig,
-  val http: HttpClient
-) extends Logging {
+  http: HttpClient
+)(implicit ec: ExecutionContext)
+    extends Logging {
 
-  def readSubscriptionInformation(
-    subscription: DisplaySubscriptionForMDRRequest
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
-    val serviceName = "read-subscription"
-
+  def submitDisclosure(submission: NodeSeq)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
+    val serviceName = "submission"
     val extraHeaders = Seq()
       .withBearerToken(s"${config.bearerToken}")
       .withXForwardedHost()
       .withDate()
       .withXCorrelationId()
       .withXConversationId()
-      .withContentType(Some("application/json"))
-      .withAccept(Some("application/json"))
+      .withContentType(Some("application/xml"))
+      .withAccept(Some("application/xml"))
       .withEnvironment(Some(config.environment(serviceName)))
     logger.info(s"ExtraHeaders size = ${extraHeaders.size}")
-
-    http.POST[DisplaySubscriptionForMDRRequest, HttpResponse](
-      config.serviceUrl(serviceName),
-      subscription,
-      headers = extraHeaders
-    )(
-      wts = DisplaySubscriptionForMDRRequest.format,
-      rds = httpReads,
-      hc = hc,
-      ec = ec
-    )
+    http.POSTString[HttpResponse](config.serviceUrl(serviceName), submission.mkString, extraHeaders)(implicitly, hc, ec)
   }
+
 }
