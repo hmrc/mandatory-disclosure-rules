@@ -28,19 +28,19 @@ import scala.xml.Elem
 
 class SubmissionValidationEngine @Inject() (xmlValidationService: XMLValidationService, xmlErrorMessageHelper: XmlErrorMessageHelper) extends Logging {
 
-  def validateUploadSubmission(upScanUrl: Option[String]): Future[Option[UploadSubmissionValidationResult]] =
+  def validateUploadSubmission(upScanUrl: Option[String]): Future[Option[SubmissionValidationResult]] =
     try performXmlValidation(upScanUrl) match {
       case None =>
-        Future.successful(Some(UploadSubmissionValidationSuccess(true)))
+        Future.successful(Some(SubmissionValidationSuccess(true)))
       case Some(errors) =>
-        Future.successful(Some(UploadSubmissionValidationFailure(ValidationErrors(errors))))
+        Future.successful(Some(SubmissionValidationFailure(ValidationErrors(errors))))
     } catch {
       case e: ConnectException =>
         logger.warn(s"XML parsing failed. The XML parser has thrown the exception: $e")
         Future.successful(None)
       case e: Exception =>
         logger.warn(s"XML parsing failed. The XML parser has thrown the exception: $e")
-        Future.successful(Some(UploadSubmissionValidationInvalid()))
+        Future.successful(Some(SubmissionValidationInvalid()))
     }
 
   def performXmlValidation(upScanUrl: Option[String]): Option[Seq[GenericError]] = {

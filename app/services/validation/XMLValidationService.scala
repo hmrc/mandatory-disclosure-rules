@@ -17,7 +17,6 @@
 package services.validation
 
 import com.google.inject.ImplementedBy
-import config.AppConfig
 import models.validation.SaxParseError
 import org.xml.sax.SAXParseException
 import org.xml.sax.helpers.DefaultHandler
@@ -30,8 +29,8 @@ import javax.xml.transform.Source
 import javax.xml.transform.stream.StreamSource
 import javax.xml.validation.{Schema, SchemaFactory}
 import scala.collection.mutable.ListBuffer
-import scala.xml.{Elem, NodeSeq}
 import scala.xml.factory.XMLLoader
+import scala.xml.{Elem, NodeSeq}
 
 class XMLValidationService @Inject() (xmlValidatingParser: SaxParser) {
 

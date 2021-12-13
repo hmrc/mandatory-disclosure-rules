@@ -23,7 +23,7 @@ import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{status, POST, _}
+import play.api.test.Helpers.{POST, status, _}
 import services.validation.SubmissionValidationEngine
 
 import scala.concurrent.Future
@@ -44,7 +44,7 @@ class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEac
     "must return 200 and a sequence of errors when a validation error occurs" in {
 
       when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[Option[String]]()))
-        .thenReturn(Future.successful(Some(UploadSubmissionValidationFailure(ValidationErrors(Seq(GenericError(1, "Error2")))))))
+        .thenReturn(Future.successful(Some(SubmissionValidationFailure(ValidationErrors(Seq(GenericError(1, "Error2")))))))
 
       val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url)
       val result  = route(application, request).value
@@ -55,7 +55,7 @@ class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEac
 
     "must return 200 and Validation success object " in {
       when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[Option[String]]()))
-        .thenReturn(Future.successful(Some(UploadSubmissionValidationSuccess(true))))
+        .thenReturn(Future.successful(Some(SubmissionValidationSuccess(true))))
 
       val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url)
       val result  = route(application, request).value
@@ -65,7 +65,7 @@ class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEac
 
     "must return 400 and a bad request when validation fails" in {
       when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[Option[String]]()))
-        .thenReturn(Future.successful(Some(UploadSubmissionValidationInvalid())))
+        .thenReturn(Future.successful(Some(SubmissionValidationInvalid())))
 
       val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url)
       val result  = route(application, request).value
