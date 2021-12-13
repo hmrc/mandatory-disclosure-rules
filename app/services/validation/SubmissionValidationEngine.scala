@@ -22,15 +22,14 @@ import play.api.Logging
 
 import java.net.ConnectException
 import javax.inject.Inject
+import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
+import scala.xml.Elem
 
 class SubmissionValidationEngine @Inject() (xmlValidationService: XMLValidationService, xmlErrorMessageHelper: XmlErrorMessageHelper) extends Logging {
 
-  def validateUploadSubmission(upScanUrl: Option[String]): Future[Option[UploadSubmissionValidationResult]] = {
-
-    val xmlUrl = upScanUrl.fold(throw new Exception("Unable to retrieve XML from Upscan URL"))(xmlLocation => xmlLocation)
-
-    try performXmlValidation(xmlUrl) match {
+  def validateUploadSubmission(upScanUrl: Option[String]): Future[Option[UploadSubmissionValidationResult]] =
+    try performXmlValidation(upScanUrl) match {
       case None =>
         Future.successful(Some(UploadSubmissionValidationSuccess(true)))
       case Some(errors) =>
@@ -43,10 +42,9 @@ class SubmissionValidationEngine @Inject() (xmlValidationService: XMLValidationS
         logger.warn(s"XML parsing failed. The XML parser has thrown the exception: $e")
         Future.successful(Some(UploadSubmissionValidationInvalid()))
     }
-  }
 
-  def performXmlValidation(xmlURL: String): Option[Seq[GenericError]] = {
-    val xmlErrors = xmlValidationService.validateXML(xmlURL)
-    if (xmlErrors.isEmpty) None else Some(xmlErrorMessageHelper.generateErrorMessages(xmlErrors))
+  def performXmlValidation(upScanUrl: Option[String]): Option[Seq[GenericError]] = {
+    val xmlOrErrors: Either[ListBuffer[SaxParseError], Elem] = xmlValidationService.validateXML(upScanUrl)
+    xmlOrErrors.fold(list => Some(xmlErrorMessageHelper.generateErrorMessages(list)), _ => None)
   }
 }

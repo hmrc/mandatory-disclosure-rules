@@ -26,7 +26,7 @@ import javax.xml.parsers.SAXParserFactory
 import javax.xml.transform.stream.StreamSource
 import javax.xml.validation.{Schema, SchemaFactory}
 import scala.collection.mutable.ListBuffer
-import scala.io.Source
+import scala.xml.XML
 
 class XmlValidationServiceSpec extends SpecBase {
   val noErrors: ListBuffer[SaxParseError] = ListBuffer()
@@ -72,33 +72,27 @@ class XmlValidationServiceSpec extends SpecBase {
       <will>not validate</will>
       </this>
 
-      val result = service.validateSubmission(invalid.mkString)
+      val result = service.validateXML(None, Some(invalid))
 
       result.isLeft mustBe true
     }
 
     "must correctly invalidate a submission with a data problem" in {
       val service = app.injector.instanceOf[XMLValidationService]
-      val validsubmission =
-        Source
-          .fromInputStream(getClass.getResourceAsStream("/invalid.xml"))
-          .getLines
-          .mkString("\n")
 
-      val result = service.validateSubmission(validsubmission)
+      val validSubmission = XML.loadFile("test/resources/invalid.xml")
+
+      val result = service.validateXML(None, Some(validSubmission))
 
       result.isLeft mustBe true
     }
 
     "must correctly validate a submission" in {
       val service = app.injector.instanceOf[XMLValidationService]
-      val validsubmission =
-        Source
-          .fromInputStream(getClass.getResourceAsStream("/valid.xml"))
-          .getLines
-          .mkString("\n")
 
-      val result = service.validateSubmission(validsubmission)
+      val validSubmission = XML.loadFile("test/resources/valid.xml")
+
+      val result = service.validateXML(None, Some(validSubmission))
 
       result.isLeft mustBe false
     }
