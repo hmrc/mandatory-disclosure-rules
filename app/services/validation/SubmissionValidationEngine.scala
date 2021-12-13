@@ -31,9 +31,9 @@ class SubmissionValidationEngine @Inject() (xmlValidationService: XMLValidationS
     val xmlUrl = upScanUrl.fold(throw new Exception("Unable to retrieve XML from Upscan URL"))(xmlLocation => xmlLocation)
 
     try performXmlValidation(xmlUrl) match {
-      case Seq() =>
+      case None =>
         Future.successful(Some(UploadSubmissionValidationSuccess(true)))
-      case errors =>
+      case Some(errors) =>
         Future.successful(Some(UploadSubmissionValidationFailure(ValidationErrors(errors))))
     } catch {
       case e: ConnectException =>
@@ -45,8 +45,8 @@ class SubmissionValidationEngine @Inject() (xmlValidationService: XMLValidationS
     }
   }
 
-  def performXmlValidation(xmlURL: String): Seq[GenericError] = {
+  def performXmlValidation(xmlURL: String): Option[Seq[GenericError]] = {
     val xmlErrors = xmlValidationService.validateXML(xmlURL)
-    if (xmlErrors.isEmpty) Seq() else xmlErrorMessageHelper.generateErrorMessages(xmlErrors)
+    if (xmlErrors.isEmpty) None else Some(xmlErrorMessageHelper.generateErrorMessages(xmlErrors))
   }
 }
