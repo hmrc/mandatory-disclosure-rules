@@ -18,6 +18,7 @@ package services.validation
 
 import helpers.XmlErrorMessageHelper
 import models.validation._
+import org.xml.sax.SAXParseException
 import play.api.Logging
 
 import java.net.ConnectException
@@ -35,12 +36,12 @@ class SubmissionValidationEngine @Inject() (xmlValidationService: XMLValidationS
       case Some(errors) =>
         Future.successful(Some(SubmissionValidationFailure(ValidationErrors(errors))))
     } catch {
+      case e: SAXParseException =>
+        logger.warn(s"XML parsing failed. The XML parser has thrown the exception: $e")
+        Future.successful(Some(InvalidXmlError(e.getMessage)))
       case e: ConnectException =>
-        logger.warn(s"XML parsing failed. The XML parser has thrown the exception: $e")
+        logger.warn(s"Connection timed out with exception: $e")
         Future.successful(None)
-      case e: Exception =>
-        logger.warn(s"XML parsing failed. The XML parser has thrown the exception: $e")
-        Future.successful(Some(SubmissionValidationInvalid()))
     }
 
   def performXmlValidation(upScanUrl: Option[String]): Option[Seq[GenericError]] = {

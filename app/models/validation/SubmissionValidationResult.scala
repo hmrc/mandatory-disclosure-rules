@@ -24,15 +24,12 @@ object SubmissionValidationResult {
   implicit val validationWrites: Format[SubmissionValidationResult] = new Format[SubmissionValidationResult] {
 
     override def reads(json: JsValue): JsResult[SubmissionValidationResult] =
-      json
-        .validate[SubmissionValidationSuccess]
-        .orElse(
-          json.validate[SubmissionValidationFailure]
-        )
+      json.validate[SubmissionValidationSuccess].orElse(json.validate[SubmissionValidationFailure])
 
     override def writes(o: SubmissionValidationResult): JsValue = o match {
       case m @ SubmissionValidationSuccess(_) => SubmissionValidationSuccess.format.writes(m)
       case m @ SubmissionValidationFailure(_) => SubmissionValidationFailure.format.writes(m)
+
     }
   }
 }
@@ -51,8 +48,10 @@ object SubmissionValidationSuccess {
 
 case class SubmissionValidationFailure(validationErrors: ValidationErrors) extends SubmissionValidationResult
 
-case class SubmissionValidationInvalid() extends SubmissionValidationResult
-
 object SubmissionValidationFailure {
   implicit val format: OFormat[SubmissionValidationFailure] = Json.format[SubmissionValidationFailure]
+}
+
+case class InvalidXmlError(saxException: String) extends SubmissionValidationResult {
+  override def toString: String = s"Invalid XML - $saxException"
 }

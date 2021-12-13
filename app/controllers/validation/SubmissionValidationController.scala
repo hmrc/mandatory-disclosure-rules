@@ -16,7 +16,7 @@
 
 package controllers.validation
 
-import models.validation.{SubmissionValidationFailure, SubmissionValidationInvalid, SubmissionValidationSuccess}
+import models.validation.{InvalidXmlError, SubmissionValidationFailure, SubmissionValidationSuccess}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import services.validation.SubmissionValidationEngine
@@ -32,15 +32,15 @@ class SubmissionValidationController @Inject() (
     extends BackendController(cc) {
 
   def validateSubmission: Action[AnyContent] = Action.async { implicit request =>
-    validationEngine.validateUploadSubmission(request.body.asText) map {
+    try validationEngine.validateUploadSubmission(request.body.asText) map {
       case Some(SubmissionValidationSuccess(_)) =>
         Ok(Json.toJsObject(SubmissionValidationSuccess(true)))
 
       case Some(SubmissionValidationFailure(errors)) =>
         Ok(Json.toJson(SubmissionValidationFailure(errors)))
 
-      case Some(SubmissionValidationInvalid()) =>
-        BadRequest("Invalid XML")
+      case Some(InvalidXmlError(saxException)) =>
+        BadRequest(InvalidXmlError(saxException).toString)
 
       case None =>
         BadRequest("Service unavailable")

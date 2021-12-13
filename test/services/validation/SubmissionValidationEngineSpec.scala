@@ -20,6 +20,7 @@ import base.SpecBase
 import helpers.XmlErrorMessageHelper
 import models.validation._
 import org.mockito.ArgumentMatchers.any
+import org.xml.sax.SAXParseException
 import play.api.inject.bind
 
 import scala.collection.mutable.ListBuffer
@@ -268,13 +269,6 @@ class SubmissionValidationEngineSpec extends SpecBase {
       Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe Some(
         SubmissionValidationFailure(ValidationErrors(expectedErrors))
       )
-    }
-
-    "must return UploadSubmissionValidationInvalid when xml parsing fails and audit failure" in new SetUp {
-      val exception = new RuntimeException
-      when(mockXmlValidationService.validateXML(any(), any())).thenThrow(exception)
-
-      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe Some(SubmissionValidationInvalid())
     }
   }
 }

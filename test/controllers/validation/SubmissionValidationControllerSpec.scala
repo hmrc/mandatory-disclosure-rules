@@ -23,7 +23,7 @@ import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{POST, status, _}
+import play.api.test.Helpers.{status, POST, _}
 import services.validation.SubmissionValidationEngine
 
 import scala.concurrent.Future
@@ -65,7 +65,7 @@ class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEac
 
     "must return 400 and a bad request when validation fails" in {
       when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[Option[String]]()))
-        .thenReturn(Future.successful(Some(SubmissionValidationInvalid())))
+        .thenReturn(Future.successful(Some(InvalidXmlError(""))))
 
       val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url)
       val result  = route(application, request).value
