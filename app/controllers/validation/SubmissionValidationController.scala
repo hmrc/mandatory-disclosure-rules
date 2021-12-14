@@ -16,31 +16,31 @@
 
 package controllers.validation
 
-import models.validation.{UploadSubmissionValidationFailure, UploadSubmissionValidationInvalid, UploadSubmissionValidationSuccess}
+import models.validation.{InvalidXmlError, SubmissionValidationFailure, SubmissionValidationSuccess}
 import play.api.libs.json.Json
-import play.api.mvc.ControllerComponents
-import services.validation.UploadSubmissionValidationEngine
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import services.validation.SubmissionValidationEngine
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 
-class UploadSubmissionValidationController @Inject() (
+class SubmissionValidationController @Inject() (
   cc: ControllerComponents,
-  validationEngine: UploadSubmissionValidationEngine
+  validationEngine: SubmissionValidationEngine
 )(implicit ec: ExecutionContext)
     extends BackendController(cc) {
 
-  def validateUploadSubmission = Action.async { implicit request =>
-    validationEngine.validateUploadSubmission(request.body.asText) map {
-      case Some(UploadSubmissionValidationSuccess(_)) =>
-        Ok(Json.toJsObject(UploadSubmissionValidationSuccess(true)))
+  def validateSubmission: Action[AnyContent] = Action.async { implicit request =>
+    try validationEngine.validateUploadSubmission(request.body.asText) map {
+      case Some(SubmissionValidationSuccess(_)) =>
+        Ok(Json.toJsObject(SubmissionValidationSuccess(true)))
 
-      case Some(UploadSubmissionValidationFailure(errors)) =>
-        Ok(Json.toJson(UploadSubmissionValidationFailure(errors)))
+      case Some(SubmissionValidationFailure(errors)) =>
+        Ok(Json.toJson(SubmissionValidationFailure(errors)))
 
-      case Some(UploadSubmissionValidationInvalid()) =>
-        BadRequest("Invalid XML")
+      case Some(InvalidXmlError(saxException)) =>
+        BadRequest(InvalidXmlError(saxException).toString)
 
       case None =>
         BadRequest("Service unavailable")

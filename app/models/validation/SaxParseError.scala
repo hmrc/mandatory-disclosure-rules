@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package config
+package models.validation
 
-import com.google.inject.AbstractModule
-import services.upscan.{MongoBackedUploadProgressTracker, UploadProgressTracker}
+import play.api.libs.json.Json
 
-class Module extends AbstractModule {
+case class SaxParseError(lineNumber: Int, errorMessage: String)
 
-  override def configure(): Unit =
-    bind(classOf[UploadProgressTracker]).to(classOf[MongoBackedUploadProgressTracker])
+object SaxParseError {
+  implicit val format = Json.format[SaxParseError]
 }
