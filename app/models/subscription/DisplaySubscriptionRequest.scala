@@ -18,6 +18,10 @@ package models.subscription
 
 import play.api.libs.json.{Json, OFormat}
 
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import java.util.UUID
+
 case class RequestParameters(paramName: String, paramValue: String)
 
 object RequestParameters {
@@ -35,8 +39,26 @@ case class RequestCommonForSubscription(
 )
 
 object RequestCommonForSubscription {
+  //Format: ISO 8601 YYYY-MM-DDTHH:mm:ssZ e.g. 2020-09-23T16:12:11Zs
+  private val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+
   implicit val requestCommonForSubscriptionFormats: OFormat[RequestCommonForSubscription] =
     Json.format[RequestCommonForSubscription]
+
+  def apply(): RequestCommonForSubscription = {
+    //Generate a 32 chars UUID without hyphens
+    val acknowledgementReference = UUID.randomUUID().toString.replace("-", "")
+    val conversationID           = UUID.randomUUID().toString
+
+    RequestCommonForSubscription(
+      regime = "MDR",
+      conversationID = Some(conversationID),
+      receiptDate = ZonedDateTime.now().format(formatter),
+      acknowledgementReference = acknowledgementReference,
+      originatingSystem = "MDTP",
+      requestParameters = None
+    )
+  }
 }
 
 case class ReadSubscriptionRequestDetail(IDType: String, IDNumber: String)
@@ -44,6 +66,10 @@ case class ReadSubscriptionRequestDetail(IDType: String, IDNumber: String)
 object ReadSubscriptionRequestDetail {
   implicit val format: OFormat[ReadSubscriptionRequestDetail] =
     Json.format[ReadSubscriptionRequestDetail]
+
+  def apply(subscriptionId: String): ReadSubscriptionRequestDetail           = new ReadSubscriptionRequestDetail("MDR", subscriptionId)
+  def apply(IDType: String, IDNumber: String): ReadSubscriptionRequestDetail = new ReadSubscriptionRequestDetail(IDType, IDNumber)
+
 }
 
 case class DisplaySubscriptionDetails(

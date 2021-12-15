@@ -1,0 +1,218 @@
+/*
+ * Copyright 2021 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package services.submission
+
+import base.SpecBase
+import models.subscription.{
+  ContactInformationForIndividual,
+  ContactInformationForOrganisation,
+  IndividualDetails,
+  OrganisationDetails,
+  PrimaryContact,
+  ResponseDetail,
+  SecondaryContact
+}
+import org.scalatest.StreamlinedXmlEquality
+
+class TransformServiceSpec extends SpecBase with StreamlinedXmlEquality {
+
+  "must transform an individual without a middle name" in {
+    val service = app.injector.instanceOf[TransformService]
+    val individual = IndividualDetails(
+      firstName = "firstName",
+      middleName = None,
+      lastName = "lastName"
+    )
+
+    val expected =
+      <individualDetails>
+        <firstName>firstName</firstName>
+        <lastName>lastName</lastName>
+      </individualDetails>
+
+    val result = <individualDetails>
+      {service.transformIndividual(individual)}
+    </individualDetails>
+
+    result mustEqual expected
+  }
+
+  "must transform an individual with a middle name" in {
+    val service = app.injector.instanceOf[TransformService]
+    val individual = IndividualDetails(
+      firstName = "firstName",
+      middleName = Some("middleName"),
+      lastName = "lastName"
+    )
+
+    val expected =
+      <individualDetails>
+        <firstName>firstName</firstName>
+        <middleName>middleName</middleName>
+        <lastName>lastName</lastName>
+      </individualDetails>
+
+    val result = <individualDetails>
+      {service.transformIndividual(individual)}
+    </individualDetails>
+
+    result mustEqual expected
+  }
+
+  "must transform ContactInformation with individual" in {
+    val service = app.injector.instanceOf[TransformService]
+
+    val contactInformation = ContactInformationForIndividual(
+      email = "aaa",
+      phone = Some("bbb"),
+      mobile = Some("ccc"),
+      individual = IndividualDetails(
+        firstName = "firstName",
+        middleName = Some("middleName"),
+        lastName = "lastName"
+      )
+    )
+
+    val expected =
+      <contactDetails>
+        <phoneNumber>bbb</phoneNumber>
+        <mobileNumber>ccc</mobileNumber>
+        <emailAddress>aaa</emailAddress>
+        <individualDetails>
+          <firstName>firstName</firstName>
+          <middleName>middleName</middleName>
+          <lastName>lastName</lastName>
+        </individualDetails>
+      </contactDetails>
+
+    val result = <contactDetails>
+      {service.transformContactInformation(contactInformation)}
+    </contactDetails>
+
+    result mustEqual expected
+  }
+
+  "must transform ContactInformation with organisation" in {
+    val service = app.injector.instanceOf[TransformService]
+
+    val contactInformation = ContactInformationForOrganisation(
+      email = "aaa",
+      phone = Some("bbb"),
+      mobile = None,
+      organisation = OrganisationDetails(
+        organisationName = "Example"
+      )
+    )
+
+    val expected =
+      <contactDetails>
+        <phoneNumber>bbb</phoneNumber>
+        <emailAddress>aaa</emailAddress>
+        <organisationDetails>
+          <organisationName>Example</organisationName>
+        </organisationDetails>
+      </contactDetails>
+
+    val result = <contactDetails>
+      {service.transformContactInformation(contactInformation)}
+    </contactDetails>
+
+    result mustEqual expected
+  }
+
+  "must transform Subscription Details" in {
+    val service = app.injector.instanceOf[TransformService]
+
+    val contactInformation =
+      ResponseDetail(
+        subscriptionID = "subscriptionID",
+        tradingName = Some("tradingName"),
+        isGBUser = true,
+        primaryContact = PrimaryContact(
+          Seq(
+            ContactInformationForOrganisation(
+              email = "aaa",
+              phone = Some("bbb"),
+              mobile = None,
+              organisation = OrganisationDetails(
+                organisationName = "Example"
+              )
+            )
+          )
+        ),
+        secondaryContact = Some(
+          SecondaryContact(
+            Seq(
+              ContactInformationForOrganisation(
+                email = "ddd",
+                phone = Some("eee"),
+                mobile = Some("fff"),
+                organisation = OrganisationDetails(
+                  organisationName = "AnotherExample"
+                )
+              )
+            )
+          )
+        )
+      )
+
+    val expected =
+      <subscriptionDetails>
+        <subscriptionID>subscriptionID</subscriptionID>
+        <tradingName>tradingName</tradingName>
+        <isGBUser>true</isGBUser>
+        <primaryContact>
+          <phoneNumber>bbb</phoneNumber>
+          <emailAddress>aaa</emailAddress>
+          <organisationDetails>
+            <organisationName>Example</organisationName>
+          </organisationDetails>
+        </primaryContact>
+        <secondaryContact>
+          <phoneNumber>eee</phoneNumber>
+          <mobileNumber>fff</mobileNumber>
+          <emailAddress>ddd</emailAddress>
+          <organisationDetails>
+            <organisationName>AnotherExample</organisationName>
+          </organisationDetails>
+        </secondaryContact>
+      </subscriptionDetails>
+
+    val result = <subscriptionDetails>
+      {service.transformSubscriptionDetails(contactInformation, None)}
+    </subscriptionDetails>
+    expected == result
+  }
+
+  "add namespace definitions for dac6 arrangement" in {
+    val service = app.injector.instanceOf[TransformService]
+    val file = <DAC6_Arrangement version="2020-04-16T09:30:47Z">
+      <submission>Submitted Data</submission>
+    </DAC6_Arrangement>
+
+    val expected = <DAC6_Arrangement version="2020-04-16T09:30:47Z"
+                                     xmlns:dac6="urn:ukdac6:v0.1"
+                                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <submission>Submitted Data</submission>
+    </DAC6_Arrangement>
+
+    val result = service.addNameSpaceDefinitions(file)
+
+    result.toString mustBe expected.toString
+  }
+
+}

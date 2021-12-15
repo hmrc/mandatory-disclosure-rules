@@ -6,3 +6,5 @@ GET        /upscan/status/:uploadId                     controllers.upscan.Uploa
 POST       /upscan/upload                               controllers.upscan.UploadFormController.requestUpload
 
 POST       /validate-submission                  controllers.validation.SubmissionValidationController.validateSubmission
+
+POST       /submit                                      controllers.SubmissionController.submitDisclosure

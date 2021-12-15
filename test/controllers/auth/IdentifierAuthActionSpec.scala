@@ -17,7 +17,6 @@
 package controllers.auth
 
 import akka.util.Timeout
-import config.AppConfig
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -50,15 +49,13 @@ class IdentifierAuthActionSpec extends PlaySpec with GuiceOneAppPerSuite with Mo
   }
 
   val mockAuthConnector: AuthConnector = mock[AuthConnector]
-  val mockAppConfig: AppConfig         = mock[AppConfig]
 
   implicit val timeout: Timeout = 5 seconds
 
   val application: Application = new GuiceApplicationBuilder()
-    .configure(Configuration("metrics.enabled" -> "false"))
+    .configure(Configuration("metrics.enabled" -> "false", "enrolmentKeys.mdr.key" -> "HMRC-MDR-ORG", "enrolmentKeys.mdr.identifier" -> "MDRID"))
     .overrides(
-      bind[AuthConnector].toInstance(mockAuthConnector),
-      bind[AppConfig].toInstance(mockAppConfig)
+      bind[AuthConnector].toInstance(mockAuthConnector)
     )
     .build()
 
@@ -67,10 +64,7 @@ class IdentifierAuthActionSpec extends PlaySpec with GuiceOneAppPerSuite with Mo
       "must return unauthorised" in {
         when(mockAuthConnector.authorise(any(), any())(any(), any()))
           .thenReturn(Future.failed(new MissingBearerToken))
-        when(mockAppConfig.enrolmentKey)
-          .thenReturn(_ => "HMRC-MDR-ORG")
-        when(mockAppConfig.enrolmentId)
-          .thenReturn(_ => "MDRID")
+
         val authAction = application.injector.instanceOf[IdentifierAuthAction]
         val controller = new Harness(authAction)
         val result     = controller.onPageLoad()(FakeRequest("", ""))
@@ -82,10 +76,6 @@ class IdentifierAuthActionSpec extends PlaySpec with GuiceOneAppPerSuite with Mo
         when(mockAuthConnector.authorise[Enrolments](any(), any())(any(), any()))
           .thenReturn(Future.successful(retrieval))
 
-        when(mockAppConfig.enrolmentKey)
-          .thenReturn(_ => "HMRC-MDR-ORG")
-        when(mockAppConfig.enrolmentId)
-          .thenReturn(_ => "MDRID")
         val authAction = application.injector.instanceOf[IdentifierAuthAction]
         val controller = new Harness(authAction)
         intercept[IllegalAccessException] {
@@ -100,10 +90,6 @@ class IdentifierAuthActionSpec extends PlaySpec with GuiceOneAppPerSuite with Mo
         val retrieval = Enrolments(Set(Enrolment("HMRC-MDR-ORG", Seq(EnrolmentIdentifier("MDRID", "subscriptionID")), "ACTIVE")))
         when(mockAuthConnector.authorise[Enrolments](any(), any())(any(), any()))
           .thenReturn(Future.successful(retrieval))
-        when(mockAppConfig.enrolmentKey)
-          .thenReturn(_ => "HMRC-MDR-ORG")
-        when(mockAppConfig.enrolmentId)
-          .thenReturn(_ => "MDRID")
 
         val authAction = application.injector.instanceOf[IdentifierAuthAction]
         val controller = new Harness(authAction)
