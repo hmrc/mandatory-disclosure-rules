@@ -41,7 +41,7 @@ class AppConfig @Inject() (
   val bearerToken: String => String = (serviceName: String) => config.get[String](s"microservice.services.$serviceName.bearer-token")
   val environment: String => String = (serviceName: String) => config.get[String](s"microservice.services.$serviceName.environment")
 
-  val enrolmentKey: String => String = (serviceName: String) => config.get[String](s"enrolmentKey.$serviceName.key")
-  val enrolmentId: String => String  = (serviceName: String) => config.get[String](s"enrolmentKey.$serviceName.identifier")
+  val enrolmentKey: String => String = (serviceName: String) => config.get[String](s"enrolmentKeys.$serviceName.key")
+  val enrolmentId: String => String  = (serviceName: String) => config.get[String](s"enrolmentKeys.$serviceName.identifier")
 
 }
