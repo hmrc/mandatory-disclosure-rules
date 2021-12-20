@@ -7,4 +7,6 @@ POST       /upscan/upload                               controllers.upscan.Uploa
 
 POST       /validate-submission                  controllers.validation.SubmissionValidationController.validateSubmission
 
-POST       /submit                                      controllers.SubmissionController.submitDisclosure
+POST       /submit                                     controllers.SubmissionController.submitDisclosure
+
+POST    /subscription/read-subscription                controllers.SubscriptionController.readSubscription
