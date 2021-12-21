@@ -35,7 +35,7 @@ class SubscriptionController @Inject() (
     extends BackendController(cc)
     with Logging {
 
-  def readSubscription() = authenticate.async(parse.json) { implicit request =>
+  def readSubscription() = authenticate.async { implicit request =>
     readSubscriptionService.getContactInformation(request.enrolmentID).map {
       case Right(value) => Ok(Json.toJson(value))
       case Left(ReadSubscriptionError(value)) =>
