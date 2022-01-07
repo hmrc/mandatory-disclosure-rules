@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package models.upscan.subscription
+package models.subscription
 
 import base.SpecBase
 import models.subscription.ResponseDetail
@@ -51,10 +51,14 @@ class ResponseDetailModelSpec extends SpecBase {
           |]
           |}""".stripMargin
 
+      val expectedJson =
+        """{"subscriptionID":"111111111","tradingName":"","isGBUser":true,"primaryContact":{"individual":
+          |{"firstName":"First","lastName":"Last"},"email":"","phone":"","mobile":""},"secondaryContact"
+          |:{"organisation":{"organisationName":""},"email":""}}""".stripMargin
       val json: JsValue =
         Json.parse(responseDetailJson)
       val responseDetail = json.as[ResponseDetail]
-      Json.toJson(responseDetail) mustBe Json.parse(responseDetailJson)
+      Json.toJson(responseDetail) mustBe Json.parse(expectedJson)
     }
   }
 }

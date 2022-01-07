@@ -37,7 +37,7 @@ class SubscriptionController @Inject() (
 
   def readSubscription() = authenticate.async { implicit request =>
     readSubscriptionService.getContactInformation(request.enrolmentID).map {
-      case Right(value) => Ok(value)
+      case Right(value) => Ok(Json.toJson(value))
       case Left(ReadSubscriptionError(value)) =>
         logger.warn(s"ReadSubscriptionError $value")
         InternalServerError

@@ -89,7 +89,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
           )
       ).thenReturn(
         Future.successful(
-          Right(responseDetail)
+          Right(responseDetail.as[ResponseDetail])
         )
       )
 

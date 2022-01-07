@@ -62,7 +62,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
     "when a file is posted we transform it, send it to the HOD and return OK" in {
 
       when(mockReadSubscriptionService.getContactInformation(any())(any(), any()))
-        .thenReturn(Future.successful(Right(Json.toJson(responseDetail))))
+        .thenReturn(Future.successful(Right(responseDetail)))
       when(mockSubmissionConnector.submitDisclosure(any())(any()))
         .thenReturn(Future.successful(HttpResponse(OK, "")))
 

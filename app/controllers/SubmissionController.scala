@@ -55,7 +55,7 @@ class SubmissionController @Inject() (
     readSubscriptionService.getContactInformation(enrolmentID).flatMap {
       case Right(value) =>
         // Add metadata
-        val submission: NodeSeq = transformService.addSubscriptionDetailsToSubmission(xml, value.as[ResponseDetail], submissionMetaData)
+        val submission: NodeSeq = transformService.addSubscriptionDetailsToSubmission(xml, value, submissionMetaData)
         //TODO validate XML
         //Submit disclosure
         submissionConnector.submitDisclosure(submission).map(_.handleResponse(logger))

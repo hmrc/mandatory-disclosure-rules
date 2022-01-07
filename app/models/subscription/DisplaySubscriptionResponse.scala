@@ -44,17 +44,7 @@ object ResponseDetail {
     }
   }
 
-  implicit val writes = new Writes[ResponseDetail] {
-    def writes(item: ResponseDetail) =
-      Json.obj(
-        "subscriptionID"   -> item.subscriptionID,
-        "tradingName"      -> item.tradingName,
-        "isGBUser"         -> item.isGBUser,
-        "primaryContact"   -> Seq(item.primaryContact),
-        "secondaryContact" -> Seq(item.secondaryContact)
-      )
-  }
-
+  implicit val writes: OWrites[ResponseDetail] = Json.writes[ResponseDetail]
 }
 
 case class ReturnParameters(paramName: String, paramValue: String)

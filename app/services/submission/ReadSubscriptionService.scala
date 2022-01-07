@@ -21,7 +21,6 @@ import models.error.{ApiError, ReadSubscriptionError}
 import models.subscription._
 import play.api.Logging
 import play.api.http.Status.OK
-import play.api.libs.json.JsValue
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
@@ -29,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ReadSubscriptionService @Inject() (subscriptionConnector: SubscriptionConnector) extends Logging {
 
-  def getContactInformation(enrolmentId: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Either[ApiError, JsValue]] = {
+  def getContactInformation(enrolmentId: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Either[ApiError, ResponseDetail]] = {
 
     val subscriptionRequest: DisplaySubscriptionForMDRRequest =
       DisplaySubscriptionForMDRRequest(
@@ -42,8 +41,7 @@ class ReadSubscriptionService @Inject() (subscriptionConnector: SubscriptionConn
     subscriptionConnector.readSubscriptionInformation(subscriptionRequest).map { response =>
       response.status match {
         case OK =>
-          val responseDetail = (response.json \ "displaySubscriptionForMDRResponse" \ "responseDetail").as[JsValue]
-
+          val responseDetail = response.json.as[DisplaySubscriptionForMDRResponse].displaySubscriptionForMDRResponse.responseDetail
           Right(responseDetail)
         case status =>
           logger.warn(s"Read subscription Got Status $status")
