@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -63,36 +63,32 @@ class TransformService @Inject() () {
       subscriptionDetails.tradingName.map(tradingName => <tradingName>{tradingName}</tradingName>),
       Some(<isGBUser>{subscriptionDetails.isGBUser}</isGBUser>),
       Some(<primaryContact>
-          {transformContactInformation(subscriptionDetails.primaryContact.contactInformation.head)}
+          {transformContactInformation(subscriptionDetails.primaryContact)}
         </primaryContact>),
       subscriptionDetails.secondaryContact.map(sc => <secondaryContact>
-          {transformContactInformation(sc.contactInformation.head)}
+          {transformContactInformation(sc)}
         </secondaryContact>)
     ).filter(_.isDefined).map(_.get)
 
   def transformContactInformation(
     contactInformation: ContactInformation
   ): NodeSeq = {
-    val nodes = contactInformation match {
-      case contactIndividual: ContactInformationForIndividual =>
-        Seq(
-          contactIndividual.phone.map(phone => <phoneNumber>{phone}</phoneNumber>),
-          contactIndividual.mobile.map(mobile => <mobileNumber>{mobile}</mobileNumber>),
-          Some(<emailAddress>{contactIndividual.email}</emailAddress>),
-          Some(<individualDetails>
-                {transformIndividual(contactIndividual.individual)}
-              </individualDetails>)
-        )
-      case contactOrganisation: ContactInformationForOrganisation =>
-        Seq(
-          contactOrganisation.phone.map(phone => <phoneNumber>{phone}</phoneNumber>),
-          contactOrganisation.mobile.map(mobile => <mobileNumber>{mobile}</mobileNumber>),
-          Some(<emailAddress>{contactOrganisation.email}</emailAddress>),
-          Some(<organisationDetails>
-                <organisationName>{contactOrganisation.organisation.organisationName}</organisationName>
-              </organisationDetails>)
-        )
+
+    val contactType = contactInformation.contactType match {
+      case individual: IndividualDetails => Some(<individualDetails>
+        {transformIndividual(individual)}
+      </individualDetails>)
+      case organisation: OrganisationDetails => Some(<organisationDetails>
+        <organisationName>{organisation.organisationName}</organisationName>
+      </organisationDetails>)
     }
+    val nodes =
+      Seq(
+        contactInformation.phone.map(phone => <phoneNumber>{phone}</phoneNumber>),
+        contactInformation.mobile.map(mobile => <mobileNumber>{mobile}</mobileNumber>),
+        Some(<emailAddress>{contactInformation.email}</emailAddress>),
+        contactType
+      )
 
     nodes.filter(_.isDefined).map(_.get)
   }
