@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,7 +78,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
         |]
         |}""".stripMargin
 
-    val responseDetail = Json.parse(responseDetailString).as[ResponseDetail]
+    val responseDetail = Json.parse(responseDetailString)
 
     "should return OK when ReadSubscription is valid" in {
       when(

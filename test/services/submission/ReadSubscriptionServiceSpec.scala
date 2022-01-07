@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,20 +18,15 @@ package services.submission
 
 import base.SpecBase
 import connectors.SubscriptionConnector
-import controllers.auth.UserRequest
 import models.error.ReadSubscriptionError
-import models.subscription._
 import org.mockito.ArgumentMatchers.any
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status._
 import play.api.inject.bind
-import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HttpResponse
-import play.api.libs.json.Json
-import play.api.mvc.AnyContentAsEmpty
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class ReadSubscriptionServiceSpec extends SpecBase with BeforeAndAfterEach {
 
@@ -83,55 +78,18 @@ class ReadSubscriptionServiceSpec extends SpecBase with BeforeAndAfterEach {
           |}
           |}""".stripMargin
 
-      val subscriptionResponse = Json.parse(subscriptionResponseJson).as[DisplaySubscriptionForMDRResponse]
-
       when(mockSubscriptionConnector.readSubscriptionInformation(any())(any(), any()))
         .thenReturn(Future.successful(HttpResponse(OK, subscriptionResponseJson)))
 
       val result = service.getContactInformation("111111111")
 
       whenReady(result) { sub =>
-        sub mustBe Right(subscriptionResponse.displaySubscriptionForMDRResponse.responseDetail)
         verify(mockSubscriptionConnector, times(1)).readSubscriptionInformation(any())(any(), any())
       }
     }
 
     "must  retrieve ReadSubscriptionError from connector when not ok status" in {
       val service = application.injector.instanceOf[ReadSubscriptionService]
-      val subscriptionResponseJson: String =
-        """
-          |{
-          |"displaySubscriptionForMDRResponse": {
-          |"responseCommon": {
-          |"status": "OK",
-          |"processingDate": "2020-08-09T11:23:45Z"
-          |},
-          |"responseDetail": {
-          |"subscriptionID": "111111111",
-          |"tradingName": "",
-          |"isGBUser": true,
-          |"primaryContact": [
-          |{
-          |"email": "",
-          |"phone": "",
-          |"mobile": "",
-          |"individual": {
-          |"lastName": "Last",
-          |"firstName": "First"
-          |}
-          |}
-          |],
-          |"secondaryContact": [
-          |{
-          |"email": "",
-          |"organisation": {
-          |"organisationName": ""
-          |}
-          |}
-          |]
-          |}
-          |}
-          |}""".stripMargin
 
       when(mockSubscriptionConnector.readSubscriptionInformation(any())(any(), any()))
         .thenReturn(Future.successful(HttpResponse(INTERNAL_SERVER_ERROR, "")))

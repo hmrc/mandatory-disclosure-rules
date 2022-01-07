@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package controllers.submission
 
-import models.subscription.{ContactInformationForOrganisation, OrganisationDetails, PrimaryContact, ResponseDetail, SecondaryContact}
+import models.subscription.{ContactInformation, OrganisationDetails, ResponseDetail}
 
 object SubmissionFixture {
   val basicXml =
@@ -53,29 +53,21 @@ object SubmissionFixture {
       subscriptionID = "subscriptionID",
       tradingName = Some("tradingName"),
       isGBUser = true,
-      primaryContact = PrimaryContact(
-        Seq(
-          ContactInformationForOrganisation(
-            email = "aaa",
-            phone = Some("bbb"),
-            mobile = None,
-            organisation = OrganisationDetails(
-              organisationName = "Example"
-            )
-          )
+      primaryContact = ContactInformation(
+        email = "aaa",
+        phone = Some("bbb"),
+        mobile = None,
+        contactType = OrganisationDetails(
+          organisationName = "Example"
         )
       ),
       secondaryContact = Some(
-        SecondaryContact(
-          Seq(
-            ContactInformationForOrganisation(
-              email = "ddd",
-              phone = Some("eee"),
-              mobile = Some("fff"),
-              organisation = OrganisationDetails(
-                organisationName = "AnotherExample"
-              )
-            )
+        ContactInformation(
+          email = "ddd",
+          phone = Some("eee"),
+          mobile = Some("fff"),
+          contactType = OrganisationDetails(
+            organisationName = "AnotherExample"
           )
         )
       )

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,9 @@ import connectors.{stripSession, SubmissionConnector}
 import controllers.auth.IdentifierAuthAction
 import models.error.ReadSubscriptionError
 import models.submission.SubmissionMetaData
+import models.subscription.ResponseDetail
 import play.api.Logging
+import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
 import services.submission.{ReadSubscriptionService, TransformService}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -53,7 +55,7 @@ class SubmissionController @Inject() (
     readSubscriptionService.getContactInformation(enrolmentID).flatMap {
       case Right(value) =>
         // Add metadata
-        val submission: NodeSeq = transformService.addSubscriptionDetailsToSubmission(xml, value, submissionMetaData)
+        val submission: NodeSeq = transformService.addSubscriptionDetailsToSubmission(xml, value.as[ResponseDetail], submissionMetaData)
         //TODO validate XML
         //Submit disclosure
         submissionConnector.submitDisclosure(submission).map(_.handleResponse(logger))

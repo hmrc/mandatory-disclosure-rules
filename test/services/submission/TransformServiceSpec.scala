@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,7 @@
 package services.submission
 
 import base.SpecBase
-import models.subscription.{
-  ContactInformationForIndividual,
-  ContactInformationForOrganisation,
-  IndividualDetails,
-  OrganisationDetails,
-  PrimaryContact,
-  ResponseDetail,
-  SecondaryContact
-}
+import models.subscription.{ContactInformation, IndividualDetails, OrganisationDetails, ResponseDetail}
 import org.scalatest.StreamlinedXmlEquality
 
 class TransformServiceSpec extends SpecBase with StreamlinedXmlEquality {
@@ -76,11 +68,11 @@ class TransformServiceSpec extends SpecBase with StreamlinedXmlEquality {
   "must transform ContactInformation with individual" in {
     val service = app.injector.instanceOf[TransformService]
 
-    val contactInformation = ContactInformationForIndividual(
+    val contactInformation = ContactInformation(
       email = "aaa",
       phone = Some("bbb"),
       mobile = Some("ccc"),
-      individual = IndividualDetails(
+      contactType = IndividualDetails(
         firstName = "firstName",
         middleName = Some("middleName"),
         lastName = "lastName"
@@ -109,11 +101,11 @@ class TransformServiceSpec extends SpecBase with StreamlinedXmlEquality {
   "must transform ContactInformation with organisation" in {
     val service = app.injector.instanceOf[TransformService]
 
-    val contactInformation = ContactInformationForOrganisation(
+    val contactInformation = ContactInformation(
       email = "aaa",
       phone = Some("bbb"),
       mobile = None,
-      organisation = OrganisationDetails(
+      contactType = OrganisationDetails(
         organisationName = "Example"
       )
     )
@@ -142,29 +134,21 @@ class TransformServiceSpec extends SpecBase with StreamlinedXmlEquality {
         subscriptionID = "subscriptionID",
         tradingName = Some("tradingName"),
         isGBUser = true,
-        primaryContact = PrimaryContact(
-          Seq(
-            ContactInformationForOrganisation(
-              email = "aaa",
-              phone = Some("bbb"),
-              mobile = None,
-              organisation = OrganisationDetails(
-                organisationName = "Example"
-              )
-            )
+        primaryContact = ContactInformation(
+          email = "aaa",
+          phone = Some("bbb"),
+          mobile = None,
+          contactType = OrganisationDetails(
+            organisationName = "Example"
           )
         ),
         secondaryContact = Some(
-          SecondaryContact(
-            Seq(
-              ContactInformationForOrganisation(
-                email = "ddd",
-                phone = Some("eee"),
-                mobile = Some("fff"),
-                organisation = OrganisationDetails(
-                  organisationName = "AnotherExample"
-                )
-              )
+          ContactInformation(
+            email = "ddd",
+            phone = Some("eee"),
+            mobile = Some("fff"),
+            contactType = OrganisationDetails(
+              organisationName = "AnotherExample"
             )
           )
         )

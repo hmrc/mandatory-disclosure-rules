@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,13 @@ import org.mockito.{ArgumentCaptor, MockitoSugar}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.inject.bind
+import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{status, _}
 import services.submission.{ReadSubscriptionService, TransformService}
 import uk.gov.hmrc.http.HttpResponse
+
 import scala.concurrent.Future
 import scala.xml.NodeSeq
 class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaCheckDrivenPropertyChecks with BeforeAndAfterEach {
@@ -60,7 +62,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
     "when a file is posted we transform it, send it to the HOD and return OK" in {
 
       when(mockReadSubscriptionService.getContactInformation(any())(any(), any()))
-        .thenReturn(Future.successful(Right(responseDetail)))
+        .thenReturn(Future.successful(Right(Json.toJson(responseDetail))))
       when(mockSubmissionConnector.submitDisclosure(any())(any()))
         .thenReturn(Future.successful(HttpResponse(OK, "")))
 

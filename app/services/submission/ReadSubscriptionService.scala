@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import models.error.{ApiError, ReadSubscriptionError}
 import models.subscription._
 import play.api.Logging
 import play.api.http.Status.OK
+import play.api.libs.json.JsValue
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
@@ -28,7 +29,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class ReadSubscriptionService @Inject() (subscriptionConnector: SubscriptionConnector) extends Logging {
 
-  def getContactInformation(enrolmentId: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Either[ApiError, ResponseDetail]] = {
+  def getContactInformation(enrolmentId: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Either[ApiError, JsValue]] = {
 
     val subscriptionRequest: DisplaySubscriptionForMDRRequest =
       DisplaySubscriptionForMDRRequest(
@@ -41,7 +42,9 @@ class ReadSubscriptionService @Inject() (subscriptionConnector: SubscriptionConn
     subscriptionConnector.readSubscriptionInformation(subscriptionRequest).map { response =>
       response.status match {
         case OK =>
-          Right(response.json.as[DisplaySubscriptionForMDRResponse].displaySubscriptionForMDRResponse.responseDetail)
+          val responseDetail = (response.json \ "displaySubscriptionForMDRResponse" \ "responseDetail").as[JsValue]
+
+          Right(responseDetail)
         case status =>
           logger.warn(s"Read subscription Got Status $status")
           Left(ReadSubscriptionError(status))

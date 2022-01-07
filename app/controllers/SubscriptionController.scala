@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 HM Revenue & Customs
+ * Copyright 2022 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ class SubscriptionController @Inject() (
 
   def readSubscription() = authenticate.async { implicit request =>
     readSubscriptionService.getContactInformation(request.enrolmentID).map {
-      case Right(value) => Ok(Json.toJson(value))
+      case Right(value) => Ok(value)
       case Left(ReadSubscriptionError(value)) =>
         logger.warn(s"ReadSubscriptionError $value")
         InternalServerError
