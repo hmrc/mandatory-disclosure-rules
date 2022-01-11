@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package services.submission
+package services.subscription
 
 import connectors.SubscriptionConnector
-import models.error.{ApiError, ReadSubscriptionError}
-import models.subscription._
+import models.error.{ApiError, ReadSubscriptionError, UpdateSubscriptionError}
+import models.subscription.{RequestDetailForUpdate, _}
 import play.api.Logging
 import play.api.http.Status.OK
+import play.api.libs.json.{JsResult, JsValue}
+import play.api.mvc.Action
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class ReadSubscriptionService @Inject() (subscriptionConnector: SubscriptionConnector) extends Logging {
+class SubscriptionService @Inject() (subscriptionConnector: SubscriptionConnector) extends Logging {
 
   def getContactInformation(enrolmentId: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Either[ApiError, ResponseDetail]] = {
 
@@ -49,4 +51,15 @@ class ReadSubscriptionService @Inject() (subscriptionConnector: SubscriptionConn
       }
     }
   }
+
+  def updateSubscription(requestDetailForUpdate: RequestDetailForUpdate)(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Either[ApiError, Unit]] =
+    subscriptionConnector.updateSubscription(UpdateSubscriptionForMDRRequest(requestDetailForUpdate)).map { res =>
+      res.status match {
+        case OK => Right(())
+        case status =>
+          logger.warn(s"Update Subscription Got Status $status")
+          logger.debug(s"Update Subscription Got Status $res")
+          Left(UpdateSubscriptionError(status))
+      }
+    }
 }

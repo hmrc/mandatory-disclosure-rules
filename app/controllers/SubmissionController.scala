@@ -20,11 +20,10 @@ import connectors.{stripSession, SubmissionConnector}
 import controllers.auth.IdentifierAuthAction
 import models.error.ReadSubscriptionError
 import models.submission.SubmissionMetaData
-import models.subscription.ResponseDetail
 import play.api.Logging
-import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
-import services.submission.{ReadSubscriptionService, TransformService}
+import services.submission.TransformService
+import services.subscription.SubscriptionService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import java.time.LocalDateTime
@@ -37,7 +36,7 @@ class SubmissionController @Inject() (
   authenticate: IdentifierAuthAction,
   cc: ControllerComponents,
   transformService: TransformService,
-  readSubscriptionService: ReadSubscriptionService,
+  readSubscriptionService: SubscriptionService,
   submissionConnector: SubmissionConnector
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)

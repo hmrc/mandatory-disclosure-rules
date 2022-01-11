@@ -16,8 +16,21 @@
 
 package generators
 
-import models.subscription.{DisplaySubscriptionDetails, DisplaySubscriptionForMDRRequest, ReadSubscriptionRequestDetail, RequestCommonForSubscription}
-import org.scalacheck.Arbitrary
+import models.subscription.{
+  ContactInformation,
+  ContactType,
+  DisplaySubscriptionDetails,
+  DisplaySubscriptionForMDRRequest,
+  IndividualDetails,
+  OrganisationDetails,
+  ReadSubscriptionRequestDetail,
+  RequestCommonForSubscription,
+  RequestCommonForUpdate,
+  RequestDetailForUpdate,
+  UpdateSubscriptionDetails,
+  UpdateSubscriptionForMDRRequest
+}
+import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary.arbitrary
 
 import java.time.LocalDate
@@ -53,7 +66,6 @@ trait ModelGenerators {
       IDNumber = idNumber
     )
   }
-
   implicit val arbitraryReadSubscriptionForMDRRequest: Arbitrary[DisplaySubscriptionForMDRRequest] =
     Arbitrary {
       for {
@@ -63,4 +75,76 @@ trait ModelGenerators {
         DisplaySubscriptionDetails(requestCommon, requestDetail)
       )
     }
+
+  implicit val arbitraryOrganisationDetails: Arbitrary[OrganisationDetails] = Arbitrary {
+    for {
+      orgName <- arbitrary[String]
+    } yield OrganisationDetails(orgName)
+  }
+
+  implicit val arbitraryIndividualDetails: Arbitrary[IndividualDetails] = Arbitrary {
+    for {
+      firstName  <- arbitrary[String]
+      middleName <- Gen.option(arbitrary[String])
+      lastName   <- arbitrary[String]
+    } yield IndividualDetails(firstName, middleName, lastName)
+  }
+
+  implicit val arbitraryContactType: Arbitrary[ContactType] = Arbitrary {
+    Gen.oneOf[ContactType](arbitrary[OrganisationDetails], arbitrary[IndividualDetails])
+  }
+
+  implicit val arbitraryContactInformation: Arbitrary[ContactInformation] = Arbitrary {
+    for {
+      contactType <- arbitrary[ContactType]
+      email       <- arbitrary[String]
+      phone       <- Gen.option(arbitrary[String])
+      mobile      <- Gen.option(arbitrary[String])
+    } yield ContactInformation(contactType, email, phone, mobile)
+  }
+
+  implicit val arbitraryRequestDetail: Arbitrary[RequestDetailForUpdate] = Arbitrary {
+    for {
+      idType           <- arbitrary[String]
+      idNumber         <- arbitrary[String]
+      tradingName      <- Gen.option(arbitrary[String])
+      isGBUser         <- arbitrary[Boolean]
+      primaryContact   <- arbitrary[ContactInformation]
+      secondaryContact <- Gen.option(arbitrary[ContactInformation])
+    } yield RequestDetailForUpdate(idType, idNumber, tradingName, isGBUser, primaryContact, secondaryContact)
+  }
+
+  implicit val arbitraryRequestCommonForUpdateSubscription: Arbitrary[RequestCommonForUpdate] =
+    Arbitrary {
+      for {
+        receiptDate        <- arbitrary[String]
+        acknowledgementRef <- stringsWithMaxLength(32)
+      } yield RequestCommonForUpdate(
+        regime = "MDR",
+        receiptDate = receiptDate,
+        acknowledgementReference = acknowledgementRef,
+        originatingSystem = "MDTP",
+        None
+      )
+    }
+
+  implicit val arbitraryUpdateSubscriptionRequestDetail: Arbitrary[UpdateSubscriptionDetails] = Arbitrary {
+    for {
+      reqCommonForUpdate        <- arbitrary[RequestCommonForUpdate]
+      reqRequestDetailForUpdate <- arbitrary[RequestDetailForUpdate]
+    } yield UpdateSubscriptionDetails(
+      reqCommonForUpdate,
+      reqRequestDetailForUpdate
+    )
+  }
+
+  implicit val arbitraryUpdateSubscriptionForMDRRequest: Arbitrary[UpdateSubscriptionForMDRRequest] =
+    Arbitrary {
+      for {
+        request <- arbitrary[UpdateSubscriptionDetails]
+      } yield UpdateSubscriptionForMDRRequest(
+        request
+      )
+    }
+
 }

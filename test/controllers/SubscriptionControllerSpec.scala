@@ -17,10 +17,10 @@
 package controllers
 
 import base.SpecBase
-import controllers.auth.{AuthAction, FakeAuthAction, FakeIdentifierAuthAction, IdentifierAuthAction}
+import controllers.auth.{FakeIdentifierAuthAction, IdentifierAuthAction}
 import generators.Generators
-import models.error.ReadSubscriptionError
-import models.subscription.{DisplaySubscriptionForMDRResponse, ResponseDetail}
+import models.error.{ReadSubscriptionError, UpdateSubscriptionError}
+import models.subscription.{RequestDetailForUpdate, ResponseDetail}
 import org.mockito.ArgumentMatchers.any
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.Application
@@ -28,7 +28,7 @@ import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import services.submission.ReadSubscriptionService
+import services.subscription.SubscriptionService
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -39,11 +39,11 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
   val mockAuthConnector: AuthConnector    = mock[AuthConnector]
   val mockResponseDetails: ResponseDetail = mock[ResponseDetail]
 
-  val mockReadSubscriptionService: ReadSubscriptionService =
-    mock[ReadSubscriptionService]
+  val mockSubscriptionService: SubscriptionService =
+    mock[SubscriptionService]
   val application: Application = applicationBuilder()
     .overrides(
-      bind[ReadSubscriptionService].toInstance(mockReadSubscriptionService),
+      bind[SubscriptionService].toInstance(mockSubscriptionService),
       bind[AuthConnector].toInstance(mockAuthConnector),
       bind[IdentifierAuthAction].to[FakeIdentifierAuthAction]
     )
@@ -80,9 +80,36 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
 
     val responseDetail = Json.parse(responseDetailString)
 
+    val requestDetailJson = Json.parse("""
+                                             |{
+                                             |      "IDType": "SAFE",
+                                             |      "IDNumber": "IDNumber",
+                                             |      "tradingName": "Trading Name",
+                                             |      "isGBUser": true,
+                                             |      "primaryContact":
+                                             |        {
+                                             |          "individual": {
+                                             |             "lastName": "lastName",
+                                             |             "firstName": "firstName",
+                                             |             "middleName": "middleName"
+                                             |         },
+                                             |          "email": "test@email.com",
+                                             |          "phone": "+4411223344"
+                                             |        },
+                                             |      "secondaryContact":
+                                             |        {
+                                             |          "organisation": {
+                                             |            "organisationName": "orgName"
+                                             |          },
+                                             |          "email": "test@email.com",
+                                             |          "phone": "+4411223344"
+                                             |        }
+                                             |}
+                                             |""".stripMargin)
+
     "should return OK when ReadSubscription is valid" in {
       when(
-        mockReadSubscriptionService
+        mockSubscriptionService
           .getContactInformation(any[String]())(
             any[HeaderCarrier](),
             any[ExecutionContext]()
@@ -106,7 +133,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
 
     "should return InternalServerError when ReadSubscription fails" in {
       when(
-        mockReadSubscriptionService
+        mockSubscriptionService
           .getContactInformation(any[String]())(
             any[HeaderCarrier](),
             any[ExecutionContext]()
@@ -127,5 +154,54 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
       status(result) mustEqual INTERNAL_SERVER_ERROR
 
     }
+
+    "should return OK when UpdateSubscription was successful" in {
+      when(
+        mockSubscriptionService
+          .updateSubscription(any[RequestDetailForUpdate]())(
+            any[HeaderCarrier](),
+            any[ExecutionContext]()
+          )
+      ).thenReturn(
+        Future.successful(
+          Right(())
+        )
+      )
+
+      val request =
+        FakeRequest(
+          POST,
+          routes.SubscriptionController.updateSubscription().url
+        ).withJsonBody(requestDetailJson)
+
+      val result = route(application, request).value
+      status(result) mustEqual OK
+
+    }
+
+    "should return InternalServerError when UpdateSubscription fails" in {
+      when(
+        mockSubscriptionService
+          .updateSubscription(any[RequestDetailForUpdate]())(
+            any[HeaderCarrier](),
+            any[ExecutionContext]()
+          )
+      ).thenReturn(
+        Future.successful(
+          Left(UpdateSubscriptionError(500))
+        )
+      )
+
+      val request =
+        FakeRequest(
+          POST,
+          routes.SubscriptionController.updateSubscription().url
+        ).withJsonBody(requestDetailJson)
+
+      val result = route(application, request).value
+      status(result) mustEqual INTERNAL_SERVER_ERROR
+
+    }
+
   }
 }
