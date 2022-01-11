@@ -17,12 +17,10 @@
 package services.subscription
 
 import connectors.SubscriptionConnector
-import models.error.{ApiError, ReadSubscriptionError, UpdateSubscriptionError}
-import models.subscription.{RequestDetailForUpdate, _}
+import models.error.{ReadSubscriptionError, UpdateSubscriptionError}
+import models.subscription._
 import play.api.Logging
 import play.api.http.Status.OK
-import play.api.libs.json.{JsResult, JsValue}
-import play.api.mvc.Action
 import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
@@ -30,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class SubscriptionService @Inject() (subscriptionConnector: SubscriptionConnector) extends Logging {
 
-  def getContactInformation(enrolmentId: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Either[ApiError, ResponseDetail]] = {
+  def getContactInformation(enrolmentId: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Either[ReadSubscriptionError, ResponseDetail]] = {
 
     val subscriptionRequest: DisplaySubscriptionForMDRRequest =
       DisplaySubscriptionForMDRRequest(
@@ -52,7 +50,9 @@ class SubscriptionService @Inject() (subscriptionConnector: SubscriptionConnecto
     }
   }
 
-  def updateSubscription(requestDetailForUpdate: RequestDetailForUpdate)(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Either[ApiError, Unit]] =
+  def updateSubscription(
+    requestDetailForUpdate: RequestDetailForUpdate
+  )(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Either[UpdateSubscriptionError, Unit]] =
     subscriptionConnector.updateSubscription(UpdateSubscriptionForMDRRequest(requestDetailForUpdate)).map { res =>
       res.status match {
         case OK => Right(())

@@ -16,12 +16,10 @@
 
 package controllers
 
-import connectors.SubscriptionConnector
 import controllers.auth.IdentifierAuthAction
 import models.error.{ReadSubscriptionError, UpdateSubscriptionError}
-import models.subscription.{DisplaySubscriptionForMDRResponse, RequestDetailForUpdate, UpdateSubscriptionForMDRRequest}
+import models.subscription.RequestDetailForUpdate
 import play.api.Logging
-import play.api.http.Status.OK
 import play.api.libs.json.{JsResult, JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
 import services.subscription.SubscriptionService
