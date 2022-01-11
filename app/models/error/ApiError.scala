@@ -18,5 +18,5 @@ package models.error
 
 sealed trait ApiError
 
-case class ReadSubscriptionError(int: Int) extends ApiError
-case class UpdateSubscriptionError(int: Int) extends ApiError
+case class ReadSubscriptionError(status: Int) extends ApiError
+case class UpdateSubscriptionError(status: Int) extends ApiError
