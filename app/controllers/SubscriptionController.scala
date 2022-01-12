@@ -52,8 +52,8 @@ class SubscriptionController @Inject() (
     updateSubscriptionResult.fold(
       invalid =>
         Future.successful {
-          logger.warn(s"Json Validation Failed")
-          logger.debug(s"Json Validation Failed: $invalid")
+          logger.warn(s" updateSubscription Json Validation Failed")
+          logger.debug(s" updateSubscription Json Validation Failed: $invalid")
           InternalServerError("Json Validation Failed")
         },
       validReq =>
