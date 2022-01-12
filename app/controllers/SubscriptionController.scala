@@ -58,7 +58,7 @@ class SubscriptionController @Inject() (
         },
       validReq =>
         subscriptionService.updateSubscription(validReq).map {
-          case Right(_) => Ok("")
+          case Right(_) => Ok
           case Left(UpdateSubscriptionError(value)) =>
             logger.warn(s"UpdateSubscriptionError $value")
             InternalServerError(s"UpdateSubscriptionError $value")
