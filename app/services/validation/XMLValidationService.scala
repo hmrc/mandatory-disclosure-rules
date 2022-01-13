@@ -34,7 +34,7 @@ import scala.xml.{Elem, NodeSeq}
 class XMLValidationService @Inject() (xmlValidatingParser: SaxParser) {
 
   def validateXML(upScanUrl: Option[String] = None, xml: Option[NodeSeq] = None): Either[ListBuffer[SaxParseError], Elem] = {
-    println(fansi.Color.Green(upScanUrl.toString))
+
     val list: ListBuffer[SaxParseError] = new ListBuffer[SaxParseError]
 
     trait AccumulatorState extends DefaultHandler {

@@ -46,10 +46,6 @@ class SubmissionValidationEngine @Inject() (xmlValidationService: XMLValidationS
 
   def performXmlValidation(upScanUrl: Option[String]): Option[Seq[GenericError]] = {
     val xmlOrErrors: Either[ListBuffer[SaxParseError], Elem] = xmlValidationService.validateXML(upScanUrl)
-    xmlOrErrors match {
-      case Left(errors) => println(fansi.Color.Red(s"\n\n$errors\n\n"))
-      case _            => ()
-    }
     xmlOrErrors.fold(list => Some(xmlErrorMessageHelper.generateErrorMessages(list)), _ => None)
   }
 }
