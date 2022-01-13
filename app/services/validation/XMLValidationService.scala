@@ -63,28 +63,6 @@ trait SaxParser {
   def validatingParser: SAXParser
 }
 
-class Dac6SchemaValidatingParser extends SaxParser {
-
-  val schemaLang: String             = javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI
-  val isoXsdUrl: URL                 = getClass.getResource("/schemas/dac6/IsoTypes_v1.01.xsd")
-  val ukDAC6XsdUrl: URL              = getClass.getResource("/schemas/dac6/UKDac6XSD_v0.5.xsd")
-  val ukDCT06XsdUrl: URL             = getClass.getResource("/schemas/dac6/DCT06_EIS_UK_schema.xsd")
-  val isoXsdStream: StreamSource     = new StreamSource(isoXsdUrl.openStream())
-  val ukDAC6XsdStream: StreamSource  = new StreamSource(ukDAC6XsdUrl.openStream())
-  val ukDCT06XsdStream: StreamSource = new StreamSource(ukDCT06XsdUrl.openStream())
-
-  //IsoTypes xsd is referenced by UKDac6XSD so must come first in the array
-  val streams: Array[Source] = Array(isoXsdStream, ukDAC6XsdStream, ukDCT06XsdStream)
-
-  val schema: Schema = SchemaFactory.newInstance(schemaLang).newSchema(streams)
-
-  val factory: SAXParserFactory = SAXParserFactory.newInstance()
-  factory.setNamespaceAware(true)
-  factory.setSchema(schema)
-
-  override def validatingParser: SAXParser = factory.newSAXParser()
-}
-
 class MDRSchemaValidatingParser extends SaxParser {
 
   val schemaLang: String                = javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI

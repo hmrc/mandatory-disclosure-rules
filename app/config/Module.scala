@@ -17,21 +17,14 @@
 package config
 
 import com.google.inject.AbstractModule
-import play.api.{Configuration, Environment}
 import services.upscan.{MongoBackedUploadProgressTracker, UploadProgressTracker}
-import services.validation.{Dac6SchemaValidatingParser, MDRSchemaValidatingParser, SaxParser}
+import services.validation.{MDRSchemaValidatingParser, SaxParser}
 
-class Module(environment: Environment, config: Configuration) extends AbstractModule {
+class Module() extends AbstractModule {
 
   override def configure(): Unit = {
-
-    val useMDR = config.get[Boolean]("xmlparser.useMDR")
-
     bind(classOf[UploadProgressTracker]).to(classOf[MongoBackedUploadProgressTracker])
-    if (useMDR)
-      bind(classOf[SaxParser]).to(classOf[MDRSchemaValidatingParser])
-    else
-      bind(classOf[SaxParser]).to(classOf[Dac6SchemaValidatingParser])
+    bind(classOf[SaxParser]).to(classOf[MDRSchemaValidatingParser])
   }
 
 }
