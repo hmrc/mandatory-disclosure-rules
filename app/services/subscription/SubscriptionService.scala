@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package services.submission
+package services.subscription
 
 import connectors.SubscriptionConnector
-import models.error.{ApiError, ReadSubscriptionError}
+import models.error.{ReadSubscriptionError, UpdateSubscriptionError}
 import models.subscription._
 import play.api.Logging
 import play.api.http.Status.OK
@@ -26,9 +26,9 @@ import uk.gov.hmrc.http.HeaderCarrier
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class ReadSubscriptionService @Inject() (subscriptionConnector: SubscriptionConnector) extends Logging {
+class SubscriptionService @Inject() (subscriptionConnector: SubscriptionConnector) extends Logging {
 
-  def getContactInformation(enrolmentId: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Either[ApiError, ResponseDetail]] = {
+  def getContactInformation(enrolmentId: String)(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Either[ReadSubscriptionError, ResponseDetail]] = {
 
     val subscriptionRequest: DisplaySubscriptionForMDRRequest =
       DisplaySubscriptionForMDRRequest(
@@ -49,4 +49,17 @@ class ReadSubscriptionService @Inject() (subscriptionConnector: SubscriptionConn
       }
     }
   }
+
+  def updateSubscription(
+    requestDetailForUpdate: RequestDetailForUpdate
+  )(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Either[UpdateSubscriptionError, Unit]] =
+    subscriptionConnector.updateSubscription(UpdateSubscriptionForMDRRequest(requestDetailForUpdate)).map { res =>
+      res.status match {
+        case OK => Right(())
+        case status =>
+          logger.warn(s"Update Subscription Got Status $status")
+          logger.debug(s"Update Subscription Got Status $res")
+          Left(UpdateSubscriptionError(status))
+      }
+    }
 }

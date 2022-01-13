@@ -22,11 +22,11 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
-case class RequestParameters(paramName: String, paramValue: String)
+case class RequestParameter(paramName: String, paramValue: String)
 
-object RequestParameters {
-  implicit val indentifierFormats: OFormat[RequestParameters] =
-    Json.format[RequestParameters]
+object RequestParameter {
+  implicit val indentifierFormats: OFormat[RequestParameter] =
+    Json.format[RequestParameter]
 }
 
 case class RequestCommonForSubscription(
@@ -35,7 +35,7 @@ case class RequestCommonForSubscription(
   receiptDate: String,
   acknowledgementReference: String,
   originatingSystem: String,
-  requestParameters: Option[Seq[RequestParameters]]
+  requestParameters: Option[Seq[RequestParameter]]
 )
 
 object RequestCommonForSubscription {

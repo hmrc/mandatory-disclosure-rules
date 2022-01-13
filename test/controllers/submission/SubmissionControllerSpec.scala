@@ -31,17 +31,18 @@ import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{status, _}
-import services.submission.{ReadSubscriptionService, TransformService}
+import services.submission.TransformService
+import services.subscription.SubscriptionService
 import uk.gov.hmrc.http.HttpResponse
 
 import scala.concurrent.Future
 import scala.xml.NodeSeq
 class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaCheckDrivenPropertyChecks with BeforeAndAfterEach {
 
-  val mockTransformService                                 = mock[TransformService]
-  val mockSubmissionConnector: SubmissionConnector         = mock[SubmissionConnector]
-  val mockSubscriptionConnector: SubscriptionConnector     = mock[SubscriptionConnector]
-  val mockReadSubscriptionService: ReadSubscriptionService = mock[ReadSubscriptionService]
+  val mockTransformService                             = mock[TransformService]
+  val mockSubmissionConnector: SubmissionConnector     = mock[SubmissionConnector]
+  val mockSubscriptionConnector: SubscriptionConnector = mock[SubscriptionConnector]
+  val mockReadSubscriptionService: SubscriptionService = mock[SubscriptionService]
 
   val errorStatusCodes: Seq[Int] = Seq(BAD_REQUEST, FORBIDDEN, NOT_FOUND, METHOD_NOT_ALLOWED, CONFLICT, INTERNAL_SERVER_ERROR, SERVICE_UNAVAILABLE)
 
@@ -54,7 +55,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
       .overrides(
         bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
         bind[SubmissionConnector].toInstance(mockSubmissionConnector),
-        bind[ReadSubscriptionService].toInstance(mockReadSubscriptionService),
+        bind[SubscriptionService].toInstance(mockReadSubscriptionService),
         bind[IdentifierAuthAction].to[FakeIdentifierAuthAction]
       )
       .build()

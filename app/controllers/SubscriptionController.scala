@@ -17,31 +17,53 @@
 package controllers
 
 import controllers.auth.IdentifierAuthAction
-import models.error.ReadSubscriptionError
+import models.error.{ReadSubscriptionError, UpdateSubscriptionError}
+import models.subscription.RequestDetailForUpdate
 import play.api.Logging
-import play.api.libs.json.Json
-import play.api.mvc.ControllerComponents
-import services.submission.ReadSubscriptionService
+import play.api.libs.json.{JsResult, JsValue, Json}
+import play.api.mvc.{Action, ControllerComponents}
+import services.subscription.SubscriptionService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class SubscriptionController @Inject() (
   authenticate: IdentifierAuthAction,
   cc: ControllerComponents,
-  readSubscriptionService: ReadSubscriptionService
+  subscriptionService: SubscriptionService
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
   def readSubscription() = authenticate.async { implicit request =>
-    readSubscriptionService.getContactInformation(request.enrolmentID).map {
+    subscriptionService.getContactInformation(request.enrolmentID).map {
       case Right(value) => Ok(Json.toJson(value))
       case Left(ReadSubscriptionError(value)) =>
         logger.warn(s"ReadSubscriptionError $value")
-        InternalServerError
+        InternalServerError(s"ReadSubscriptionError $value")
     }
+  }
+
+  def updateSubscription(): Action[JsValue] = authenticate.async(parse.json) { implicit request =>
+    val updateSubscriptionResult: JsResult[RequestDetailForUpdate] =
+      request.body.validate[RequestDetailForUpdate]
+
+    updateSubscriptionResult.fold(
+      invalid =>
+        Future.successful {
+          logger.warn(s" updateSubscription Json Validation Failed")
+          logger.debug(s" updateSubscription Json Validation Failed: $invalid")
+          InternalServerError("Json Validation Failed")
+        },
+      validReq =>
+        subscriptionService.updateSubscription(validReq).map {
+          case Right(_) => Ok
+          case Left(UpdateSubscriptionError(value)) =>
+            logger.warn(s"UpdateSubscriptionError $value")
+            InternalServerError(s"UpdateSubscriptionError $value")
+        }
+    )
 
   }
 

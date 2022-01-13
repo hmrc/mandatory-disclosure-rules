@@ -10,3 +10,5 @@ POST       /validate-submission                  controllers.validation.Submissi
 POST       /submit                                     controllers.SubmissionController.submitDisclosure
 
 POST    /subscription/read-subscription                controllers.SubscriptionController.readSubscription
+
+POST    /subscription/update-subscription              controllers.SubscriptionController.updateSubscription

@@ -20,19 +20,20 @@ import base.{SpecBase, WireMockServerHandler}
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, urlEqualTo}
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import generators.Generators
-import models.subscription.DisplaySubscriptionForMDRRequest
+import models.subscription.{DisplaySubscriptionForMDRRequest, UpdateSubscriptionForMDRRequest}
 import org.scalacheck.Arbitrary.arbitrary
 import play.api.Application
 import play.api.http.Status.OK
 import org.scalacheck.Gen
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with Generators with ScalaCheckPropertyChecks {
 
   override lazy val app: Application = applicationBuilder()
     .configure(
-      conf = "microservice.services.create-subscription.port" -> server.port(),
+      conf = "microservice.services.update-subscription.port" -> server.port(),
       "microservice.services.read-subscription.port" -> server.port()
     )
     .build()
@@ -70,6 +71,34 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
         }
       }
     }
+
+    "update subscription" - {
+      "must return status as OK for update Subscription" in {
+        stubResponse(
+          "/mdr/dct70e/v1",
+          OK
+        )
+
+        forAll(arbitrary[UpdateSubscriptionForMDRRequest]) { sub =>
+          val result = connector.updateSubscription(sub)
+          result.futureValue.status mustBe OK
+        }
+      }
+
+      "must return an error status for failed update Subscription" in {
+
+        forAll(arbitrary[UpdateSubscriptionForMDRRequest], errorCodes) { (sub, errorCode) =>
+          stubResponse(
+            "/mdr/dct70e/v1",
+            errorCode
+          )
+
+          val result = connector.updateSubscription(sub)
+          result.futureValue.status mustBe errorCode
+        }
+      }
+    }
+
   }
 
   private def stubResponse(
