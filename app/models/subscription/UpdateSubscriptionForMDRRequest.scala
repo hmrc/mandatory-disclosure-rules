@@ -86,7 +86,7 @@ object UpdateSubscriptionDetails {
   implicit val format: OFormat[UpdateSubscriptionDetails] = Json.format[UpdateSubscriptionDetails]
 }
 
-case class UpdateSubscriptionForMDRRequest(updateSubscriptionForDACRequest: UpdateSubscriptionDetails)
+case class UpdateSubscriptionForMDRRequest(updateSubscriptionForMDRRequest: UpdateSubscriptionDetails)
 
 object UpdateSubscriptionForMDRRequest {
   implicit val format: OFormat[UpdateSubscriptionForMDRRequest] = Json.format[UpdateSubscriptionForMDRRequest]
