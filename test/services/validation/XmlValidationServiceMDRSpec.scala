@@ -26,13 +26,14 @@ import javax.xml.parsers.SAXParserFactory
 import javax.xml.transform.stream.StreamSource
 import javax.xml.validation.{Schema, SchemaFactory}
 import scala.collection.mutable.ListBuffer
+import javax.xml.transform.Source
 import scala.xml.XML
 
-class XmlValidationServiceSpec extends SpecBase {
+class XmlValidationServiceMDRSpec extends SpecBase {
   val noErrors: ListBuffer[SaxParseError] = ListBuffer()
 
   val application: Application = applicationBuilder()
-    .configure(Configuration("xmlparser.useMDR" -> "false"))
+    .configure(Configuration("xmlparser.useMDR" -> "true"))
     .build()
 
   "Validation Service" - {
@@ -51,7 +52,7 @@ class XmlValidationServiceSpec extends SpecBase {
     "must correctly invalidate a submission with a data problem" in {
       val service = application.injector.instanceOf[XMLValidationService]
 
-      val validSubmission = XML.loadFile("test/resources/dac6/invalid.xml")
+      val validSubmission = XML.loadFile("test/resources/mdr/invalid.xml")
 
       val result = service.validateXML(None, Some(validSubmission))
 
@@ -61,7 +62,7 @@ class XmlValidationServiceSpec extends SpecBase {
     "must correctly validate a submission" in {
       val service = application.injector.instanceOf[XMLValidationService]
 
-      val validSubmission = XML.loadFile("test/resources/dac6/valid.xml")
+      val validSubmission = XML.loadFile("test/resources/mdr/validmdr.xml")
 
       val result = service.validateXML(None, Some(validSubmission))
 
