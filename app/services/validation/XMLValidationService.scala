@@ -77,7 +77,7 @@ class MDRSchemaValidatingParser @Inject() (appConfig: AppConfig) extends SaxPars
   val ukMDRTypesXsdStream: StreamSource = new StreamSource(mdrTypesUrl.openStream())
   val ukDCT06XsdStream: StreamSource    = new StreamSource(ukDCT06XsdUrl.openStream())
 
-  //IsoTypes xsd is referenced by UKDac6XSD so must come first in the array
+  //Order is significant as files containing parent name spaces should come last
   val streams: Array[Source] = Array(isoXsdStream, ukMDRTypesXsdStream, ukMDRXsdStream, ukDCT06XsdStream)
 
   val schema: Schema = SchemaFactory.newInstance(schemaLang).newSchema(streams)
