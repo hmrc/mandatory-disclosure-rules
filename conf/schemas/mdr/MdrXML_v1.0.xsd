@@ -1,0 +1,812 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2012 rel. 2 sp1 (x64) (http://www.altova.com) by Sebastien Michon (OECD) -->
+<xsd:schema xmlns:mdr="urn:oecd:ties:mdr:v1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:stf="urn:oecd:ties:mdrstf:v1" xmlns:iso="urn:oecd:ties:isomdrtypes:v1" targetNamespace="urn:oecd:ties:mdr:v1" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">
+	<xsd:import namespace="urn:oecd:ties:isomdrtypes:v1" schemaLocation="IsoMdrTypes_v1.0.xsd"/>
+	<xsd:import namespace="urn:oecd:ties:mdrstf:v1" schemaLocation="OecdMdrTypes_v1.0.xsd"/>
+	<!-- -->
+	<!--+++++++++++++++++++++++  String lenght types ++++++++++++++++++++++++++++++++++++++ -->
+	<!-- -->
+	<!-- Defines a string with minimum length 1 and maximum length of 10 -->
+	<xsd:simpleType name="StringMin1Max10_Type">
+		<xsd:annotation>
+			<xsd:documentation>Defines a string with minimum length 1 and maximum length of 10</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="10"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- -->
+	<!-- Defines a string with minimum length 1 and maximum length of 170 -->
+	<xsd:simpleType name="StringMin1Max170_Type">
+		<xsd:annotation>
+			<xsd:documentation>Defines a string with minimum length 1 and maximum length of 170</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="170"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- -->
+	<!-- Defines a string with minimum length 1 and maximum length of 200 -->
+	<xsd:simpleType name="StringMin1Max200_Type">
+		<xsd:annotation>
+			<xsd:documentation>Defines a string with minimum length 1 and maximum length of 200</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="200"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- -->
+	<!-- Defines a string with minimum length 1 and maximum length of 400 -->
+	<xsd:simpleType name="StringMin1Max400_Type">
+		<xsd:annotation>
+			<xsd:documentation>Defines a string with minimum length 1 and maximum length of 400</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="400"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- -->
+	<!-- Defines a string with minimum length 1 and maximum length of 4000 -->
+	<xsd:simpleType name="StringMin1Max4000_Type">
+		<xsd:annotation>
+			<xsd:documentation>Defines a string with minimum length 1 and maximum length of 4000</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:minLength value="1"/>
+			<xsd:maxLength value="4000"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!-- -->
+	<!-- Defines a string with minimum length 1 and maximum length of 4000, with the Language attribute -->
+	<xsd:complexType name="StringMin1Max4000WithLang_Type">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Defines a string with minimum length 1 and maximum length of 4000, with the Language attribute</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="mdr:StringMin1Max4000_Type">
+				<xsd:attribute name="language" type="iso:LanguageCode_Type" use="optional">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">Language used</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- -->
+	<!--+++++++++++++++++++++++  Reusable Simple types ++++++++++++++++++++++++++++++++++++++ -->
+	<!-- -->
+	<!-- Message type definitions -->
+	<xsd:simpleType name="MessageType_EnumType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Message type defines the type of reporting</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="MDR"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--  -->
+	<!-- MessageTypeIndic - 4 -->
+	<xsd:simpleType name="MdrMessageTypeIndic_EnumType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">The MessageTypeIndic defines the type of message sent</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="MDR401">
+				<xsd:annotation>
+					<xsd:documentation>The message contains new information</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MDR402">
+				<xsd:annotation>
+					<xsd:documentation>The message contains corrections for previously sent information</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--  -->
+	<!-- Capacity of disclosing person - 5 -->
+	<xsd:simpleType name="CapacityDisclosingPerson_EnumType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Capacity of disclosing person
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="MDR501">
+				<xsd:annotation>
+					<xsd:documentation>Intermediary - Promoter</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MDR502">
+				<xsd:annotation>
+					<xsd:documentation>Intermediary - Service Provider</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MDR503">
+				<xsd:annotation>
+					<xsd:documentation>Intermediary - Client </xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MDR504">
+				<xsd:annotation>
+					<xsd:documentation>Reportable Taxpayer</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--  -->
+	<!-- Nexus for disclosure  - 6 -->
+	<xsd:simpleType name="NexusDisclosure_EnumType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Capacity of disclosing person
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="MDR601">
+				<xsd:annotation>
+					<xsd:documentation>Tax residence</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MDR602">
+				<xsd:annotation>
+					<xsd:documentation>Incorporation / Establishment</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MDR603">
+				<xsd:annotation>
+					<xsd:documentation>Place of Management</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MDR604">
+				<xsd:annotation>
+					<xsd:documentation>Branch</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--  -->
+	<!-- Reason for disclosure (CRS Avoidance Arrangement) - 7 -->
+	<xsd:simpleType name="DisclosureReasonCRSAA_EnumType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Reason for disclosure</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="MDR701">
+				<xsd:annotation>
+					<xsd:documentation>Arrangement available for implementation</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MDR702">
+				<xsd:annotation>
+					<xsd:documentation>Provision of Relevant Services</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--  -->
+	<!-- Type of CRS Avoidance Arrangement - 8 -->
+	<xsd:simpleType name="CRSAvoidanceArrangement_EnumType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Type of CRS Avoidance Arrangement</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="MDR801">
+				<xsd:annotation>
+					<xsd:documentation>Not a Financial Account</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MDR802">
+				<xsd:annotation>
+					<xsd:documentation>Conversion or transfer</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MDR803">
+				<xsd:annotation>
+					<xsd:documentation>Incorrect due diligence</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MDR804">
+				<xsd:annotation>
+					<xsd:documentation>Non-reporting of Controlling Persons</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MDR805">
+				<xsd:annotation>
+					<xsd:documentation>Disguise of payments</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MDR806">
+				<xsd:annotation>
+					<xsd:documentation>Other</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--  -->
+	<!-- Reason for disclosure (Opaque Offshore Structure) - 9 -->
+	<xsd:simpleType name="DisclosureReasonOOS_EnumType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Reason for disclosure</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="MDR901">
+				<xsd:annotation>
+					<xsd:documentation>Structure made available for implementation</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MDR902">
+				<xsd:annotation>
+					<xsd:documentation>Provision of Relevant Services</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--  -->
+	<!-- Type of Opaque Offshore Structure - 10 -->
+	<xsd:simpleType name="OOS_EnumType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Type of Opaque Offshore Structure</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="MDR1001">
+				<xsd:annotation>
+					<xsd:documentation>Use of nominees</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MDR1002">
+				<xsd:annotation>
+					<xsd:documentation>Means of indirect control</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MDR1003">
+				<xsd:annotation>
+					<xsd:documentation>Access to assets without disclosure of Beneficial Owners</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MDR1004">
+				<xsd:annotation>
+					<xsd:documentation>Use of Legal Persons without basic corporate information</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MDR1005">
+				<xsd:annotation>
+					<xsd:documentation>Use of Legal Persons without obligation to disclose shareholders</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MDR1006">
+				<xsd:annotation>
+					<xsd:documentation>Use of Legal Persons without notification of change of shareholders/partners</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MDR1007">
+				<xsd:annotation>
+					<xsd:documentation>Use of Legal Arrangements without Beneficial Ownership information</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MDR1008">
+				<xsd:annotation>
+					<xsd:documentation>Other</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--  -->
+	<!-- Role of the Intermediary  - 11 -->
+	<xsd:simpleType name="IntermediaryRole_EnumType">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Role of the Intermediary</xsd:documentation>
+		</xsd:annotation>
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="MDR1101">
+				<xsd:annotation>
+					<xsd:documentation>Promoter</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MDR1102">
+				<xsd:annotation>
+					<xsd:documentation>Service Provider</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="MDR1103">
+				<xsd:annotation>
+					<xsd:documentation>Client</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--  -->
+	<!-- Percentage (between 0 and 100) -->
+	<xsd:simpleType name="Percentage_Type">
+		<xsd:restriction base="xsd:integer">
+			<xsd:minInclusive value="0"/>
+			<xsd:maxInclusive value="100"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<!--  -->
+	<!--++++++++++++++++++ Reusable Complex types +++++++++++++++++++++++++++++++++++++ -->
+	<!-- -->
+	<!-- Document specification: Data identifying and describing the document -->
+	<xsd:complexType name="DocSpec_Type">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Document specification: Data identifying and describing the document, where
+'document' here means the part of a message that is to transmit the data about a single block of MDR information. </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="DocTypeIndic" type="stf:OECDDocTypeIndic_EnumType"/>
+			<xsd:element name="DocRefId" type="mdr:StringMin1Max200_Type">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Sender's unique identifier of this document </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="CorrDocRefId" type="mdr:StringMin1Max200_Type" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Reference id of the document referred to if this is correction</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- -->
+	<!-- Organisation name -->
+	<xsd:complexType name="NameOrganisation_Type">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Name of organisation</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="mdr:StringMin1Max200_Type">
+				<xsd:attribute name="language" type="iso:LanguageCode_Type" use="optional">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">Language used</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- -->
+	<!-- Address Fix -->
+	<xsd:complexType name="AddressFix_Type">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+			Structure of the address for a party broken down into its logical parts, recommended for easy matching. The 'City' element is the only required subelement. All of the subelements are simple text - data type 'string'.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="Street" type="mdr:StringMin1Max200_Type" minOccurs="0"/>
+			<xsd:element name="BuildingIdentifier" type="mdr:StringMin1Max200_Type" minOccurs="0"/>
+			<xsd:element name="SuiteIdentifier" type="mdr:StringMin1Max200_Type" minOccurs="0"/>
+			<xsd:element name="FloorIdentifier" type="mdr:StringMin1Max200_Type" minOccurs="0"/>
+			<xsd:element name="DistrictName" type="mdr:StringMin1Max200_Type" minOccurs="0"/>
+			<xsd:element name="POB" type="mdr:StringMin1Max200_Type" minOccurs="0"/>
+			<xsd:element name="PostCode" type="mdr:StringMin1Max200_Type" minOccurs="0"/>
+			<xsd:element name="City" type="mdr:StringMin1Max200_Type"/>
+			<xsd:element name="CountrySubentity" type="mdr:StringMin1Max200_Type" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!--  -->
+	<!--  The Address of a Party, given in fixed or free Form, possibly in both Forms -->
+	<xsd:complexType name="Address_Type">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+			There are two alternative options for Address type in the MDR XML schema – AddressFix and AddressFree. In principle, AddressFix should be used in all cases.
+			
+If the sending Competent Authority chooses to enter the data in 'AddressFree', all available address details shall be presented as one string of bytes, with blanks, slashes or carriage returns being used as a delimiter between parts of the address. This option should only be used if the data cannot be presented in the AddressFix format.
+
+NOTE: If the sending Competent Authority selects AddressFix, it will have the option of inputting the full street address in the AddressFree element rather than using the related fixed elements. In this case, the city, subentity, and postal code information should still be entered in the appropriate fixed elements.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="CountryCode" type="iso:CountryCode_Type"/>
+			<xsd:choice>
+				<xsd:element name="AddressFree" type="mdr:StringMin1Max4000_Type"/>
+				<xsd:sequence>
+					<xsd:element name="AddressFix" type="mdr:AddressFix_Type"/>
+					<xsd:element name="AddressFree" type="mdr:StringMin1Max4000_Type" minOccurs="0"/>
+				</xsd:sequence>
+			</xsd:choice>
+		</xsd:sequence>
+		<xsd:attribute name="legalAddressType" type="stf:OECDLegalAddressType_EnumType" use="optional"/>
+		<xsd:attribute name="language" type="iso:LanguageCode_Type" use="optional">
+			<xsd:annotation>
+				<xsd:documentation xml:lang="en">Language used</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<!--  -->
+	<!-- General Type for Monetary Amounts -->
+	<xsd:complexType name="MonAmnt_Type">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+This data type is to be used whenever monetary amounts are to be communicated. Such amounts shall be given
+in full units, i.e. without decimals. The code for the currency in which the value is expressed has to be
+taken from the ISO codelist 4217 and added in attribute currCode.
+</xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="xsd:integer">
+				<xsd:attribute name="currCode" type="iso:currCode_Type" use="required"/>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!--  -->
+	<!-- TIN -->
+	<xsd:complexType name="TIN_Type">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">This is the identification number/identification code for the party in question. As the identifier may be not strictly numeric, it is just defined as a string of characters. Attribute 'issuedBy' is required to designate the issuer of the identifier. </xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="mdr:StringMin1Max200_Type">
+				<xsd:attribute name="issuedBy" type="iso:CountryCode_Type" use="optional">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">Country code of issuing country, indicating country of Residence (to taxes and other)</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- -->
+	<!-- Message specification: Data identifying and describing the message as a whole -->
+	<xsd:complexType name="MessageSpec_Type">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Information in the message header identifies the Tax Administration that is sending the message.  It specifies when the message was created, what period (normally a year) the report is for, and the nature of the report (original, corrected, supplemental, etc).</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="TransmittingCountry" type="iso:CountryCode_Type"/>
+			<xsd:element name="ReceivingCountry" type="iso:CountryCode_Type"/>
+			<xsd:element name="MessageType" type="mdr:MessageType_EnumType"/>
+			<xsd:element name="Language" type="iso:LanguageCode_Type" minOccurs="0"/>
+			<xsd:element name="Warning" type="mdr:StringMin1Max4000_Type" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Free text expressing the restrictions for use of the information this
+message contains and the legal framework under which it is given</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Contact" type="mdr:StringMin1Max4000_Type" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">All necessary contact information about persons responsible for and
+involved in the processing of the data transmitted in this message, both legally and technically. Free text as this is not
+intended for automatic processing. </xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MessageRefId" type="mdr:StringMin1Max170_Type">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Sender's unique identifier for this message</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="MessageTypeIndic" type="mdr:MdrMessageTypeIndic_EnumType"/>
+			<xsd:element name="Timestamp" type="xsd:dateTime"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- -->
+	<!-- Organisation Identification Number -->
+	<xsd:complexType name="OrganisationIN_Type">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">This is the identification number/identification code for the Entity in question. As the identifier may be not strictly numeric, it is just defined as a string of characters. Attribute 'issuedBy' is required to designate the issuer of the identifier.  Attribute 'INType' defines the type of identification number. </xsd:documentation>
+		</xsd:annotation>
+		<xsd:simpleContent>
+			<xsd:extension base="mdr:StringMin1Max200_Type">
+				<xsd:attribute name="issuedBy" type="iso:CountryCode_Type" use="optional">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">Country code of issuing country, indicating country of Residence (to taxes and other)</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+				<xsd:attribute name="INType" type="mdr:StringMin1Max200_Type" use="optional">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">Identification Number Type</xsd:documentation>
+					</xsd:annotation>
+				</xsd:attribute>
+			</xsd:extension>
+		</xsd:simpleContent>
+	</xsd:complexType>
+	<!-- -->
+	<!-- Collection of all Data describing an organisationy  as party-->
+	<xsd:complexType name="OrganisationParty_Type">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+This container brings together all data about an organisation as a party. Name and address are required components and each can
+be present more than once to enable as complete a description as possible. Whenever possible one or more identifiers (TIN
+etc) should be added as well as a residence country code. Additional data that describes and identifies the party can be
+given . The code for the legal type according to the OECD codelist must be added. The structures of
+all of the subelements are defined elsewhere in this schema.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ResCountryCode" type="iso:CountryCode_Type" maxOccurs="unbounded"/>
+			<xsd:element name="TIN" type="mdr:TIN_Type">
+				<xsd:annotation>
+					<xsd:documentation>Tax Identification Number</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="IN" type="mdr:OrganisationIN_Type" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Entity Identification Number</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Name" type="mdr:NameOrganisation_Type" maxOccurs="unbounded"/>
+			<xsd:element name="Address" type="mdr:Address_Type" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- -->
+	<!-- -->
+	<!-- Collection of all Data describing a person as a  Party -->
+	<xsd:complexType name="PersonParty_Type">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">
+This container brings together all data about a person as a party. Name and address are required components and each can
+be present more than once to enable as complete a description as possible. Whenever possible one or more identifiers (TIN
+etc) should be added as well as a residence country code. Additional data that describes and identifies the party can be
+given. The code for the legal type according to the OECD codelist must be added. The structures of
+all of the subelements are defined elsewhere in this schema.</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="ResCountryCode" type="iso:CountryCode_Type" maxOccurs="unbounded"/>
+			<xsd:element name="TIN" type="mdr:TIN_Type" maxOccurs="unbounded"/>
+			<xsd:element name="Name" type="mdr:NamePerson_Type" maxOccurs="unbounded"/>
+			<xsd:element name="Address" type="mdr:Address_Type" maxOccurs="unbounded"/>
+			<xsd:element name="BirthDate" type="xsd:date" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- -->
+	<!--  -->
+	<!-- The Name of a Party, given in fixed Form-->
+	<xsd:complexType name="NamePerson_Type">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">The user must spread the data about the name of a party over up to six elements. The container element for this will be 'NameFix'. </xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:element name="PrecedingTitle" type="mdr:StringMin1Max200_Type" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">His Excellency,Estate of the Late ...</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Title" type="mdr:StringMin1Max200_Type" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Greeting title. Example: Mr, Dr, Ms, Herr, etc. Can have multiple titles.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="FirstName">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">FirstName of the person</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="mdr:StringMin1Max200_Type">
+							<xsd:attribute name="xnlNameType" type="mdr:StringMin1Max200_Type">
+								<xsd:annotation>
+									<xsd:documentation xml:lang="en">Defines the name type of FirstName. Example: Given Name, Forename, Christian Name, Father's Name, etc. In some countries, FirstName could be a Family Name or a SurName. Use this attribute to define the type for this name.
+									</xsd:documentation>
+								</xsd:annotation>
+							</xsd:attribute>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="MiddleName" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Middle name (essential part of the name for many nationalities). Example: Sakthi in "Nivetha Sakthi Shantha". Can have multiple middle names.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="mdr:StringMin1Max200_Type">
+							<xsd:attribute name="xnlNameType" type="mdr:StringMin1Max200_Type">
+								<xsd:annotation>
+									<xsd:documentation xml:lang="en">Defines the name type of Middle Name. Example: First name, middle name, maiden name, father's name, given name, etc.
+									</xsd:documentation>
+								</xsd:annotation>
+							</xsd:attribute>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="NamePrefix" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">de, van, van de, von, etc. Example: Derick de Clarke</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="mdr:StringMin1Max200_Type">
+							<xsd:attribute name="xnlNameType" type="mdr:StringMin1Max200_Type">
+								<xsd:annotation>
+									<xsd:documentation xml:lang="en">Defines the type of name associated with the NamePrefix. For example the type of name is LastName and this prefix is the prefix for this last name.
+							</xsd:documentation>
+								</xsd:annotation>
+							</xsd:attribute>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="LastName">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Represents the position of the name in a name string. Can be Given Name, Forename, Christian Name, Surname, Family Name, etc. Use the attribute "NameType" to define what type this name is.
+In case of a company, this field can be used for the company name.</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:simpleContent>
+						<xsd:extension base="mdr:StringMin1Max200_Type">
+							<xsd:attribute name="xnlNameType" type="mdr:StringMin1Max200_Type">
+								<xsd:annotation>
+									<xsd:documentation xml:lang="en">Defines the name type of LastName. Example: Father's name, Family name, Sur Name, Mother's Name, etc. In some countries, LastName could be the given name or first name.
+									</xsd:documentation>
+								</xsd:annotation>
+							</xsd:attribute>
+						</xsd:extension>
+					</xsd:simpleContent>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="GenerationIdentifier" type="mdr:StringMin1Max200_Type" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Jnr, Thr Third, III</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="Suffix" type="mdr:StringMin1Max200_Type" minOccurs="0" maxOccurs="unbounded">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Could be compressed initials - PhD, VC, QC</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<xsd:element name="GeneralSuffix" type="mdr:StringMin1Max200_Type" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Deceased, Retired ...</xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="nameType" type="stf:OECDNameType_EnumType" use="optional"/>
+		<xsd:attribute name="language" type="iso:LanguageCode_Type" use="optional">
+			<xsd:annotation>
+				<xsd:documentation xml:lang="en">Language used</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<!-- -->
+	<!-- CRS Avoidance Arrangement -->
+	<xsd:complexType name="CrsAvoidanceArrangement_Type">
+		<xsd:sequence>
+			<xsd:element name="DisclosureDate" type="xsd:date"/>
+			<xsd:element name="Reason" type="mdr:DisclosureReasonCRSAA_EnumType" minOccurs="0"/>
+			<xsd:element name="Type" type="mdr:CRSAvoidanceArrangement_EnumType" maxOccurs="unbounded"/>
+			<xsd:element name="OtherInfo" type="mdr:StringMin1Max4000WithLang_Type" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="StructureChart" type="mdr:ReportableTaxPayerChart_Type" minOccurs="0"/>
+			<xsd:element name="Narrative" type="mdr:StringMin1Max4000WithLang_Type" maxOccurs="unbounded"/>
+			<xsd:element name="Jurisdictions" type="iso:CountryCode_Type" maxOccurs="unbounded"/>
+			<xsd:element name="Summary" type="mdr:StringMin1Max4000WithLang_Type" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- -->
+	<!-- Opaque Offshore Structure -->
+	<xsd:complexType name="OpaqueOffshoreStructure_Type">
+		<xsd:sequence>
+			<xsd:element name="DisclosureDate" type="xsd:date"/>
+			<xsd:element name="Reason" type="mdr:DisclosureReasonOOS_EnumType" minOccurs="0"/>
+			<xsd:element name="Type" type="mdr:OOS_EnumType" maxOccurs="unbounded"/>
+			<xsd:element name="OtherInfo" type="mdr:StringMin1Max4000WithLang_Type" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="StructureChart" type="mdr:ReportableTaxPayerChart_Type" minOccurs="0"/>
+			<xsd:element name="Narrative" type="mdr:StringMin1Max4000WithLang_Type" maxOccurs="unbounded"/>
+			<xsd:element name="Jurisdictions" type="iso:CountryCode_Type" maxOccurs="unbounded"/>
+			<xsd:element name="Summary" type="mdr:StringMin1Max4000WithLang_Type" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- -->
+	<!-- Reportable Tax Payer Chart -->
+	<xsd:complexType name="ReportableTaxPayerChart_Type">
+		<xsd:sequence>
+			<xsd:element name="ID" type="mdr:PersonOrOrganisation_Type"/>
+			<xsd:element name="Ownership" type="mdr:Percentage_Type" minOccurs="0"/>
+			<xsd:element name="InvestAmount" type="mdr:MonAmnt_Type" minOccurs="0"/>
+			<xsd:element name="OtherInfo" type="mdr:StringMin1Max4000WithLang_Type" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="ListChilds" minOccurs="0">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="ChildRTP" type="mdr:ReportableTaxPayerChart_Type" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- -->
+	<!-- Person or Organisation -->
+	<xsd:complexType name="PersonOrOrganisation_Type">
+		<xsd:sequence>
+			<xsd:choice>
+				<xsd:element name="Individual" type="mdr:PersonParty_Type"/>
+				<xsd:element name="Organisation" type="mdr:OrganisationParty_Type"/>
+			</xsd:choice>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Top level types  ++++++++++++++++++++++++++++++++++++++++++++ -->
+	<!-- -->
+	<!-- Disclosing Person / Entity -->
+	<xsd:complexType name="Disclosing_Type">
+		<xsd:sequence>
+			<xsd:element name="ID" type="mdr:PersonOrOrganisation_Type"/>
+			<xsd:element name="Capacity" type="mdr:CapacityDisclosingPerson_EnumType" maxOccurs="unbounded"/>
+			<xsd:element name="Nexus" type="mdr:NexusDisclosure_EnumType" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- -->
+	<!-- Correctable Disclosing Person / Entity -->
+	<xsd:complexType name="CorrectableDisclosing_Type">
+		<xsd:complexContent>
+			<xsd:extension base="mdr:Disclosing_Type">
+				<xsd:sequence>
+					<xsd:element name="DocSpec" type="mdr:DocSpec_Type"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- -->
+	<!-- Reportable Tax Payer -->
+	<xsd:complexType name="TaxPayer_Type">
+		<xsd:sequence>
+			<xsd:element name="ID" type="mdr:PersonOrOrganisation_Type"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- -->
+	<!-- Intermediaries -->
+	<xsd:complexType name="Intermediary_Type">
+		<xsd:sequence>
+			<xsd:element name="ID" type="mdr:PersonOrOrganisation_Type"/>
+			<xsd:element name="Role" type="mdr:IntermediaryRole_EnumType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!--  -->
+	<!-- Structure type -->
+	<xsd:complexType name="Structure_Type">
+		<xsd:sequence>
+			<xsd:element name="Arrangement">
+				<xsd:complexType>
+					<xsd:choice>
+						<xsd:element name="CrsAvoidance" type="mdr:CrsAvoidanceArrangement_Type"/>
+						<xsd:element name="OOS" type="mdr:OpaqueOffshoreStructure_Type"/>
+					</xsd:choice>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- -->
+	<!-- MDR Report -->
+	<xsd:complexType name="MdrReport_Type">
+		<xsd:sequence>
+			<xsd:element name="ReportableTaxPayer" type="mdr:TaxPayer_Type" maxOccurs="unbounded"/>
+			<xsd:element name="Intermediaries" type="mdr:Intermediary_Type" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="Structure" type="mdr:Structure_Type"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- -->
+	<!-- Correctable MDR Report -->
+	<xsd:complexType name="CorrectableMdrReport_Type">
+		<xsd:complexContent>
+			<xsd:extension base="mdr:MdrReport_Type">
+				<xsd:sequence>
+					<xsd:element name="DocSpec" type="mdr:DocSpec_Type"/>
+				</xsd:sequence>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!--  -->
+	<!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Body type  ++++++++++++++++++++++++++++++++++++++++++++ -->
+	<!-- mdr Body Type  -->
+	<xsd:complexType name="MdrBody_Type">
+		<xsd:sequence>
+			<xsd:element name="Disclosing" type="mdr:CorrectableDisclosing_Type"/>
+			<xsd:element name="MdrReport" type="mdr:CorrectableMdrReport_Type" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!--  -->
+	<!--+++++++++++++++++++++++++++++++++++++++++++++++++++++++++ Schema top element ++++++++++++++++++++++++++++++++++++++++++++ -->
+	<!-- MDR OECD File Message structure  -->
+	<!-- -->
+	<!-- MDR Message structure  -->
+	<xsd:element name="MDR_OECD">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="MessageSpec" type="mdr:MessageSpec_Type"/>
+				<xsd:element name="MdrBody" type="mdr:MdrBody_Type" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="version" type="mdr:StringMin1Max10_Type">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">MDR Version</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	<!-- -->
+</xsd:schema>

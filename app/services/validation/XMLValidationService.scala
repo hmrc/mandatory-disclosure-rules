@@ -16,14 +16,14 @@
 
 package services.validation
 
-import com.google.inject.ImplementedBy
+import config.AppConfig
 import models.validation.SaxParseError
 import org.xml.sax.SAXParseException
 import org.xml.sax.helpers.DefaultHandler
 
 import java.io.StringReader
 import java.net.URL
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import javax.xml.parsers.{SAXParser, SAXParserFactory}
 import javax.xml.transform.Source
 import javax.xml.transform.stream.StreamSource
@@ -35,6 +35,7 @@ import scala.xml.{Elem, NodeSeq}
 class XMLValidationService @Inject() (xmlValidatingParser: SaxParser) {
 
   def validateXML(upScanUrl: Option[String] = None, xml: Option[NodeSeq] = None): Either[ListBuffer[SaxParseError], Elem] = {
+
     val list: ListBuffer[SaxParseError] = new ListBuffer[SaxParseError]
 
     trait AccumulatorState extends DefaultHandler {
@@ -59,23 +60,25 @@ class XMLValidationService @Inject() (xmlValidatingParser: SaxParser) {
   }
 }
 
-@ImplementedBy(classOf[SchemaValidatingParser])
 trait SaxParser {
   def validatingParser: SAXParser
 }
 
-class SchemaValidatingParser extends SaxParser {
+@Singleton
+class MDRSchemaValidatingParser @Inject() (appConfig: AppConfig) extends SaxParser {
 
-  val schemaLang: String             = javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI
-  val isoXsdUrl: URL                 = getClass.getResource("/schemas/IsoTypes_v1.01.xsd")
-  val ukDAC6XsdUrl: URL              = getClass.getResource("/schemas/UKDac6XSD_v0.5.xsd")
-  val ukDCT06XsdUrl: URL             = getClass.getResource("/schemas/DCT06_EIS_UK_schema.xsd")
-  val isoXsdStream: StreamSource     = new StreamSource(isoXsdUrl.openStream())
-  val ukDAC6XsdStream: StreamSource  = new StreamSource(ukDAC6XsdUrl.openStream())
-  val ukDCT06XsdStream: StreamSource = new StreamSource(ukDCT06XsdUrl.openStream())
+  val schemaLang: String                = javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI
+  val isoXsdUrl: URL                    = getClass.getResource(appConfig.isotypes)
+  val mdrTypesUrl: URL                  = getClass.getResource(appConfig.mdrtypes)
+  val ukMDRXsdUrl: URL                  = getClass.getResource(appConfig.mdrschema)
+  val ukDCT06XsdUrl: URL                = getClass.getResource(appConfig.eisSchema)
+  val isoXsdStream: StreamSource        = new StreamSource(isoXsdUrl.openStream())
+  val ukMDRXsdStream: StreamSource      = new StreamSource(ukMDRXsdUrl.openStream())
+  val ukMDRTypesXsdStream: StreamSource = new StreamSource(mdrTypesUrl.openStream())
+  val ukDCT06XsdStream: StreamSource    = new StreamSource(ukDCT06XsdUrl.openStream())
 
-  //IsoTypes xsd is referenced by UKDac6XSD so must come first in the array
-  val streams: Array[Source] = Array(isoXsdStream, ukDAC6XsdStream, ukDCT06XsdStream)
+  //Order is significant as files containing parent name spaces should come last
+  val streams: Array[Source] = Array(isoXsdStream, ukMDRTypesXsdStream, ukMDRXsdStream, ukDCT06XsdStream)
 
   val schema: Schema = SchemaFactory.newInstance(schemaLang).newSchema(streams)
 
