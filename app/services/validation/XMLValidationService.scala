@@ -16,13 +16,14 @@
 
 package services.validation
 
+import config.AppConfig
 import models.validation.SaxParseError
 import org.xml.sax.SAXParseException
 import org.xml.sax.helpers.DefaultHandler
 
 import java.io.StringReader
 import java.net.URL
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import javax.xml.parsers.{SAXParser, SAXParserFactory}
 import javax.xml.transform.Source
 import javax.xml.transform.stream.StreamSource
@@ -63,20 +64,21 @@ trait SaxParser {
   def validatingParser: SAXParser
 }
 
-class MDRSchemaValidatingParser extends SaxParser {
+@Singleton
+class MDRSchemaValidatingParser @Inject() (appConfig: AppConfig) extends SaxParser {
 
   val schemaLang: String                = javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI
-  val isoXsdUrl: URL                    = getClass.getResource("/schemas/mdr/IsoMdrTypes_v1.0.xsd")
-  val ukMDRXsdUrl: URL                  = getClass.getResource("/schemas/mdr/MdrXML_v1.0.xsd")
-  val mdrTypesUrl: URL                  = getClass.getResource("/schemas/mdr/OecdMdrTypes_v1.0.xsd")
-  val ukDCT06XsdUrl: URL                = getClass.getResource("/schemas/mdr/DCT06_EIS_UK_schema.xsd")
+  val isoXsdUrl: URL                    = getClass.getResource(appConfig.isotypes)
+  val mdrTypesUrl: URL                  = getClass.getResource(appConfig.mdrtypes)
+  val ukMDRXsdUrl: URL                  = getClass.getResource(appConfig.mdrschema)
+  val ukDCT06XsdUrl: URL                = getClass.getResource(appConfig.eisSchema)
   val isoXsdStream: StreamSource        = new StreamSource(isoXsdUrl.openStream())
   val ukMDRXsdStream: StreamSource      = new StreamSource(ukMDRXsdUrl.openStream())
   val ukMDRTypesXsdStream: StreamSource = new StreamSource(mdrTypesUrl.openStream())
   val ukDCT06XsdStream: StreamSource    = new StreamSource(ukDCT06XsdUrl.openStream())
 
   //IsoTypes xsd is referenced by UKDac6XSD so must come first in the array
-  val streams: Array[Source] = Array(isoXsdStream, ukMDRTypesXsdStream, ukMDRXsdStream)
+  val streams: Array[Source] = Array(isoXsdStream, ukMDRTypesXsdStream, ukMDRXsdStream, ukDCT06XsdStream)
 
   val schema: Schema = SchemaFactory.newInstance(schemaLang).newSchema(streams)
 
