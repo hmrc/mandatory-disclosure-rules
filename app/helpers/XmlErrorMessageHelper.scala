@@ -18,7 +18,6 @@ package helpers
 
 import models.validation.{GenericError, Message, SaxParseError}
 
-import java.io
 import scala.collection.mutable.ListBuffer
 
 class XmlErrorMessageHelper {
@@ -43,7 +42,6 @@ class XmlErrorMessageHelper {
           .orElse(extractInvalidDateErrorValues(error1, error2))
           .orElse(extractMissingTagValues(error1))
           .orElse(extractBooleanErrorValues(error1, error2))
-
 
         GenericError(groupedErrors._1, error.getOrElse(Message(defaultMessage)))
       } else GenericError(groupedErrors._1, Message(defaultMessage))
@@ -130,9 +128,9 @@ class XmlErrorMessageHelper {
       case formatOfFirstError(_, _, allowedLength, _) =>
         formattedError match {
           case formatOfSecondError(_, element) =>
-            Some(Message("xml.not.allowed.length",Seq(element,allowedLength)))
+            Some(Message("xml.not.allowed.length", Seq(element, allowedLength)))
           case formatOfAlternativeSecondError(element) =>
-            Some(Message("xml.not.allowed.length",Seq(element,allowedLength)))
+            Some(Message("xml.not.allowed.length", Seq(element, allowedLength)))
           case _ => None
         }
       case _ => None
@@ -195,9 +193,7 @@ class XmlErrorMessageHelper {
     }
   }
 
-
-
-  def extractInvalidDateErrorValues(errorMessage1: String, errorMessage2: String): Option[String] = {
+  def extractInvalidDateErrorValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
     val formatOfFirstError  = """cvc-datatype-valid.1.2.1: '(.*?)' is not a valid value for 'date'.""".stripMargin.r
     val formatOfSecondError = """cvc-type.3.1.3: The value '(.*?)' of element '(.*?)' is not valid.""".stripMargin.r
 
@@ -205,17 +201,14 @@ class XmlErrorMessageHelper {
       case formatOfFirstError(_) =>
         errorMessage2 match {
           case formatOfSecondError(_, element) =>
-            val displayName = if (element.equals("ImplementingDate")) {
-              "DisclosureInformation/ImplementingDate"
-            } else element
-            Some(s"Enter a $displayName in the format YYYY-MM-DD")
+            Some(Message("xml.date.format", Seq(element)))
           case _ => None
         }
       case _ => None
     }
   }
 
-  def extractMissingTagValues(errorMessage: String): Option[String] = {
+  def extractMissingTagValues(errorMessage: String): Option[Message] = {
 
     val formattedError = errorMessage.replaceAll("[{}]", "")
     val format =
@@ -223,7 +216,7 @@ class XmlErrorMessageHelper {
 
     formattedError match {
       case format(_, element) =>
-        Some(s"Enter a line for $element")
+        Some(Message("xml.enter.line", Seq(element)))
       case _ => None
     }
   }
@@ -232,7 +225,7 @@ class XmlErrorMessageHelper {
     val vowels = "aeiouAEIOU"
     if (vowels.contains(elementName.head)) {
       Message("xml.enter.an.element", Seq(elementName))
-    } else  Message("xml.enter.an.element", Seq(elementName))
+    } else Message("xml.enter.an.element", Seq(elementName))
 
   }
 

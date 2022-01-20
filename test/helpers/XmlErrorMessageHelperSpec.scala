@@ -18,6 +18,7 @@ package helpers
 
 import base.SpecBase
 import models.validation.{GenericError, SaxParseError}
+import models.validation.Message
 
 import scala.collection.mutable.ListBuffer
 
@@ -35,13 +36,13 @@ class XmlErrorMessageHelperSpec extends SpecBase {
       "must return correct error for missing attribute error'" in {
         val missingAttributeError = SaxParseError(lineNumber, "cvc-complex-type.4: Attribute 'currCode' must appear on element 'Amount'.")
         val result                = helper.generateErrorMessages(ListBuffer(missingAttributeError))
-        result mustBe List(GenericError(lineNumber, "Enter an Amount currCode"))
+        result mustBe List(GenericError(lineNumber, Message("xml.enter.an.element", List("Amount currCode"))))
       }
 
       "must return correct error for unexpected error message'" in {
         val randomError = SaxParseError(lineNumber, "random error.")
         val result      = helper.generateErrorMessages(ListBuffer(randomError))
-        result mustBe List(GenericError(lineNumber, "There is a problem with this line number"))
+        result mustBe List(GenericError(lineNumber, Message("xml.defaultMessage")))
       }
 
       "must return correct error for invalid enum error for attribute" in {
@@ -54,7 +55,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
                         "cvc-attribute.3: The value 'GBf' of attribute 'issuedBy' on element 'TIN' is not valid with respect to its type, 'CountryCode_Type'."
           )
         val result = helper.generateErrorMessages(ListBuffer(invalidEnumError1, invalidEnumError2))
-        result mustBe List(GenericError(lineNumber, "TIN issuedBy is not one of the ISO country codes"))
+        result mustBe List(GenericError(lineNumber, Message("xml.not.ISO.code", List("TIN issuedBy"))))
       }
 
       "must return correct error for missing element error'" in {
@@ -67,7 +68,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         val missingElementError2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value '' of element 'Street' is not valid.")
 
         val result = helper.generateErrorMessages(ListBuffer(missingElementError1, missingElementError2))
-        result mustBe List(GenericError(lineNumber, "Enter a Street"))
+        result mustBe List(GenericError(lineNumber, Message("xml.enter.an.element", List("Street"))))
       }
 
       "must return correct error for missing ConcernedMS'" in {
@@ -79,7 +80,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         val error2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value '' of element 'ConcernedMS' is not valid.")
 
         val result = helper.generateErrorMessages(ListBuffer(error1, error2))
-        result mustBe List(GenericError(lineNumber, "Enter a ConcernedMS"))
+        result mustBe List(GenericError(lineNumber, Message("xml.enter.an.element", List("ConcernedMS"))))
       }
 
       "must return correct error for missing birthplace'" in {
@@ -90,7 +91,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
           )
         val error2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value '' of element 'BirthPlace' is not valid.")
         val result = helper.generateErrorMessages(ListBuffer(error1, error2))
-        result mustBe List(GenericError(lineNumber, "Enter a BirthPlace"))
+        result mustBe List(GenericError(lineNumber, Message("xml.enter.an.element", List("BirthPlace"))))
       }
 
       "must return correct error when length exceed for TIN'" in {
@@ -102,7 +103,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         val error2 = SaxParseError(lineNumber, "cvc-complex-type.2.2: Element 'TIN' must have no element [children], and the value must be valid.")
 
         val result = helper.generateErrorMessages(ListBuffer(error1, error2))
-        result mustBe List(GenericError(lineNumber, "TIN must be 200 characters or less"))
+        result mustBe List(GenericError(lineNumber, Message("xml.not.allowed.length", List("TIN", "200"))))
       }
 
       "must return correct error for missing org name'" in {
@@ -113,7 +114,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
           )
         val error2 = SaxParseError(lineNumber, "cvc-complex-type.2.2: Element 'OrganisationName' must have no element [children], and the value must be valid.")
         val result = helper.generateErrorMessages(ListBuffer(error1, error2))
-        result mustBe List(GenericError(lineNumber, "Enter an OrganisationName"))
+        result mustBe List(GenericError(lineNumber, Message("xml.enter.an.element", List("OrganisationName"))))
       }
 
       "must return correct error when allowed length exceeded" in {
@@ -125,7 +126,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         val maxlengthError2 = SaxParseError(lineNumber, s"cvc-type.3.1.3: The value '$over400' of element 'BuildingIdentifier' is not valid.")
 
         val result = helper.generateErrorMessages(ListBuffer(maxLengthError1, maxlengthError2))
-        result mustBe List(GenericError(lineNumber, "BuildingIdentifier must be 400 characters or less"))
+        result mustBe List(GenericError(lineNumber, Message("xml.not.allowed.length", List("BuildingIdentifier", "400"))))
       }
 
       "must return correct error when invalid enum given for element" in {
@@ -137,7 +138,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         val invalidEnumError2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value 'Raneevev' of element 'Country' is not valid.")
 
         val result = helper.generateErrorMessages(ListBuffer(invalidEnumError1, invalidEnumError2))
-        result mustBe List(GenericError(lineNumber, "Country is not one of the ISO country codes"))
+        result mustBe List(GenericError(lineNumber, Message("xml.not.ISO.code", List("Country"))))
       }
 
       "must return correct error when when pence included on amount field" in {
@@ -145,7 +146,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         val error1 = SaxParseError(lineNumber, "cvc-datatype-valid.1.2.1: '4000.02' is not a valid value for 'integer'.")
         val error2 = SaxParseError(lineNumber, "cvc-complex-type.2.2: Element 'Amount' must have no element [children], and the value must be valid.")
         val result = helper.generateErrorMessages(ListBuffer(error1, error2))
-        result mustBe List(GenericError(lineNumber, "Amount must not include pence, like 123 or 156"))
+        result mustBe List(GenericError(lineNumber, Message("xml.must.not.include.pence", List("Amount"))))
       }
 
       "must return correct error for invalid date format" in {
@@ -153,7 +154,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         val error1 = SaxParseError(lineNumber, "cvc-datatype-valid.1.2.1: '14-01-2007' is not a valid value for 'date'.")
         val error2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value '14-01-2007' of element 'BirthDate' is not valid.")
         val result = helper.generateErrorMessages(ListBuffer(error1, error2))
-        result mustBe List(GenericError(lineNumber, "Enter a BirthDate in the format YYYY-MM-DD"))
+        result mustBe List(GenericError(lineNumber, Message("xml.date.format", List("BirthDate"))))
       }
 
       "must return correct error for invalid date format (ImplementingDate)" in {
@@ -161,7 +162,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         val error2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value '2020-05-oo' of element 'ImplementingDate' is not valid.")
 
         val result = helper.generateErrorMessages(ListBuffer(error1, error2))
-        result mustBe List(GenericError(lineNumber, "Enter a DisclosureInformation/ImplementingDate in the format YYYY-MM-DD"))
+        result mustBe List(GenericError(lineNumber, Message("xml.date.format", List("ImplementingDate"))))
       }
 
       "must return correct error for invalid Intermediary Capacity" in {
@@ -172,7 +173,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         val error2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value 'DAC61102fggg' of element 'Capacity' is not valid.")
 
         val result = helper.generateErrorMessages(ListBuffer(error1, error2))
-        result mustBe List(GenericError(lineNumber, "Capacity is not one of the allowed values (DAC61101, DAC61102) for Intermediary"))
+        result mustBe List(GenericError(lineNumber, Message("xml.defaultMessage")))
       }
 
       "must return correct error for invalid TaxPayer Capacity" in {
@@ -182,7 +183,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         )
         val error2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value 'DAC61105hjkjk' of element 'Capacity' is not valid.")
         val result = helper.generateErrorMessages(ListBuffer(error1, error2))
-        result mustBe List(GenericError(lineNumber, "Capacity is not one of the allowed values (DAC61104, DAC61105, DAC61106) for Taxpayer"))
+        result mustBe List(GenericError(lineNumber, Message("xml.defaultMessage")))
       }
 
       "must return correct error for line (value and tags)" in {
@@ -192,7 +193,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
           "cvc-complex-type.2.4.a: Invalid content was found starting with element '{\"urn:ukdac6:v0.1\":BuildingIdentifier}'. One of '{\"urn:ukdac6:v0.1\":Street}' is expected."
         )
         val result = helper.generateErrorMessages(ListBuffer(error1))
-        result mustBe List(GenericError(lineNumber, "Enter a line for Street"))
+        result mustBe List(GenericError(lineNumber, Message("xml.defaultMessage")))
       }
 
       "must return correct error when 3 errors present for same line" in {
@@ -202,7 +203,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         val error3 = SaxParseError(lineNumber, "random error 3")
 
         val result = helper.generateErrorMessages(ListBuffer(error1, error2, error3))
-        result mustBe List(GenericError(20, "There is a problem with this line number"))
+        result mustBe List(GenericError(20, Message("xml.defaultMessage")))
       }
 
       "must return correct error for missing boolean value (affected Person)" in {
@@ -211,7 +212,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         val error2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value '' of element 'AffectedPerson' is not valid.")
 
         val result = helper.generateErrorMessages(ListBuffer(error1, error2))
-        result mustBe List(GenericError(lineNumber, "Enter an AssociatedEnterprise/AffectedPerson"))
+        result mustBe List(GenericError(lineNumber, Message("xml.enter.an.element", List("AssociatedEnterprise/AffectedPerson"))))
       }
 
       "must return correct error for missing other boolean value" in {
@@ -220,7 +221,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         val error2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value '' of element 'InitialDisclosureMA' is not valid.")
 
         val result = helper.generateErrorMessages(ListBuffer(error1, error2))
-        result mustBe List(GenericError(lineNumber, "Enter an InitialDisclosureMA"))
+        result mustBe List(GenericError(lineNumber, Message("xml.enter.an.element", List("InitialDisclosureMA"))))
       }
 
       "must return correct error for invalid boolean value" in {
@@ -229,7 +230,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         val error2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value 'yes' of element 'InitialDisclosureMA' is not valid.")
 
         val result = helper.generateErrorMessages(ListBuffer(error1, error2))
-        result mustBe List(GenericError(lineNumber, "InitialDisclosureMA must be true or false"))
+        result mustBe List(GenericError(lineNumber, Message("xml.must.be.boolean", List("InitialDisclosureMA"))))
       }
 
       "must return correct error for incorrectly formatted arrangement id" in {
@@ -241,7 +242,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         val error2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value 'njinjin' of element 'ArrangementID' is not valid.")
 
         val result = helper.generateErrorMessages(ListBuffer(error1, error2))
-        result mustBe List(GenericError(lineNumber, "Enter ArrangementID in the format CCAYYYYMMDDXXXXXX"))
+        result mustBe List(GenericError(lineNumber, Message("xml.defaultMessage")))
       }
 
       "must return correct error for incorrectly formatted disclosure id" in {
@@ -252,7 +253,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         )
         val error2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value 'rbrbrbrbrb' of element 'DisclosureID' is not valid.")
         val result = helper.generateErrorMessages(ListBuffer(error1, error2))
-        result mustBe List(GenericError(lineNumber, "Enter DisclosureID in the format CCDYYYYMMDDXXXXXX"))
+        result mustBe List(GenericError(lineNumber, Message("xml.defaultMessage")))
       }
 
       "must return correct error for missing MessageRefId" in {
@@ -263,7 +264,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
           )
         val error2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value '' of element 'MessageRefId' is not valid.")
         val result = helper.generateErrorMessages(ListBuffer(error1, error2))
-        result mustBe List(GenericError(lineNumber, "Enter a MessageRefId"))
+        result mustBe List(GenericError(lineNumber, Message("xml.enter.an.element", List("MessageRefId"))))
       }
 
     }
@@ -272,47 +273,42 @@ class XmlErrorMessageHelperSpec extends SpecBase {
 
       "must return correct message for 'Country'" in {
         val result = helper.invalidCodeMessage("Country")
-        result mustBe Some("Country is not one of the ISO country codes")
+        result mustBe Some(Message("xml.not.ISO.code", List("Country")))
       }
 
       "must return correct message for 'CountryExemption'" in {
         val result = helper.invalidCodeMessage("CountryExemption")
-        result mustBe Some("CountryExemption is not one of the ISO country codes")
+        result mustBe Some(Message("xml.not.ISO.code", List("CountryExemption")))
       }
 
       "must return correct message for 'ConcernedMS'" in {
         val result = helper.invalidCodeMessage("ConcernedMS")
-        result mustBe Some("ConcernedMS is not one of the ISO EU Member State country codes")
+        result mustBe Some(Message("xml.not.ISO.code.concernedMS"))
       }
 
       "must return correct message for 'Reason'" in {
         val result = helper.invalidCodeMessage("Reason")
-        result mustBe Some("Reason is not one of the allowed values")
-      }
-
-      "must return correct message for 'Capacity'" in {
-        val result = helper.invalidCodeMessage("Capacity", Some("(DAC61101, DAC61102)"))
-        result mustBe Some("Capacity is not one of the allowed values (DAC61101, DAC61102) for Intermediary")
+        result mustBe Some(Message("xml.not.allowed.value", List("Reason")))
       }
 
       "must return correct message for 'IntermediaryNexus'" in {
         val result = helper.invalidCodeMessage("IntermediaryNexus")
-        result mustBe Some("IntermediaryNexus is not one of the allowed values")
+        result mustBe Some(Message("xml.not.allowed.value", List("IntermediaryNexus")))
       }
 
       "must return correct message for 'RelevantTaxpayerNexus'" in {
         val result = helper.invalidCodeMessage("RelevantTaxpayerNexus")
-        result mustBe Some("RelevantTaxpayerNexus is not one of the allowed values")
+        result mustBe Some(Message("xml.not.allowed.value", List("RelevantTaxpayerNexus")))
       }
 
       "must return correct message for 'Hallmark'" in {
         val result = helper.invalidCodeMessage("Hallmark")
-        result mustBe Some("Hallmark is not one of the allowed values")
+        result mustBe Some(Message("xml.not.allowed.value", List("Hallmark")))
       }
 
       "must return correct message for 'ResCountryCode'" in {
         val result = helper.invalidCodeMessage("ResCountryCode")
-        result mustBe Some("ResCountryCode is not one of the allowed values")
+        result mustBe Some(Message("xml.not.allowed.value", List("ResCountryCode")))
       }
 
       "must return None for unexpected elementName" in {

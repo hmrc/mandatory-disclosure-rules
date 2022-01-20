@@ -44,7 +44,7 @@ class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEac
     "must return 200 and a sequence of errors when a validation error occurs" in {
 
       when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[Option[String]]()))
-        .thenReturn(Future.successful(Some(SubmissionValidationFailure(ValidationErrors(Seq(GenericError(1, "Error2")))))))
+        .thenReturn(Future.successful(SubmissionValidationFailure(ValidationErrors(Seq(GenericError(1, Message("xml.enter.an.element")))))))
 
       val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url)
       val result  = route(application, request).value
@@ -55,7 +55,7 @@ class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEac
 
     "must return 200 and Validation success object " in {
       when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[Option[String]]()))
-        .thenReturn(Future.successful(Some(SubmissionValidationSuccess(true))))
+        .thenReturn(Future.successful(SubmissionValidationSuccess(true)))
 
       val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url)
       val result  = route(application, request).value
@@ -65,7 +65,7 @@ class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEac
 
     "must return 400 and a bad request when validation fails" in {
       when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[Option[String]]()))
-        .thenReturn(Future.successful(Some(InvalidXmlError(""))))
+        .thenReturn(Future.successful(InvalidXmlError("")))
 
       val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url)
       val result  = route(application, request).value
@@ -73,15 +73,6 @@ class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEac
       status(result) mustBe BAD_REQUEST
     }
 
-    "must return 400 and a bad request when None returns from validation engine" in {
-      when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[Option[String]]()))
-        .thenReturn(Future.successful(None))
-
-      val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url)
-      val result  = route(application, request).value
-
-      status(result) mustBe BAD_REQUEST
-    }
   }
 
 }

@@ -20,7 +20,11 @@ import play.api.libs.json.{Json, OFormat}
 
 case class GenericError(lineNumber: Int, message: Message)
 
-case class Message(messageKey: String, attr: Seq[String] = Seq.empty)
+case class Message(messageKey: String, args: Seq[String] = Seq.empty)
+
+object Message {
+  implicit val messageFormat: OFormat[Message] = Json.format[Message]
+}
 
 object GenericError {
 

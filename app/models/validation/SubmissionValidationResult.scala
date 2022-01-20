@@ -55,3 +55,7 @@ object SubmissionValidationFailure {
 case class InvalidXmlError(saxException: String) extends SubmissionValidationResult {
   override def toString: String = s"Invalid XML - $saxException"
 }
+
+case class XmlConnectionError(saxException: String) extends SubmissionValidationResult {
+  override def toString: String = s"Invalid XML - $saxException"
+}
