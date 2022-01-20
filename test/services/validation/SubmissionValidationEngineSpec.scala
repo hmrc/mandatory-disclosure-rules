@@ -20,12 +20,9 @@ import base.SpecBase
 import helpers.XmlErrorMessageHelper
 import models.validation._
 import org.mockito.ArgumentMatchers.any
-import org.xml.sax.SAXParseException
-import play.api.inject.bind
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Await
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
 import scala.xml.Elem
 
@@ -141,7 +138,7 @@ class SubmissionValidationEngineSpec extends SpecBase {
       val expectedErrors =
         Seq(GenericError(20, Message("xml.enter.an.element", List("Street"))), GenericError(27, Message("xml.enter.an.element", List("City"))))
 
-      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
+      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(expectedErrors)
     }
 
     "must return ValidationFailure for file missing mandatory attributes" in new SetUp {
@@ -152,7 +149,7 @@ class SubmissionValidationEngineSpec extends SpecBase {
 
       val expectedErrors = Seq(GenericError(175, Message("xml.enter.an.element", List("Amount currCode"))))
 
-      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
+      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(expectedErrors)
     }
 
     "must return ValidationFailure for file where element is too long (1-400 allowed)" in new SetUp {
@@ -161,7 +158,7 @@ class SubmissionValidationEngineSpec extends SpecBase {
 
       val expectedErrors = Seq(GenericError(116, Message("xml.not.allowed.length", List("BuildingIdentifier", "400"))))
 
-      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
+      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(expectedErrors)
     }
 
     "must return ValidationFailure for file where element is too long (1-4000 allowed)" in new SetUp {
@@ -170,7 +167,7 @@ class SubmissionValidationEngineSpec extends SpecBase {
 
       val expectedErrors = Seq(GenericError(116, Message("xml.not.allowed.length", List("NationalProvision", "4000"))))
 
-      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
+      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(expectedErrors)
     }
 
     "must return ValidationFailure for file with invalid country code" in new SetUp {
@@ -179,7 +176,7 @@ class SubmissionValidationEngineSpec extends SpecBase {
 
       val expectedErrors = Seq(GenericError(123, Message("xml.not.ISO.code", List("Country"))))
 
-      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
+      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(expectedErrors)
     }
 
     "must return ValidationFailure for file with invalid countryMS code" in new SetUp {
@@ -187,7 +184,7 @@ class SubmissionValidationEngineSpec extends SpecBase {
 
       val expectedErrors = Seq(GenericError(177, Message("xml.not.ISO.code.concernedMS")))
 
-      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
+      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(expectedErrors)
     }
 
     "must return ValidationFailure for file with invalid countryExemption code" in new SetUp {
@@ -196,7 +193,7 @@ class SubmissionValidationEngineSpec extends SpecBase {
 
       val expectedErrors = Seq(GenericError(133, Message("xml.not.ISO.code", List("CountryExemption"))))
 
-      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
+      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(expectedErrors)
     }
 
     "must return ValidationFailure for file with invalid Reason entry code" in new SetUp {
@@ -205,7 +202,7 @@ class SubmissionValidationEngineSpec extends SpecBase {
 
       val expectedErrors = Seq(GenericError(169, Message("xml.not.allowed.value", List("Reason"))))
 
-      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
+      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(expectedErrors)
     }
 
     "must return ValidationFailure for file with invalid issuedBy code" in new SetUp {
@@ -214,7 +211,7 @@ class SubmissionValidationEngineSpec extends SpecBase {
 
       val expectedErrors = Seq(GenericError(18, Message("xml.not.ISO.code", List("TIN issuedBy"))))
 
-      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
+      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(expectedErrors)
     }
 
     "must return ValidationFailure with generic error message if parse error is not in an expected format" in new SetUp {
@@ -224,7 +221,7 @@ class SubmissionValidationEngineSpec extends SpecBase {
 
       val expectedErrors = Seq(GenericError(lineNumber, Message("xml.defaultMessage")))
 
-      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
+      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(expectedErrors)
     }
   }
 }

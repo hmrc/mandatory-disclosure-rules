@@ -34,28 +34,18 @@ object SubmissionValidationResult {
   }
 }
 
-case class ValidationErrors(errors: Seq[GenericError])
-
-object ValidationErrors {
-  implicit val format = Json.format[ValidationErrors]
-}
-
 case class SubmissionValidationSuccess(boolean: Boolean) extends SubmissionValidationResult // ToDo change to metadata when available
 
 object SubmissionValidationSuccess {
   implicit val format: OFormat[SubmissionValidationSuccess] = Json.format[SubmissionValidationSuccess]
 }
 
-case class SubmissionValidationFailure(validationErrors: ValidationErrors) extends SubmissionValidationResult
+case class SubmissionValidationFailure(errors: Seq[GenericError]) extends SubmissionValidationResult
 
 object SubmissionValidationFailure {
   implicit val format: OFormat[SubmissionValidationFailure] = Json.format[SubmissionValidationFailure]
 }
 
 case class InvalidXmlError(saxException: String) extends SubmissionValidationResult {
-  override def toString: String = s"Invalid XML - $saxException"
-}
-
-case class XmlConnectionError(saxException: String) extends SubmissionValidationResult {
   override def toString: String = s"Invalid XML - $saxException"
 }

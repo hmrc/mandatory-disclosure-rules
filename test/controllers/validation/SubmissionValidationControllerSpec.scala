@@ -23,7 +23,7 @@ import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{status, POST, _}
+import play.api.test.Helpers.{POST, status, _}
 import services.validation.SubmissionValidationEngine
 
 import scala.concurrent.Future
@@ -44,7 +44,7 @@ class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEac
     "must return 200 and a sequence of errors when a validation error occurs" in {
 
       when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[Option[String]]()))
-        .thenReturn(Future.successful(SubmissionValidationFailure(ValidationErrors(Seq(GenericError(1, Message("xml.enter.an.element")))))))
+        .thenReturn(Future.successful(SubmissionValidationFailure(Seq(GenericError(1, Message("xml.enter.an.element"))))))
 
       val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url)
       val result  = route(application, request).value

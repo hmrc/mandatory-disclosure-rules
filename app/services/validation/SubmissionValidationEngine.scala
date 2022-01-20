@@ -21,7 +21,6 @@ import models.validation._
 import org.xml.sax.SAXParseException
 import play.api.Logging
 
-import java.net.ConnectException
 import javax.inject.Inject
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
@@ -34,7 +33,7 @@ class SubmissionValidationEngine @Inject() (xmlValidationService: XMLValidationS
       case None =>
         Future.successful(SubmissionValidationSuccess(true))
       case Some(errors) =>
-        Future.successful(SubmissionValidationFailure(ValidationErrors(errors)))
+        Future.successful(SubmissionValidationFailure(errors))
     } catch {
       case e: SAXParseException =>
         logger.warn(s"XML parsing failed. The XML parser has thrown the exception: $e")
