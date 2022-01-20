@@ -1,4 +1,9 @@
 xml.defaultMessage = "There is a problem with this line number"
 xml.enter.an.element = Enter an {0}
 xml.enter.a.element = Enter a {0}
-xml.must.be.boolean = {} must be true or false
+xml.must.be.boolean = {0} must be true or false
+xml.not.ISO.code = {0} is not one of the ISO country codes
+xml.not.ISO.code.concernedMS = ConcernedMS is not one of the ISO EU Member State country codes
+xml.not.allowed.value = {0} is not one of the allowed values
+xml.not.allowed.length = {0} must be {1} characters or less
+xml.must.not.include.pence = {0} must not include pence, like 123 or 156
