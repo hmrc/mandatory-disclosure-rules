@@ -16,13 +16,14 @@
 
 package helpers
 
-import models.validation.{GenericError, SaxParseError}
+import models.validation.{GenericError, Message, SaxParseError}
 
+import java.io
 import scala.collection.mutable.ListBuffer
 
 class XmlErrorMessageHelper {
 
-  val defaultMessage = "There is a problem with this line number"
+  val defaultMessage = "xml.defaultMessage"
 
   def generateErrorMessages(errors: ListBuffer[SaxParseError]): List[GenericError] = {
     val errorsGroupedByLineNumber = errors.groupBy(saxParseError => saxParseError.lineNumber)
@@ -32,7 +33,7 @@ class XmlErrorMessageHelper {
         val error1 = groupedErrors._2.head.errorMessage
         val error2 = groupedErrors._2.last.errorMessage
 
-        val error = extractMissingElementValues(error1, error2)
+        val error: Option[Message] = extractMissingElementValues(error1, error2)
           .orElse(extractEmptyTagValues(error1, error2))
           .orElse(extractInvalidEnumAttributeValues(error1, error2))
           .orElse(extractMaxLengthErrorValues(error1, error2))
@@ -46,13 +47,13 @@ class XmlErrorMessageHelper {
             extractInvalidIdErrorValues(error2)
           )
 
-        GenericError(groupedErrors._1, error.getOrElse(defaultMessage))
-      } else GenericError(groupedErrors._1, defaultMessage)
+        GenericError(groupedErrors._1, error.getOrElse(Message(defaultMessage)))
+      } else GenericError(groupedErrors._1, Message(defaultMessage))
     }.toList
 
   }
 
-  def extractMissingAttributeValues(errorMessage: String): Option[String] = {
+  def extractMissingAttributeValues(errorMessage: String): Option[Message] = {
     val format = """cvc-complex-type.4: Attribute '(.*?)' must appear on element '(.*?)'.""".stripMargin.r
 
     errorMessage match {
@@ -80,7 +81,7 @@ class XmlErrorMessageHelper {
     }
   }
 
-  def extractMissingElementValues(errorMessage1: String, errorMessage2: String): Option[String] = {
+  def extractMissingElementValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
 
     val formattedError = errorMessage2.replaceAll("\\[", "").replaceAll("\\]", "")
     val formatOfFirstError =
@@ -101,7 +102,7 @@ class XmlErrorMessageHelper {
     }
   }
 
-  def extractEmptyTagValues(errorMessage1: String, errorMessage2: String): Option[String] = {
+  def extractEmptyTagValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
 
     val formattedError = errorMessage2.replaceAll("\\[", "").replaceAll("\\]", "")
     val formatOfFirstError =
@@ -142,7 +143,7 @@ class XmlErrorMessageHelper {
     }
   }
 
-  def extractEnumErrorValues(errorMessage1: String, errorMessage2: String): Option[String] = {
+  def extractEnumErrorValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
     val formattedError = errorMessage1.replaceAll("\\[", "(").replaceAll("\\]", ")")
 
     val formatOfFirstError =
@@ -162,7 +163,7 @@ class XmlErrorMessageHelper {
     }
   }
 
-  def extractBooleanErrorValues(errorMessage1: String, errorMessage2: String): Option[String] = {
+  def extractBooleanErrorValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
     val formatOfFirstError  = """cvc-datatype-valid.1.2.1: '(.*?)' is not a valid value for 'boolean'.""".stripMargin.r
     val formatOfSecondError = """cvc-type.3.1.3: The value '(.*?)' of element '(.*?)' is not valid.""".stripMargin.r
 
@@ -176,7 +177,7 @@ class XmlErrorMessageHelper {
 
             if (entry.isEmpty) {
               Some(missingInfoMessage(displayName))
-            } else Some(s"$displayName must be true or false")
+            } else Some(Message("xml.must.be.boolean", Seq(displayName))
           case _ => None
         }
       case _ => None
@@ -243,11 +244,11 @@ class XmlErrorMessageHelper {
     }
   }
 
-  private def missingInfoMessage(elementName: String): String = {
+  private def missingInfoMessage(elementName: String): Message = {
     val vowels = "aeiouAEIOU"
     if (vowels.contains(elementName.head)) {
-      s"Enter an $elementName"
-    } else s"Enter a $elementName"
+      Message("xml.enter.an.element", Seq(elementName))
+    } else  Message("xml.enter.an.element", Seq(elementName))
 
   }
 

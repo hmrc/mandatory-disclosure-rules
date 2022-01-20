@@ -1,0 +1,4 @@
+xml.defaultMessage = "There is a problem with this line number"
+xml.enter.an.element = Enter an {0}
+xml.enter.a.element = Enter a {0}
+xml.must.be.boolean = {} must be true or false
