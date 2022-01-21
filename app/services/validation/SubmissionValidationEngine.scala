@@ -33,7 +33,7 @@ class SubmissionValidationEngine @Inject() (xmlValidationService: XMLValidationS
       case None =>
         Future.successful(SubmissionValidationSuccess(true))
       case Some(errors) =>
-        Future.successful(SubmissionValidationFailure(errors))
+        Future.successful(SubmissionValidationFailure(ValidationErrors(errors)))
     } catch {
       case e: SAXParseException =>
         logger.warn(s"XML parsing failed. The XML parser has thrown the exception: $e")
