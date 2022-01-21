@@ -28,9 +28,12 @@ import play.api.mvc.{Action, AnyContent, InjectedController}
 import play.api.test.FakeRequest
 import play.api.test.Helpers.status
 import play.api.{Application, Configuration}
+import uk.gov.hmrc.auth.core.authorise.Predicate
+import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.auth.core.{AuthConnector, MissingBearerToken}
+import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
@@ -57,7 +60,7 @@ class AuthActionSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar
   "Auth Action" when {
     "the user is not logged in" must {
       "must return unauthorised" in {
-        when(mockAuthConnector.authorise(any(), any())(any(), any()))
+        when(mockAuthConnector.authorise(any[Predicate](), any[Retrieval[_]]())(any[HeaderCarrier](), any[ExecutionContext]()))
           .thenReturn(Future.failed(new MissingBearerToken))
 
         val authAction = application.injector.instanceOf[AuthAction]
@@ -70,7 +73,7 @@ class AuthActionSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar
 
     "the user is logged in" must {
       "must return the request" in {
-        when(mockAuthConnector.authorise[Unit](any(), any())(any(), any()))
+        when(mockAuthConnector.authorise[Unit](any[Predicate](), any[Retrieval[Unit]]())(any[HeaderCarrier](), any[ExecutionContext]()))
           .thenReturn(Future.successful(()))
 
         val authAction = application.injector.instanceOf[AuthAction]
