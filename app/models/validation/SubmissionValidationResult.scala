@@ -18,20 +18,21 @@ package models.validation
 
 import play.api.libs.json._
 
-import scala.annotation.nowarn
-
 sealed trait SubmissionValidationResult
 object SubmissionValidationResult {
 
   implicit val validationWrites: Format[SubmissionValidationResult] = new Format[SubmissionValidationResult] {
 
     override def reads(json: JsValue): JsResult[SubmissionValidationResult] =
-      json.validate[SubmissionValidationSuccess].orElse(json.validate[SubmissionValidationFailure])
+      json
+        .validate[SubmissionValidationSuccess]
+        .orElse(json.validate[SubmissionValidationFailure])
+        .orElse(json.validate[InvalidXmlError])
 
-    @nowarn //suppress this warning
     override def writes(o: SubmissionValidationResult): JsValue = o match {
       case m @ SubmissionValidationSuccess(_) => SubmissionValidationSuccess.format.writes(m)
       case m @ SubmissionValidationFailure(_) => SubmissionValidationFailure.format.writes(m)
+      case m @ InvalidXmlError(_)             => InvalidXmlError.format.writes(m)
 
     }
   }
@@ -57,4 +58,8 @@ object SubmissionValidationFailure {
 
 case class InvalidXmlError(saxException: String) extends SubmissionValidationResult {
   override def toString: String = s"Invalid XML - $saxException"
+}
+
+object InvalidXmlError {
+  implicit val format: OFormat[InvalidXmlError] = Json.format[InvalidXmlError]
 }
