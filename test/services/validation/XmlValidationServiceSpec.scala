@@ -18,15 +18,8 @@ package services.validation
 
 import base.SpecBase
 import models.validation.SaxParseError
-import play.api.{Application, Configuration}
-import play.api.inject.bind
 
-import java.net.URL
-import javax.xml.parsers.SAXParserFactory
-import javax.xml.transform.stream.StreamSource
-import javax.xml.validation.{Schema, SchemaFactory}
 import scala.collection.mutable.ListBuffer
-import javax.xml.transform.Source
 import scala.xml.XML
 
 class XmlValidationServiceSpec extends SpecBase {

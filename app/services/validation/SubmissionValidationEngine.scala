@@ -21,7 +21,6 @@ import models.validation._
 import org.xml.sax.SAXParseException
 import play.api.Logging
 
-import java.net.ConnectException
 import javax.inject.Inject
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
@@ -29,19 +28,16 @@ import scala.xml.Elem
 
 class SubmissionValidationEngine @Inject() (xmlValidationService: XMLValidationService, xmlErrorMessageHelper: XmlErrorMessageHelper) extends Logging {
 
-  def validateUploadSubmission(upScanUrl: Option[String]): Future[Option[SubmissionValidationResult]] =
+  def validateUploadSubmission(upScanUrl: Option[String]): Future[SubmissionValidationResult] =
     try performXmlValidation(upScanUrl) match {
       case None =>
-        Future.successful(Some(SubmissionValidationSuccess(true)))
+        Future.successful(SubmissionValidationSuccess(true))
       case Some(errors) =>
-        Future.successful(Some(SubmissionValidationFailure(ValidationErrors(errors))))
+        Future.successful(SubmissionValidationFailure(ValidationErrors(errors)))
     } catch {
       case e: SAXParseException =>
         logger.warn(s"XML parsing failed. The XML parser has thrown the exception: $e")
-        Future.successful(Some(InvalidXmlError(e.getMessage)))
-      case e: ConnectException =>
-        logger.warn(s"Connection timed out with exception: $e")
-        Future.successful(None)
+        Future.successful(InvalidXmlError(e.getMessage))
     }
 
   def performXmlValidation(upScanUrl: Option[String]): Option[Seq[GenericError]] = {

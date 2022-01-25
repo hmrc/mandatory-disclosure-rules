@@ -18,6 +18,8 @@ package models.validation
 
 import play.api.libs.json._
 
+import scala.annotation.nowarn
+
 sealed trait SubmissionValidationResult
 object SubmissionValidationResult {
 
@@ -26,6 +28,7 @@ object SubmissionValidationResult {
     override def reads(json: JsValue): JsResult[SubmissionValidationResult] =
       json.validate[SubmissionValidationSuccess].orElse(json.validate[SubmissionValidationFailure])
 
+    @nowarn //suppress this warning
     override def writes(o: SubmissionValidationResult): JsValue = o match {
       case m @ SubmissionValidationSuccess(_) => SubmissionValidationSuccess.format.writes(m)
       case m @ SubmissionValidationFailure(_) => SubmissionValidationFailure.format.writes(m)

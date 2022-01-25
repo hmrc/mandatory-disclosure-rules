@@ -27,15 +27,14 @@ import org.mockito.{ArgumentCaptor, MockitoSugar}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.inject.bind
-import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{status, _}
 import services.submission.TransformService
 import services.subscription.SubscriptionService
-import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
 class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaCheckDrivenPropertyChecks with BeforeAndAfterEach {
 
@@ -62,9 +61,9 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
 
     "when a file is posted we transform it, send it to the HOD and return OK" in {
 
-      when(mockReadSubscriptionService.getContactInformation(any())(any(), any()))
+      when(mockReadSubscriptionService.getContactInformation(any[String]())(any[HeaderCarrier](), any[ExecutionContext]()))
         .thenReturn(Future.successful(Right(responseDetail)))
-      when(mockSubmissionConnector.submitDisclosure(any())(any()))
+      when(mockSubmissionConnector.submitDisclosure(any[NodeSeq]())(any[HeaderCarrier]()))
         .thenReturn(Future.successful(HttpResponse(OK, "")))
 
       val submission = basicXml
@@ -76,13 +75,13 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
 
       val argumentCaptor: ArgumentCaptor[NodeSeq] = ArgumentCaptor.forClass(classOf[NodeSeq])
 
-      verify(mockSubmissionConnector, times(1)).submitDisclosure(argumentCaptor.capture())(any())
+      verify(mockSubmissionConnector, times(1)).submitDisclosure(argumentCaptor.capture())(any[HeaderCarrier]())
     }
     "when a read subscription returns not OK response INTERNAL_SERVER_ERROR" in {
 
-      when(mockReadSubscriptionService.getContactInformation(any())(any(), any()))
+      when(mockReadSubscriptionService.getContactInformation(any[String]())(any[HeaderCarrier](), any[ExecutionContext]()))
         .thenReturn(Future.successful(Left(ReadSubscriptionError(500))))
-      when(mockSubmissionConnector.submitDisclosure(any())(any()))
+      when(mockSubmissionConnector.submitDisclosure(any[NodeSeq]())(any[HeaderCarrier]()))
         .thenReturn(Future.successful(HttpResponse(INTERNAL_SERVER_ERROR, "")))
 
       val submission = basicXml
@@ -94,7 +93,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
 
       val argumentCaptor: ArgumentCaptor[NodeSeq] = ArgumentCaptor.forClass(classOf[NodeSeq])
 
-      verify(mockSubmissionConnector, times(0)).submitDisclosure(argumentCaptor.capture())(any())
+      verify(mockSubmissionConnector, times(0)).submitDisclosure(argumentCaptor.capture())(any[HeaderCarrier]())
     }
   }
 }

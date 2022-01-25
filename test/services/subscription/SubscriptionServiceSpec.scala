@@ -19,16 +19,16 @@ package services.subscription
 import base.SpecBase
 import connectors.SubscriptionConnector
 import models.error.{ReadSubscriptionError, UpdateSubscriptionError}
-import models.subscription.RequestDetailForUpdate
+import models.subscription.{DisplaySubscriptionForMDRRequest, RequestDetailForUpdate, UpdateSubscriptionForMDRRequest}
 import org.mockito.ArgumentMatchers.any
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status._
 import play.api.inject.bind
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class SubscriptionServiceSpec extends SpecBase with BeforeAndAfterEach {
 
@@ -108,40 +108,44 @@ class SubscriptionServiceSpec extends SpecBase with BeforeAndAfterEach {
           |}
           |}""".stripMargin
 
-      when(mockSubscriptionConnector.readSubscriptionInformation(any())(any(), any()))
+      when(mockSubscriptionConnector.readSubscriptionInformation(any[DisplaySubscriptionForMDRRequest]())(any[HeaderCarrier](), any[ExecutionContext]()))
         .thenReturn(Future.successful(HttpResponse(OK, subscriptionResponseJson)))
 
       val result = service.getContactInformation("111111111")
 
-      whenReady(result) { sub =>
-        verify(mockSubscriptionConnector, times(1)).readSubscriptionInformation(any())(any(), any())
+      whenReady(result) { _ =>
+        verify(mockSubscriptionConnector, times(1)).readSubscriptionInformation(any[DisplaySubscriptionForMDRRequest]())(any[HeaderCarrier](),
+                                                                                                                         any[ExecutionContext]()
+        )
       }
     }
 
     "must retrieve ReadSubscriptionError from connector when not ok status" in {
       val service = application.injector.instanceOf[SubscriptionService]
 
-      when(mockSubscriptionConnector.readSubscriptionInformation(any())(any(), any()))
+      when(mockSubscriptionConnector.readSubscriptionInformation(any[DisplaySubscriptionForMDRRequest]())(any[HeaderCarrier](), any[ExecutionContext]()))
         .thenReturn(Future.successful(HttpResponse(INTERNAL_SERVER_ERROR, "")))
 
       val result = service.getContactInformation("111111111")
 
       whenReady(result) { sub =>
         sub mustBe Left(ReadSubscriptionError(500))
-        verify(mockSubscriptionConnector, times(1)).readSubscriptionInformation(any())(any(), any())
+        verify(mockSubscriptionConnector, times(1)).readSubscriptionInformation(any[DisplaySubscriptionForMDRRequest]())(any[HeaderCarrier](),
+                                                                                                                         any[ExecutionContext]()
+        )
       }
     }
 
     "must  return UpdateSubscription with OK status when connector response with ok status" in {
       val service = application.injector.instanceOf[SubscriptionService]
 
-      when(mockSubscriptionConnector.updateSubscription(any())(any(), any()))
+      when(mockSubscriptionConnector.updateSubscription(any[UpdateSubscriptionForMDRRequest]())(any[HeaderCarrier](), any[ExecutionContext]()))
         .thenReturn(Future.successful(HttpResponse(OK, "Good Response")))
 
       val result = service.updateSubscription(requestDetailForUpdate)
 
       whenReady(result) { sub =>
-        verify(mockSubscriptionConnector, times(1)).updateSubscription(any())(any(), any())
+        verify(mockSubscriptionConnector, times(1)).updateSubscription(any[UpdateSubscriptionForMDRRequest]())(any[HeaderCarrier](), any[ExecutionContext]())
         sub mustBe Right(())
       }
     }
@@ -149,13 +153,13 @@ class SubscriptionServiceSpec extends SpecBase with BeforeAndAfterEach {
     "must have UpdateSubscriptionError when connector response with not ok status" in {
       val service = application.injector.instanceOf[SubscriptionService]
 
-      when(mockSubscriptionConnector.updateSubscription(any())(any(), any()))
+      when(mockSubscriptionConnector.updateSubscription(any[UpdateSubscriptionForMDRRequest]())(any[HeaderCarrier](), any[ExecutionContext]()))
         .thenReturn(Future.successful(HttpResponse(INTERNAL_SERVER_ERROR, "")))
 
       val result = service.updateSubscription(requestDetailForUpdate)
 
       whenReady(result) { sub =>
-        verify(mockSubscriptionConnector, times(1)).updateSubscription(any())(any(), any())
+        verify(mockSubscriptionConnector, times(1)).updateSubscription(any[UpdateSubscriptionForMDRRequest]())(any[HeaderCarrier](), any[ExecutionContext]())
         sub mustBe Left(UpdateSubscriptionError(500))
       }
     }

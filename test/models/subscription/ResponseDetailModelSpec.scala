@@ -17,7 +17,6 @@
 package models.subscription
 
 import base.SpecBase
-import models.subscription.ResponseDetail
 import play.api.libs.json.{JsValue, Json}
 
 class ResponseDetailModelSpec extends SpecBase {

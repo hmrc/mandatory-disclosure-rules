@@ -29,14 +29,17 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.status
 import play.api.{Application, Configuration}
 import uk.gov.hmrc.auth.core._
-import uk.gov.hmrc.auth.core.retrieve.~
+import uk.gov.hmrc.auth.core.authorise.Predicate
+import uk.gov.hmrc.auth.core.retrieve.{~, Retrieval}
+import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.Future
+import scala.annotation.nowarn
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
 class IdentifierAuthActionSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar {
-
+  @nowarn
   implicit private class HelperOps[A](a: A) {
     def ~[B](b: B) = new ~(a, b)
   }
@@ -62,7 +65,7 @@ class IdentifierAuthActionSpec extends PlaySpec with GuiceOneAppPerSuite with Mo
   "Identifier Auth Action" when {
     "the user is not logged in" must {
       "must return unauthorised" in {
-        when(mockAuthConnector.authorise(any(), any())(any(), any()))
+        when(mockAuthConnector.authorise(any[Predicate](), any[Retrieval[_]]())(any[HeaderCarrier](), any[ExecutionContext]()))
           .thenReturn(Future.failed(new MissingBearerToken))
 
         val authAction = application.injector.instanceOf[IdentifierAuthAction]
@@ -73,7 +76,7 @@ class IdentifierAuthActionSpec extends PlaySpec with GuiceOneAppPerSuite with Mo
       }
       "must return IllegalAccessException for not known enrolment" in {
         val retrieval = Enrolments(Set(Enrolment("HMRC-TEST-ORG", Seq(EnrolmentIdentifier("TESTID", "subscriptionID")), "ACTIVE")))
-        when(mockAuthConnector.authorise[Enrolments](any(), any())(any(), any()))
+        when(mockAuthConnector.authorise[Enrolments](any[Predicate](), any[Retrieval[Enrolments]]())(any[HeaderCarrier](), any[ExecutionContext]()))
           .thenReturn(Future.successful(retrieval))
 
         val authAction = application.injector.instanceOf[IdentifierAuthAction]
@@ -88,7 +91,7 @@ class IdentifierAuthActionSpec extends PlaySpec with GuiceOneAppPerSuite with Mo
     "the user is logged in" must {
       "must return the request" in {
         val retrieval = Enrolments(Set(Enrolment("HMRC-MDR-ORG", Seq(EnrolmentIdentifier("MDRID", "subscriptionID")), "ACTIVE")))
-        when(mockAuthConnector.authorise[Enrolments](any(), any())(any(), any()))
+        when(mockAuthConnector.authorise[Enrolments](any[Predicate](), any[Retrieval[Enrolments]]())(any[HeaderCarrier](), any[ExecutionContext]()))
           .thenReturn(Future.successful(retrieval))
 
         val authAction = application.injector.instanceOf[IdentifierAuthAction]
