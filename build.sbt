@@ -7,7 +7,6 @@ val silencerVersion = "1.7.3"
 
 
 lazy val scalaCompilerOptions = Seq(
-  "-Xfatal-warnings",
   "-Xlint:-missing-interpolator,_",
   "-Yno-adapted-args",
   "-Ywarn-unused:imports",
@@ -33,7 +32,7 @@ lazy val microservice = Project(appName, file("."))
     libraryDependencies              ++= AppDependencies.compile ++ AppDependencies.test,
     scalafmtOnCompile in Compile := true,
     scalafmtOnCompile in Test := true,
-    scalafmtOnCompile in ThisBuild := true,
+    scalafmtOnCompile.withRank(KeyRanks.Invisible) in ThisBuild := true,
     scalacOptions ++= scalaCompilerOptions,
     // ***************
     // Use the silencer plugin to suppress warnings
