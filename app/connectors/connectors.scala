@@ -52,7 +52,7 @@ package object connectors {
       seq :+ ("x-forwarded-host" -> s"${value.getOrElse("mdtp")}")
 
     def withXCorrelationId(value: Option[String] = None)(implicit headerCarrier: HeaderCarrier): Seq[(String, String)] = {
-      val xCorrelationId = value.getOrElse(headerCarrier.requestId.map(_.value).getOrElse(UUID.randomUUID().toString))
+      val xCorrelationId = value.getOrElse(UUID.randomUUID().toString)
       seq :+ ("x-correlation-id" -> s"$xCorrelationId")
     }
 
