@@ -204,7 +204,6 @@
                     <CrsAvoidance>
                         <DisclosureDate>12-04-2021</DisclosureDate>
                         <Reason>MDR701</Reason>
-                        <Type>MDR801</Type>
                         <OtherInfo>Other inforamtion</OtherInfo>
                         <StructureChart>
                             <ID>
