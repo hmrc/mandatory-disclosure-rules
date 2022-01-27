@@ -266,6 +266,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
           "Summary",
           "ResCountryCode",
           "TIN",
+          "Name",
           "FirstName",
           "LastName",
           "CountryCode",
@@ -287,8 +288,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
           "DocSpec",
           "ReportableTaxPayer",
           "Structure",
-          "MessageSpec",
-          "Name"
+          "MessageSpec"
         )
 
         elements.map { element =>

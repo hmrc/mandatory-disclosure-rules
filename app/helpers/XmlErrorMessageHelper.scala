@@ -257,7 +257,8 @@ class XmlErrorMessageHelper {
 
   private def getErrorMessageForMissingTags(element: String): Option[Message] =
     element match {
-      case "ID" | "DocSpec" | "ReportableTaxPayer" | "Structure" | "Address" | "MessageSpec" | "MdrBody" | "Name" => Some(missingInfoMessage(element))
+      case "ID" | "DocSpec" | "ReportableTaxPayer" | "Structure" | "Address" | "MessageSpec" | "MdrBody" =>
+        Some(missingInfoMessage(element))
       case "Disclosing" => Some(Message("xml.add.element", Seq(element)))
       case _            => Some(Message("xml.add.line", Seq(element)))
 
