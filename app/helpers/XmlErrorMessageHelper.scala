@@ -146,6 +146,11 @@ class XmlErrorMessageHelper {
     val formatOfSecondError = """cvc-type.3.1.3: The value '(.*?)' of element '(.*?)' is not valid.""".stripMargin.r
 
     formattedError match {
+      case formatOfFirstError("", "(MDR)") =>
+        errorMessage2 match {
+          case formatOfSecondError(_, element) =>
+            Some(Message("xml.add.line.messageType", Seq(element)))
+        }
       case formatOfFirstError(suppliedValue, allowedValues) =>
         errorMessage2 match {
           case formatOfSecondError(_, element) =>
@@ -232,8 +237,15 @@ class XmlErrorMessageHelper {
       """cvc-complex-type.2.4.b: The content of element '(.*?)' is not complete. One of '"urn:oecd:ties:mdr:v1":(.*?)' is expected.""".stripMargin.r
 
     formattedError match {
+      case format("Arrangement", element) =>
+        val formattedElement = element.replaceAll(", \"urn:oecd:ties:mdr:v1\":", " or ")
+        Some(Message("xml.empty.tag", Seq("Arrangement", formattedElement)))
+      case format("ID", element) =>
+        val formattedElement = element.replaceAll(", \"urn:oecd:ties:mdr:v1\":", " or ")
+        Some(Message("xml.empty.tag", Seq("ID", formattedElement)))
       case format(parent, element) =>
-        Some(Message("xml.empty.tag", Seq(parent, element)))
+        val formattedElement = element.replaceAll("(.*?):", "")
+        Some(Message("xml.empty.tag", Seq(parent, formattedElement)))
       case _ => None
     }
   }
