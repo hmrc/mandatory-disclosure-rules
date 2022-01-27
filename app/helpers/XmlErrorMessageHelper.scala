@@ -26,7 +26,11 @@ class XmlErrorMessageHelper {
 
   def generateErrorMessages(errors: ListBuffer[SaxParseError]): List[GenericError] = {
     val errorsGroupedByLineNumber = errors.groupBy(saxParseError => saxParseError.lineNumber)
-
+    println("****************************************")
+    println("****************************************")
+    println(errorsGroupedByLineNumber)
+    println("****************************************")
+    println("****************************************")
     errorsGroupedByLineNumber.map { groupedErrors =>
       if (groupedErrors._2.length <= 2) {
         val error1 = groupedErrors._2.head.errorMessage
@@ -254,8 +258,11 @@ class XmlErrorMessageHelper {
     val vowels = "aeiouAEIOU"
     if (vowels.contains(elementName.head) || elementName.toLowerCase.startsWith("mdr")) {
       Message("xml.add.an.element", Seq(elementName))
-    } else Message("xml.add.a.element", Seq(elementName))
-
+    } else if (elementName.contains("Jurisdictions")) {
+      Message("xml.add.one.or.more.elements", Seq(elementName))
+    } else {
+      Message("xml.add.a.element", Seq(elementName))
+    }
   }
 
   def invalidCodeMessage(elementName: String, allowedValues: Option[String] = None): Option[Message] =
