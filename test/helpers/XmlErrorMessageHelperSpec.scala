@@ -266,7 +266,6 @@ class XmlErrorMessageHelperSpec extends SpecBase {
           "Summary",
           "ResCountryCode",
           "TIN",
-          "Name",
           "FirstName",
           "LastName",
           "CountryCode",
@@ -288,7 +287,8 @@ class XmlErrorMessageHelperSpec extends SpecBase {
           "DocSpec",
           "ReportableTaxPayer",
           "Structure",
-          "MessageSpec"
+          "MessageSpec",
+          "Name"
         )
 
         elements.map { element =>
@@ -326,6 +326,16 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         )
         val result = helper.generateErrorMessages(ListBuffer(error1))
         result mustBe List(GenericError(lineNumber, Message("xml.add.element", Seq("Disclosing"))))
+      }
+
+      "must return 'X is missing one or more fields, including Y' message for relevant missing tag values" in {
+
+        val error1 = SaxParseError(
+          lineNumber,
+          s"""cvc-complex-type.2.4.b: The content of element 'ParentElement' is not complete. One of '{\"urn:oecd:ties:mdr:v1\":ChildElement}' is expected."""
+        )
+        val result = helper.generateErrorMessages(ListBuffer(error1))
+        result mustBe List(GenericError(lineNumber, Message("xml.empty.tag", Seq("ParentElement", "ChildElement"))))
       }
     }
 

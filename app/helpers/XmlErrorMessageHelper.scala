@@ -229,11 +229,11 @@ class XmlErrorMessageHelper {
 
     val formattedError = errorMessage.replaceAll("[{}]", "")
     val format =
-      """cvc-complex-type.2.4.b: The content of element '(.*?)' is not complete. One of '"urn:oecd:ties:mdr:v1":(?:.*)' is expected.""".stripMargin.r
+      """cvc-complex-type.2.4.b: The content of element '(.*?)' is not complete. One of '"urn:oecd:ties:mdr:v1":(.*?)' is expected.""".stripMargin.r
 
     formattedError match {
-      case format(element) =>
-        getErrorMessageForEmptyTags(element)
+      case format(parent, element) =>
+        Some(Message("xml.empty.tag", Seq(parent, element)))
       case _ => None
     }
   }
@@ -255,19 +255,11 @@ class XmlErrorMessageHelper {
       case _ => None
     }
 
-  private def getErrorMessageForEmptyTags(element: String) =
+  private def getErrorMessageForMissingTags(element: String): Option[Message] =
     element match {
-      case "MessageSpec" | "MdrBody" | "ReportableTaxPayer" | "Structure" => Some(Message("xml.empty.tag", Seq(element)))
-//      case "Name"                                                         => Some(Message("xml.add.a.element", Seq(element)))
-      case _ => Some(Message("xml.add.a.element", Seq(element)))
-
-    }
-
-  private def getErrorMessageForMissingTags(element: String) =
-    element match {
-      case "ID" | "DocSpec" | "ReportableTaxPayer" | "Structure" | "Address" | "MessageSpec" | "MdrBody" => Some(missingInfoMessage(element))
-      case "Disclosing"                                                                                  => Some(Message("xml.add.element", Seq(element)))
-      case _                                                                                             => Some(Message("xml.add.line", Seq(element)))
+      case "ID" | "DocSpec" | "ReportableTaxPayer" | "Structure" | "Address" | "MessageSpec" | "MdrBody" | "Name" => Some(missingInfoMessage(element))
+      case "Disclosing" => Some(Message("xml.add.element", Seq(element)))
+      case _            => Some(Message("xml.add.line", Seq(element)))
 
     }
 }
