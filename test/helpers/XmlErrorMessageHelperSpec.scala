@@ -173,12 +173,12 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         result mustBe List(GenericError(lineNumber, Message("xml.not.ISO.code", List("Country"))))
       }
 
-      "must return correct error when when pence included on amount field" in {
+      "must return correct error when decimal is included on whole number field" in {
 
         val error1 = SaxParseError(lineNumber, "cvc-datatype-valid.1.2.1: '4000.02' is not a valid value for 'integer'.")
         val error2 = SaxParseError(lineNumber, "cvc-complex-type.2.2: Element 'Amount' must have no element [children], and the value must be valid.")
         val result = helper.generateErrorMessages(ListBuffer(error1, error2))
-        result mustBe List(GenericError(lineNumber, Message("xml.must.not.include.pence", List("Amount"))))
+        result mustBe List(GenericError(lineNumber, Message("xml.must.be.whole.number", List("Amount"))))
       }
 
       "must return correct error for invalid date format" in {

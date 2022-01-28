@@ -217,7 +217,7 @@ class XmlErrorMessageHelper {
       case formatOfFirstError(_) =>
         errorMessage2 match {
           case formatOfSecondError(element, _) =>
-            Some(Message("xml.must.not.include.pence", Seq(element)))
+            Some(Message("xml.must.be.whole.number", Seq(element)))
           case _ => None
         }
       case _ => None

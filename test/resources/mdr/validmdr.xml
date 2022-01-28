@@ -57,7 +57,7 @@
                             <FirstName>Larry</FirstName>
                             <MiddleName>David</MiddleName>
                             <NamePrefix>van</NamePrefix>
-                            <LastName>David</LastName>
+                            <LastName xnlNameType="test">David</LastName>
                             <GenerationIdentifier>Jnr</GenerationIdentifier>
                             <Suffix>(Cat)</Suffix>
                             <GeneralSuffix>Deceased</GeneralSuffix>
@@ -101,7 +101,7 @@
                                 <City>London</City>
                                 <CountrySubentity>GB</CountrySubentity>
                             </AddressFix>
-                            <AddressFree>Address is Free</AddressFree>                            
+                            <AddressFree>Address is Free</AddressFree>
                         </Address>
                     </Organisation>
                 </ID>
@@ -135,7 +135,7 @@
                                 <City>London</City>
                                 <CountrySubentity>GB</CountrySubentity>
                             </AddressFix>
-                            <AddressFree>Address is Free</AddressFree>                            
+                            <AddressFree>Address is Free</AddressFree>
                         </Address>
                         <BirthDate>2007-01-14</BirthDate>
                     </Individual>
@@ -162,7 +162,7 @@
                                 <City>London</City>
                                 <CountrySubentity>GB</CountrySubentity>
                             </AddressFix>
-                            <AddressFree>Address is Free</AddressFree>                            
+                            <AddressFree>Address is Free</AddressFree>
                         </Address>
                     </Organisation>
                 </ID>
@@ -204,7 +204,7 @@
                                             <City>London</City>
                                             <CountrySubentity>GB</CountrySubentity>
                                         </AddressFix>
-                                        <AddressFree>Address is Free</AddressFree>                                        
+                                        <AddressFree>Address is Free</AddressFree>
                                     </Address>
                                     <BirthDate>2007-01-14</BirthDate>
                                 </Individual>
@@ -242,7 +242,7 @@
                                                     <City>London</City>
                                                     <CountrySubentity>GB</CountrySubentity>
                                                 </AddressFix>
-                                                <AddressFree>Address is Free</AddressFree>                                                
+                                                <AddressFree>Address is Free</AddressFree>
                                             </Address>
                                             <BirthDate>2007-01-14</BirthDate>
                                         </Individual>
