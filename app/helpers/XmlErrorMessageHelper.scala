@@ -26,7 +26,11 @@ class XmlErrorMessageHelper {
 
   def generateErrorMessages(errors: ListBuffer[SaxParseError]): List[GenericError] = {
     val errorsGroupedByLineNumber = errors.groupBy(saxParseError => saxParseError.lineNumber)
-
+    println("****************************************")
+    println("****************************************")
+    println(errorsGroupedByLineNumber)
+    println("****************************************")
+    println("****************************************")
     errorsGroupedByLineNumber.map { groupedErrors =>
       if (groupedErrors._2.length <= 2) {
         val error1 = groupedErrors._2.head.errorMessage
@@ -41,6 +45,7 @@ class XmlErrorMessageHelper {
           .orElse(extractInvalidIntegerErrorValues(error1, error2))
           .orElse(extractInvalidDateErrorValues(error1, error2))
           .orElse(extractMissingTagValues(error1))
+          .orElse(extractEmptyTagValues(error1))
           .orElse(extractBooleanErrorValues(error1, error2))
 
         GenericError(groupedErrors._1, error.getOrElse(Message(defaultMessage)))
@@ -145,6 +150,11 @@ class XmlErrorMessageHelper {
     val formatOfSecondError = """cvc-type.3.1.3: The value '(.*?)' of element '(.*?)' is not valid.""".stripMargin.r
 
     formattedError match {
+      case formatOfFirstError("", "(MDR)") =>
+        errorMessage2 match {
+          case formatOfSecondError(_, element) =>
+            Some(Message("xml.add.line.messageType", Seq(element)))
+        }
       case formatOfFirstError(suppliedValue, allowedValues) =>
         errorMessage2 match {
           case formatOfSecondError(_, element) =>
@@ -215,26 +225,61 @@ class XmlErrorMessageHelper {
       """cvc-complex-type.2.4.a: Invalid content was found starting with element '(.*?)'. One of '"urn:oecd:ties:mdr:v1":(.*?)' is expected.""".stripMargin.r
 
     formattedError match {
+      case format(_, element) if element.contains(":") =>
+        val formattedElement = element.replaceAll("""(.*?), "urn:oecd:ties:mdr:v1":""", "")
+        getErrorMessageForMissingTags(formattedElement)
       case format(_, element) =>
-        Some(Message("xml.enter.line", Seq(element)))
+        getErrorMessageForMissingTags(element)
+      case _ => None
+    }
+  }
+
+  def extractEmptyTagValues(errorMessage: String): Option[Message] = {
+
+    val formattedError = errorMessage.replaceAll("[{}]", "")
+    val format =
+      """cvc-complex-type.2.4.b: The content of element '(.*?)' is not complete. One of '"urn:oecd:ties:mdr:v1":(.*?)' is expected.""".stripMargin.r
+
+    formattedError match {
+      case format("Arrangement", element) =>
+        val formattedElement = element.replaceAll(", \"urn:oecd:ties:mdr:v1\":", " or ")
+        Some(Message("xml.empty.tag", Seq("Arrangement", formattedElement)))
+      case format("ID", element) =>
+        val formattedElement = element.replaceAll(", \"urn:oecd:ties:mdr:v1\":", " or ")
+        Some(Message("xml.empty.tag", Seq("ID", formattedElement)))
+      case format(parent, element) =>
+        val formattedElement = element.replaceAll("(.*?):", "")
+        Some(Message("xml.empty.tag", Seq(parent, formattedElement)))
       case _ => None
     }
   }
 
   private def missingInfoMessage(elementName: String): Message = {
     val vowels = "aeiouAEIOU"
-    if (vowels.contains(elementName.head)) {
-      Message("xml.enter.an.element", Seq(elementName))
-    } else Message("xml.enter.an.element", Seq(elementName))
-
+    if (vowels.contains(elementName.head) || elementName.toLowerCase.startsWith("mdr")) {
+      Message("xml.add.an.element", Seq(elementName))
+    } else if (elementName.contains("Jurisdictions")) {
+      Message("xml.add.one.or.more.elements", Seq(elementName))
+    } else {
+      Message("xml.add.a.element", Seq(elementName))
+    }
   }
 
   def invalidCodeMessage(elementName: String, allowedValues: Option[String] = None): Option[Message] =
     (elementName, allowedValues) match {
       case ("Country" | "CountryExemption" | "TIN issuedBy", _) => Some(Message("xml.not.ISO.code", Seq(elementName)))
       case ("ConcernedMS", _)                                   => Some(Message("xml.not.ISO.code.concernedMS"))
-      case ("Reason" | "IntermediaryNexus" | "RelevantTaxpayerNexus" | "Hallmark" | "ResCountryCode", _) =>
+      case ("Capacity" | "Nexus" | "Reason" | "RelevantTaxpayerNexus" | "Hallmark" | "ResCountryCode", _) =>
         Some(Message("xml.not.allowed.value", Seq(elementName)))
       case _ => None
+    }
+
+  private def getErrorMessageForMissingTags(element: String): Option[Message] =
+    element match {
+      case "ID" | "DocSpec" | "ReportableTaxPayer" | "Structure" | "Address" | "MessageSpec" | "MdrBody" =>
+        Some(missingInfoMessage(element))
+      case "Disclosing" => Some(Message("xml.add.element", Seq(element)))
+      case _            => Some(Message("xml.add.line", Seq(element)))
+
     }
 }

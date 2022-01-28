@@ -137,7 +137,7 @@ class SubmissionValidationEngineSpec extends SpecBase {
         .thenReturn(Left(ListBuffer(addressError1, addressError2, cityError1, cityError2)))
 
       val expectedErrors =
-        Seq(GenericError(20, Message("xml.enter.an.element", List("Street"))), GenericError(27, Message("xml.enter.an.element", List("City"))))
+        Seq(GenericError(20, Message("xml.add.a.element", List("Street"))), GenericError(27, Message("xml.add.a.element", List("City"))))
 
       Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
     }
@@ -148,7 +148,7 @@ class SubmissionValidationEngineSpec extends SpecBase {
 
       when(mockXmlValidationService.validateXML(any[Option[String]](), any[Option[NodeSeq]]())).thenReturn(Left(ListBuffer(missingAttributeError)))
 
-      val expectedErrors = Seq(GenericError(175, Message("xml.enter.an.element", List("Amount currCode"))))
+      val expectedErrors = Seq(GenericError(175, Message("xml.add.an.element", List("Amount currCode"))))
 
       Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
     }
