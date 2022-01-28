@@ -37,6 +37,7 @@ class XmlErrorMessageHelper {
         val error2 = groupedErrors._2.last.errorMessage
 
         val error: Option[Message] = extractMissingElementValues(error1, error2)
+          .orElse(extractPercentageErrorTagValues(error1, error2))
           .orElse(extractEmptyTagValues(error1, error2))
           .orElse(extractTooLongFieldAttributeValues(error1, error2))
           .orElse(extractInvalidEnumAttributeValues(error1, error2))
@@ -118,6 +119,32 @@ class XmlErrorMessageHelper {
             Some(missingInfoMessage(element))
           case formatOfAlternativeSecondError(element) =>
             Some(missingInfoMessage(element))
+          case _ => None
+        }
+      case _ => None
+    }
+  }
+
+  def extractPercentageErrorTagValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
+
+    val formattedError = errorMessage2.replaceAll("\\[", "").replaceAll("\\]", "")
+    val formatOfFirstError =
+      """cvc-maxInclusive-valid: Value '(.*?)' is not facet-valid with respect to maxInclusive '(.*?)' for type '(.*?)'.""".stripMargin.r
+    val formatOfAlternativeFirstError = """cvc-datatype-valid.1.2.1: '(.*?)' is not a valid value for 'integer'.""".stripMargin.r
+
+    val formatOfSecondError = """cvc-type.3.1.3: The value '(.*?)' of element '(.*?)' is not valid.""".stripMargin.r
+
+    errorMessage1 match {
+      case formatOfFirstError(_, _, _) =>
+        formattedError match {
+          case formatOfSecondError(_, element) =>
+            Some(Message("xml.not.valid.percentage", Seq(element)))
+          case _ => None
+        }
+      case formatOfAlternativeFirstError(_) =>
+        formattedError match {
+          case formatOfSecondError(_, element) =>
+            Some(Message("xml.not.valid.percentage", Seq(element)))
           case _ => None
         }
       case _ => None

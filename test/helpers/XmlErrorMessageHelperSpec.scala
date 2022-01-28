@@ -181,6 +181,23 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         result mustBe List(GenericError(lineNumber, Message("xml.must.be.whole.number", List("Amount"))))
       }
 
+      "must return correct error when a percentage is not in the range 0-100" in {
+
+        val error1 =
+          SaxParseError(lineNumber, "cvc-maxInclusive-valid: Value '120' is not facet-valid with respect to maxInclusive '100' for type 'Ownership'.")
+        val error2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value '90.1' of element 'Ownership' is not valid.")
+        val result = helper.generateErrorMessages(ListBuffer(error1, error2))
+        result mustBe List(GenericError(lineNumber, Message("xml.not.valid.percentage", List("Ownership"))))
+      }
+
+      "must return correct error when a percentage is not a whole number" in {
+
+        val error1 = SaxParseError(lineNumber, "cvc-datatype-valid.1.2.1: '90.1' is not a valid value for 'integer'.")
+        val error2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value '90.1' of element 'Ownership' is not valid.")
+        val result = helper.generateErrorMessages(ListBuffer(error1, error2))
+        result mustBe List(GenericError(lineNumber, Message("xml.not.valid.percentage", List("Ownership"))))
+      }
+
       "must return correct error for invalid date format" in {
 
         val error1 = SaxParseError(lineNumber, "cvc-datatype-valid.1.2.1: '14-01-2007' is not a valid value for 'date'.")
