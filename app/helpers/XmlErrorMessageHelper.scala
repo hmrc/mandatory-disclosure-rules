@@ -38,6 +38,7 @@ class XmlErrorMessageHelper {
 
         val error: Option[Message] = extractMissingElementValues(error1, error2)
           .orElse(extractEmptyTagValues(error1, error2))
+          .orElse(extractTooLongFieldAttributeValues(error1, error2))
           .orElse(extractInvalidEnumAttributeValues(error1, error2))
           .orElse(extractMaxLengthErrorValues(error1, error2))
           .orElse(extractEnumErrorValues(error1, error2))
@@ -61,6 +62,26 @@ class XmlErrorMessageHelper {
       case format(attribute, element) =>
         Some(missingInfoMessage(element + " " + attribute))
       case _ => None
+    }
+  }
+
+  def extractTooLongFieldAttributeValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
+    val formatOfFirstError =
+      """cvc-maxLength-valid: Value '(.*?)' with length = '(.*?)' is not facet-valid with respect to maxLength '(.*?)' for type '(.*?)'.""".stripMargin.r
+    val formatOfSecondError =
+      """cvc-attribute.3: The value '(.*?)' of attribute '(.*?)' on element '(.*?)' is not valid with respect to its type, '(.*?)'.""".stripMargin.r
+
+    errorMessage1 match {
+      case formatOfFirstError(_, _, maxLength, _) =>
+        errorMessage2 match {
+          case formatOfSecondError(_, "INType", _, _) =>
+            Some(Message("xml.not.allowed.length", Seq("INType", maxLength)))
+          case formatOfSecondError(_, attribute, element, _) =>
+            Some(Message("xml.not.allowed.length", Seq(element + " " + attribute, maxLength)))
+          case _ => None
+        }
+      case _ => None
+
     }
   }
 

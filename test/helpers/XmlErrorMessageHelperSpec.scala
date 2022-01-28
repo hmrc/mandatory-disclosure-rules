@@ -44,6 +44,39 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         result mustBe List(GenericError(lineNumber, Message("xml.defaultMessage")))
       }
 
+      "must return correct error for too long field attribute error for xnlNameType" in {
+        val tooLongValue =
+          "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+        val invalidEnumError1 =
+          SaxParseError(
+            lineNumber,
+            s"cvc-maxLength-valid: Value '$tooLongValue' with length = '210' is not facet-valid with respect to maxLength '200' for type 'xnlNameType'."
+          )
+        val invalidEnumError2 =
+          SaxParseError(
+            lineNumber,
+            s"cvc-attribute.3: The value '$tooLongValue' of attribute 'xnlNameType' on element 'FirstName' is not valid with respect to its type, 'StringMin1Max200_Type'."
+          )
+        val result = helper.generateErrorMessages(ListBuffer(invalidEnumError1, invalidEnumError2))
+        result mustBe List(GenericError(lineNumber, Message("xml.not.allowed.length", List("FirstName xnlNameType", "200"))))
+      }
+
+      "must return correct error for too long field attribute error for INType" in {
+        val tooLongValue =
+          "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+        val invalidEnumError1 =
+          SaxParseError(lineNumber,
+                        s"cvc-maxLength-valid: Value '$tooLongValue' with length = '210' is not facet-valid with respect to maxLength '200' for type 'INType'."
+          )
+        val invalidEnumError2 =
+          SaxParseError(
+            lineNumber,
+            s"cvc-attribute.3: The value '$tooLongValue' of attribute 'INType' on element 'IN' is not valid with respect to its type, 'StringMin1Max200_Type'."
+          )
+        val result = helper.generateErrorMessages(ListBuffer(invalidEnumError1, invalidEnumError2))
+        result mustBe List(GenericError(lineNumber, Message("xml.not.allowed.length", List("INType", "200"))))
+      }
+
       "must return correct error for invalid enum error for attribute" in {
         val invalidEnumError1 =
           SaxParseError(lineNumber,
