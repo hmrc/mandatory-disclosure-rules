@@ -444,6 +444,21 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         result mustBe Some(Message("xml.not.allowed.value", List("ResCountryCode")))
       }
 
+      "must return correct message for 'OtherInfo language'" in {
+        val result = helper.invalidCodeMessage("OtherInfo language")
+        result mustBe Some(Message("xml.not.ISO.code.optional", List("OtherInfo language")))
+      }
+
+      "must return correct message for 'Narrative language'" in {
+        val result = helper.invalidCodeMessage("Narrative language")
+        result mustBe Some(Message("xml.not.ISO.language.code", List("Narrative language")))
+      }
+
+      "must return correct message for 'Jurisdictions'" in {
+        val result = helper.invalidCodeMessage("Jurisdictions")
+        result mustBe Some(Message("xml.not.ISO.code", List("Jurisdictions")))
+      }
+
       "must return None for unexpected elementName" in {
         val result = helper.invalidCodeMessage("Unexpected-name")
         result mustBe None
