@@ -441,12 +441,17 @@ class XmlErrorMessageHelperSpec extends SpecBase {
 
       "must return correct message for 'ResCountryCode'" in {
         val result = helper.invalidCodeMessage("ResCountryCode")
-        result mustBe Some(Message("xml.not.allowed.value", List("ResCountryCode")))
+        result mustBe Some(Message("xml.not.ISO.code", List("ResCountryCode")))
+      }
+
+      "must return correct message for 'DocTypeIndic'" in {
+        val result = helper.invalidCodeMessage("DocTypeIndic")
+        result mustBe Some(Message("xml.not.allowed.value", List("DocTypeIndic")))
       }
 
       "must return correct message for 'OtherInfo language'" in {
         val result = helper.invalidCodeMessage("OtherInfo language")
-        result mustBe Some(Message("xml.not.ISO.code.optional", List("OtherInfo language")))
+        result mustBe Some(Message("xml.not.ISO.language.code", List("OtherInfo language")))
       }
 
       "must return correct message for 'Narrative language'" in {
@@ -454,9 +459,29 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         result mustBe Some(Message("xml.not.ISO.language.code", List("Narrative language")))
       }
 
+      "must return correct message for 'Summary language'" in {
+        val result = helper.invalidCodeMessage("Summary language")
+        result mustBe Some(Message("xml.not.ISO.language.code", List("Summary language")))
+      }
+
+      "must return correct message for 'Language'" in {
+        val result = helper.invalidCodeMessage("Language")
+        result mustBe Some(Message("xml.not.ISO.language.code", List("Language")))
+      }
+
       "must return correct message for 'Jurisdictions'" in {
         val result = helper.invalidCodeMessage("Jurisdictions")
         result mustBe Some(Message("xml.not.ISO.code", List("Jurisdictions")))
+      }
+
+      "must return correct message for 'TransmittingCountry'" in {
+        val result = helper.invalidCodeMessage("TransmittingCountry")
+        result mustBe Some(Message("xml.not.ISO.code", List("TransmittingCountry")))
+      }
+
+      "must return correct message for 'ReceivingCountry'" in {
+        val result = helper.invalidCodeMessage("ReceivingCountry")
+        result mustBe Some(Message("xml.not.ISO.code", List("ReceivingCountry")))
       }
 
       "must return None for unexpected elementName" in {
