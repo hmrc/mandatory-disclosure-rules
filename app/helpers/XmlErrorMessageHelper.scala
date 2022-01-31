@@ -18,7 +18,9 @@ package helpers
 
 import models.validation.{GenericError, Message, SaxParseError}
 
+import java.time.format.{DateTimeFormatter, DateTimeParseException}
 import scala.collection.mutable.ListBuffer
+import scala.util.{Failure, Try}
 
 class XmlErrorMessageHelper {
 
@@ -256,11 +258,20 @@ class XmlErrorMessageHelper {
     val formatOfSecondError = """cvc-type.3.1.3: The value '((?s).*)' of element '(.*?)' is not valid.""".stripMargin.r
 
     errorMessage1 match {
-      case formatOfFirstError(_) =>
+      case formatOfFirstError(dateStr) =>
         errorMessage2 match {
           case formatOfSecondError(_, element) =>
-            Some(Message("xml.date.format", Seq(element)))
-          case _ => None
+            Try {
+              DateTimeFormatter.ISO_DATE.parse(dateStr)
+            } match {
+              case Failure(e: DateTimeParseException) =>
+                if (e.getMessage contains "could not be parsed at index") {
+                  Some(Message("xml.date.format", Seq(element)))
+                } else {
+                  Some(Message("xml.date.format.real", Seq(element)))
+                }
+              case _ => None
+            }
         }
       case _ => None
     }
