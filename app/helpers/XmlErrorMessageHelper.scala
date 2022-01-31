@@ -68,9 +68,9 @@ class XmlErrorMessageHelper {
 
   def extractTooLongFieldAttributeValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
     val formatOfFirstError =
-      """cvc-maxLength-valid: Value '(.*?)' with length = '(.*?)' is not facet-valid with respect to maxLength '(.*?)' for type '(.*?)'.""".stripMargin.r
+      """cvc-maxLength-valid: Value '((?s).*)' with length = '(.*?)' is not facet-valid with respect to maxLength '(.*?)' for type '(.*?)'.""".stripMargin.r
     val formatOfSecondError =
-      """cvc-attribute.3: The value '(.*?)' of attribute '(.*?)' on element '(.*?)' is not valid with respect to its type, '(.*?)'.""".stripMargin.r
+      """cvc-attribute.3: The value '((?s).*)' of attribute '(.*?)' on element '(.*?)' is not valid with respect to its type, '(.*?)'.""".stripMargin.r
 
     errorMessage1 match {
       case formatOfFirstError(_, _, maxLength, _) =>
@@ -88,9 +88,9 @@ class XmlErrorMessageHelper {
 
   def extractInvalidEnumAttributeValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
     val formatOfFirstError =
-      """cvc-enumeration-valid: Value '(.*?)' is not facet-valid with respect to enumeration '(.*?)'. It must be a value from the enumeration.""".stripMargin.r
+      """cvc-enumeration-valid: Value '((?s).*)' is not facet-valid with respect to enumeration '(.*?)'. It must be a value from the enumeration.""".stripMargin.r
     val formatOfSecondError =
-      """cvc-attribute.3: The value '(.*?)' of attribute '(.*?)' on element '(.*?)' is not valid with respect to its type, '(.*?)'.""".stripMargin.r
+      """cvc-attribute.3: The value '((?s).*)' of attribute '(.*?)' on element '(.*?)' is not valid with respect to its type, '(.*?)'.""".stripMargin.r
 
     errorMessage1 match {
       case formatOfFirstError(_, _) =>
@@ -129,10 +129,10 @@ class XmlErrorMessageHelper {
 
     val formattedError = errorMessage2.replaceAll("\\[", "").replaceAll("\\]", "")
     val formatOfFirstError =
-      """cvc-maxInclusive-valid: Value '(.*?)' is not facet-valid with respect to maxInclusive '(.*?)' for type '(.*?)'.""".stripMargin.r
+      """cvc-maxInclusive-valid: Value '((?s).*)' is not facet-valid with respect to maxInclusive '(.*?)' for type '(.*?)'.""".stripMargin.r
     val formatOfAlternativeFirstError = """cvc-datatype-valid.1.2.1: '(.*?)' is not a valid value for 'integer'.""".stripMargin.r
 
-    val formatOfSecondError = """cvc-type.3.1.3: The value '(.*?)' of element '(.*?)' is not valid.""".stripMargin.r
+    val formatOfSecondError = """cvc-type.3.1.3: The value '((?s).*)' of element '(.*?)' is not valid.""".stripMargin.r
 
     errorMessage1 match {
       case formatOfFirstError(_, _, _) =>
@@ -172,8 +172,8 @@ class XmlErrorMessageHelper {
   def extractMaxLengthErrorValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
     val formattedError = errorMessage2.replaceAll("\\[", "").replaceAll("\\]", "")
     val formatOfFirstError =
-      """cvc-maxLength-valid: Value '(.*?)' with length = '(.*?)' is not facet-valid with respect to maxLength '(.*?)' for type '(.*?)'.""".stripMargin.r
-    val formatOfSecondError = """cvc-type.3.1.3: The value '(.*?)' of element '(.*?)' is not valid.""".stripMargin.r
+      """cvc-maxLength-valid: Value '((?s).*)' with length = '(.*?)' is not facet-valid with respect to maxLength '(.*?)' for type '(.*?)'.""".stripMargin.r
+    val formatOfSecondError = """cvc-type.3.1.3: The value '((?s).*)' of element '(.*?)' is not valid.""".stripMargin.r
 
     val formatOfAlternativeSecondError = """cvc-complex-type.2.2: Element '(.*?)' must have no element children, and the value must be valid.""".stripMargin.r
 
@@ -194,8 +194,8 @@ class XmlErrorMessageHelper {
     val formattedError = errorMessage1.replaceAll("\\[", "(").replaceAll("\\]", ")")
 
     val formatOfFirstError =
-      """cvc-enumeration-valid: Value '(.*?)' is not facet-valid with respect to enumeration '(.*?)'. It must be a value from the enumeration.""".stripMargin.r
-    val formatOfSecondError = """cvc-type.3.1.3: The value '(.*?)' of element '(.*?)' is not valid.""".stripMargin.r
+      """cvc-enumeration-valid: Value '((?s).*)' is not facet-valid with respect to enumeration '(.*?)'. It must be a value from the enumeration.""".stripMargin.r
+    val formatOfSecondError = """cvc-type.3.1.3: The value '((?s).*)' of element '(.*?)' is not valid.""".stripMargin.r
 
     formattedError match {
       case formatOfFirstError("", "(MDR)") =>
@@ -217,7 +217,7 @@ class XmlErrorMessageHelper {
 
   def extractBooleanErrorValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
     val formatOfFirstError  = """cvc-datatype-valid.1.2.1: '(.*?)' is not a valid value for 'boolean'.""".stripMargin.r
-    val formatOfSecondError = """cvc-type.3.1.3: The value '(.*?)' of element '(.*?)' is not valid.""".stripMargin.r
+    val formatOfSecondError = """cvc-type.3.1.3: The value '((?s).*)' of element '(.*?)' is not valid.""".stripMargin.r
 
     errorMessage1 match {
       case formatOfFirstError(_) =>
@@ -253,7 +253,7 @@ class XmlErrorMessageHelper {
 
   def extractInvalidDateErrorValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
     val formatOfFirstError  = """cvc-datatype-valid.1.2.1: '(.*?)' is not a valid value for 'date'.""".stripMargin.r
-    val formatOfSecondError = """cvc-type.3.1.3: The value '(.*?)' of element '(.*?)' is not valid.""".stripMargin.r
+    val formatOfSecondError = """cvc-type.3.1.3: The value '((?s).*)' of element '(.*?)' is not valid.""".stripMargin.r
 
     errorMessage1 match {
       case formatOfFirstError(_) =>
