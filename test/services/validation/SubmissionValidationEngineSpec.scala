@@ -181,15 +181,6 @@ class SubmissionValidationEngineSpec extends SpecBase {
       Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
     }
 
-    "must return ValidationFailure for file with invalid countryMS code" in new SetUp {
-      when(mockXmlValidationService.validateXML(any[Option[String]](), any[Option[NodeSeq]]()))
-        .thenReturn(Left(ListBuffer(concernedMsError1, concernedMsError2)))
-
-      val expectedErrors = Seq(GenericError(177, Message("xml.not.ISO.code.concernedMS")))
-
-      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
-    }
-
     "must return ValidationFailure for file with invalid countryExemption code" in new SetUp {
 
       when(mockXmlValidationService.validateXML(any[Option[String]](), any[Option[NodeSeq]]()))
