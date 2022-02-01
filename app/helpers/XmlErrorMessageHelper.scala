@@ -334,7 +334,9 @@ class XmlErrorMessageHelper {
 
   def invalidCodeMessage(elementName: String, allowedValues: Option[String] = None): Option[Message] =
     (elementName, allowedValues) match {
-      case ("Country" | "CountryExemption" | "TIN issuedBy" | "Jurisdictions" | "ResCountryCode" | "TransmittingCountry" | "ReceivingCountry", _) =>
+      case ("Country" | "CountryCode" | "CountryExemption" | "TIN issuedBy" | "Jurisdictions" | "ResCountryCode" | "TransmittingCountry" | "ReceivingCountry",
+            _
+          ) =>
         Some(Message("xml.not.ISO.code", Seq(elementName)))
       case ("OtherInfo language" | "Narrative language" | "Summary language" | "Name language" | "Language", _) =>
         Some(Message("xml.not.ISO.language.code", Seq(elementName)))

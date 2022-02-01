@@ -20,7 +20,7 @@
                     <IN>AA000000D</IN>
                     <Name>organisationName</Name>
                     <Address>
-                        <CountryCode>GB</CountryCode>
+                        <CountryCode>GBas</CountryCode>
                         <AddressFix>
                             <Street>Downing Street</Street>
                             <BuildingIdentifier>No 10</BuildingIdentifier>
