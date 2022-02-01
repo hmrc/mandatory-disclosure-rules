@@ -225,15 +225,23 @@ class XmlErrorMessageHelperSpec extends SpecBase {
 
       "must return correct error for invalid date format" in {
 
-        val error1 = SaxParseError(lineNumber, "cvc-datatype-valid.1.2.1: '14-01-2007' is not a valid value for 'dateTime'.")
+        val error1 = SaxParseError(lineNumber, "cvc-datatype-valid.1.2.1: '14-01-2007' is not a valid value for 'date'.")
         val error2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value '14-01-2007' of element 'BirthDate' is not valid.")
         val result = helper.generateErrorMessages(ListBuffer(error1, error2))
         result mustBe List(GenericError(lineNumber, Message("xml.date.format", List("BirthDate"))))
       }
 
+      "must return correct error for invalid dateTime format" in {
+
+        val error1 = SaxParseError(lineNumber, "cvc-datatype-valid.1.2.1: '14-01-2007' is not a valid value for 'dateTime'.")
+        val error2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value '14-01-2007' of element 'BirthDate' is not valid.")
+        val result = helper.generateErrorMessages(ListBuffer(error1, error2))
+        result mustBe List(GenericError(lineNumber, Message("xml.dateTime.format", List("BirthDate"))))
+      }
+
       "must return correct error for invalid date format (leap year)" in {
 
-        val error1 = SaxParseError(lineNumber, "cvc-datatype-valid.1.2.1: '2021-02-31' is not a valid value for 'dateTime'.")
+        val error1 = SaxParseError(lineNumber, "cvc-datatype-valid.1.2.1: '2021-02-31' is not a valid value for 'date'.")
         val error2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value '2021-02-31' of element 'BirthDate' is not valid.")
         val result = helper.generateErrorMessages(ListBuffer(error1, error2))
         result mustBe List(GenericError(lineNumber, Message("xml.date.format.real", List("BirthDate"))))
@@ -244,7 +252,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         val error2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value '2020-05-oo' of element 'ImplementingDate' is not valid.")
 
         val result = helper.generateErrorMessages(ListBuffer(error1, error2))
-        result mustBe List(GenericError(lineNumber, Message("xml.date.format", List("ImplementingDate"))))
+        result mustBe List(GenericError(lineNumber, Message("xml.dateTime.format", List("ImplementingDate"))))
       }
 
       "must return correct error for line (value and tags)" in {

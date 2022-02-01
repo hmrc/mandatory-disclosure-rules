@@ -28,7 +28,11 @@ class XmlErrorMessageHelper {
 
   def generateErrorMessages(errors: ListBuffer[SaxParseError]): List[GenericError] = {
     val errorsGroupedByLineNumber = errors.groupBy(saxParseError => saxParseError.lineNumber)
-
+    println("********************************************************")
+    println("********************************************************")
+    println(errorsGroupedByLineNumber)
+    println("********************************************************")
+    println("********************************************************")
     errorsGroupedByLineNumber.map { groupedErrors =>
       if (groupedErrors._2.length <= 2) {
         val error1 = groupedErrors._2.head.errorMessage
@@ -94,7 +98,7 @@ class XmlErrorMessageHelper {
     errorMessage1 match {
       case formatOfFirstError(_, _) =>
         errorMessage2 match {
-          case formatOfSecondError("", attribute, element, _) =>
+          case formatOfSecondError("", attribute, _, _) =>
             Some(Message("xml.optional.field.empty", Seq(attribute)))
           case formatOfSecondError(_, attribute, element, _) =>
             invalidCodeMessage(element + " " + attribute)
@@ -131,18 +135,12 @@ class XmlErrorMessageHelper {
     val formattedError = errorMessage2.replaceAll("\\[", "").replaceAll("\\]", "")
     val formatOfFirstError =
       """cvc-maxInclusive-valid: Value '((?s).*)' is not facet-valid with respect to maxInclusive '(.*?)' for type '(.*?)'.""".stripMargin.r
-    val formatOfAlternativeFirstError = """cvc-datatype-valid.1.2.1: '(.*?)' is not a valid value for 'integer'.""".stripMargin.r
+    val formatOfAlternativeFirstError = """cvc-datatype-valid.1.2.1: '((?s).*)' is not a valid value for 'integer'.""".stripMargin.r
 
     val formatOfSecondError = """cvc-type.3.1.3: The value '((?s).*)' of element '(.*?)' is not valid.""".stripMargin.r
 
     errorMessage1 match {
-      case formatOfFirstError(_, _, _) =>
-        formattedError match {
-          case formatOfSecondError(_, element) =>
-            Some(Message("xml.not.valid.percentage", Seq(element)))
-          case _ => None
-        }
-      case formatOfAlternativeFirstError(_) =>
+      case formatOfFirstError(_, _, _) | formatOfAlternativeFirstError(_) =>
         formattedError match {
           case formatOfSecondError(_, element) =>
             Some(Message("xml.not.valid.percentage", Seq(element)))
@@ -225,7 +223,7 @@ class XmlErrorMessageHelper {
   }
 
   def extractBooleanErrorValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
-    val formatOfFirstError  = """cvc-datatype-valid.1.2.1: '(.*?)' is not a valid value for 'boolean'.""".stripMargin.r
+    val formatOfFirstError  = """cvc-datatype-valid.1.2.1: '((?s).*)' is not a valid value for 'boolean'.""".stripMargin.r
     val formatOfSecondError = """cvc-type.3.1.3: The value '((?s).*)' of element '(.*?)' is not valid.""".stripMargin.r
 
     errorMessage1 match {
@@ -246,7 +244,7 @@ class XmlErrorMessageHelper {
   }
 
   def extractInvalidIntegerErrorValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
-    val formatOfFirstError  = """cvc-datatype-valid.1.2.1: '(.*?)' is not a valid value for 'integer'.""".stripMargin.r
+    val formatOfFirstError  = """cvc-datatype-valid.1.2.1: '((?s).*)' is not a valid value for 'integer'.""".stripMargin.r
     val formatOfSecondError = """cvc-complex-type.2.2: Element '(.*?)' must have no element (.*?), and the value must be valid.""".stripMargin.r
 
     errorMessage1 match {
@@ -261,11 +259,11 @@ class XmlErrorMessageHelper {
   }
 
   def extractInvalidDateErrorValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
-    val formatOfFirstError  = """cvc-datatype-valid.1.2.1: '((?s).*)' is not a valid value for 'dateTime'.""".stripMargin.r
+    val formatOfFirstError  = """cvc-datatype-valid.1.2.1: '((?s).*)' is not a valid value for '(.*?)'.""".stripMargin.r
     val formatOfSecondError = """cvc-type.3.1.3: The value '((?s).*)' of element '(.*?)' is not valid.""".stripMargin.r
 
     errorMessage1 match {
-      case formatOfFirstError(dateStr) =>
+      case formatOfFirstError(dateStr, attribute) if attribute == "date" || attribute == "dateTime" =>
         errorMessage2 match {
           case formatOfSecondError(_, element) =>
             Try {
@@ -273,11 +271,11 @@ class XmlErrorMessageHelper {
             } match {
               case Failure(e: DateTimeParseException) =>
                 if (e.getMessage contains "could not be parsed at index") {
-                  Some(Message("xml.date.format", Seq(element)))
+                  Some(Message(s"xml.$attribute.format", Seq(element)))
                 } else {
                   Some(Message("xml.date.format.real", Seq(element)))
                 }
-              case _ => Some(Message("xml.date.format", Seq(element)))
+              case _ => Some(Message(s"xml.$attribute.format", Seq(element)))
             }
         }
       case _ => None
