@@ -57,7 +57,7 @@
                             <FirstName>Larry</FirstName>
                             <MiddleName>David</MiddleName>
                             <NamePrefix>van</NamePrefix>
-                            <LastName xnlNameType="test">David</LastName>
+                            <LastName>David</LastName>
                             <GenerationIdentifier>Jnr</GenerationIdentifier>
                             <Suffix>(Cat)</Suffix>
                             <GeneralSuffix>Deceased</GeneralSuffix>
