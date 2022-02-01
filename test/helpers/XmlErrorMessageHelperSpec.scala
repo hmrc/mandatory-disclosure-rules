@@ -46,8 +46,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
       }
 
       "must return correct error for too long field attribute error for xnlNameType" in {
-        val tooLongValue =
-          "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+        val tooLongValue = "1" * 200
         val invalidEnumError1 =
           SaxParseError(
             lineNumber,
@@ -63,8 +62,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
       }
 
       "must return correct error for too long field attribute error for INType" in {
-        val tooLongValue =
-          "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+        val tooLongValue = "1" * 200
         val invalidEnumError1 =
           SaxParseError(lineNumber,
                         s"cvc-maxLength-valid: Value '$tooLongValue' with length = '210' is not facet-valid with respect to maxLength '200' for type 'INType'."
