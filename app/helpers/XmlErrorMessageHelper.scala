@@ -334,14 +334,18 @@ class XmlErrorMessageHelper {
 
   def invalidCodeMessage(elementName: String, allowedValues: Option[String] = None): Option[Message] =
     (elementName, allowedValues) match {
-      case ("Country" | "CountryCode" | "CountryExemption" | "TIN issuedBy" | "Jurisdictions" | "ResCountryCode" | "TransmittingCountry" | "ReceivingCountry",
+      case ("Country" | "CountryCode" | "CountryExemption" | "TIN issuedBy" | "IN issuedBy" | "Jurisdictions" | "ResCountryCode" | "TransmittingCountry" |
+            "ReceivingCountry",
             _
           ) =>
         Some(Message("xml.not.ISO.code", Seq(elementName)))
-      case ("OtherInfo language" | "Narrative language" | "Summary language" | "Name language" | "Language", _) =>
+      case ("OtherInfo language" | "Narrative language" | "Summary language" | "Name language" | "Address language" | "Language", _) =>
         Some(Message("xml.not.ISO.language.code", Seq(elementName)))
       case ("InvestAmount currCode", _) => Some(Message("xml.not.ISO.currency.code", Seq(elementName)))
-      case ("Capacity" | "Nexus" | "Reason" | "MessageTypeIndic" | "ResCountryCode" | "Role" | "Type" | "DocTypeIndic", _) =>
+      case ("Capacity" | "Nexus" | "Reason" | "MessageTypeIndic" | "ResCountryCode" | "Role" | "Type" | "DocTypeIndic" | "Address legalAddressType" |
+            "Name nameType",
+            _
+          ) =>
         Some(Message("xml.not.allowed.value", Seq(elementName)))
       case _ => None
     }
