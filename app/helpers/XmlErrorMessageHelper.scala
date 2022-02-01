@@ -254,7 +254,7 @@ class XmlErrorMessageHelper {
   }
 
   def extractInvalidDateErrorValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
-    val formatOfFirstError  = """cvc-datatype-valid.1.2.1: '(.*?)' is not a valid value for 'date'.""".stripMargin.r
+    val formatOfFirstError  = """cvc-datatype-valid.1.2.1: '((?s).*)' is not a valid value for 'dateTime'.""".stripMargin.r
     val formatOfSecondError = """cvc-type.3.1.3: The value '((?s).*)' of element '(.*?)' is not valid.""".stripMargin.r
 
     errorMessage1 match {
@@ -270,7 +270,7 @@ class XmlErrorMessageHelper {
                 } else {
                   Some(Message("xml.date.format.real", Seq(element)))
                 }
-              case _ => None
+              case _ => Some(Message("xml.date.format", Seq(element)))
             }
         }
       case _ => None
