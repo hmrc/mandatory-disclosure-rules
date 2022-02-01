@@ -420,6 +420,16 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         val result = helper.generateErrorMessages(ListBuffer(error1))
         result mustBe List(GenericError(lineNumber, Message("xml.empty.tag", Seq("ParentElement", "ChildElement"))))
       }
+
+      "must return correct error for AddressFix tag being after AddressFree" in {
+
+        val error1 = SaxParseError(
+          lineNumber,
+          "cvc-complex-type.2.4.d: Invalid content was found starting with element 'AddressFix'. No child element is expected at this point."
+        )
+        val result = helper.generateErrorMessages(ListBuffer(error1))
+        result mustBe List(GenericError(lineNumber, Message("xml.addressFix.error")))
+      }
     }
 
     "invalidCodeMessage" - {

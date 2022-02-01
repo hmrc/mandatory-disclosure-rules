@@ -28,11 +28,7 @@ class XmlErrorMessageHelper {
 
   def generateErrorMessages(errors: ListBuffer[SaxParseError]): List[GenericError] = {
     val errorsGroupedByLineNumber = errors.groupBy(saxParseError => saxParseError.lineNumber)
-    println("****************************************")
-    println("****************************************")
-    println(errorsGroupedByLineNumber)
-    println("****************************************")
-    println("****************************************")
+
     errorsGroupedByLineNumber.map { groupedErrors =>
       if (groupedErrors._2.length <= 2) {
         val error1 = groupedErrors._2.head.errorMessage
@@ -50,6 +46,7 @@ class XmlErrorMessageHelper {
           .orElse(extractInvalidDateErrorValues(error1, error2))
           .orElse(extractMissingTagValues(error1))
           .orElse(extractEmptyTagValues(error1))
+          .orElse(extractUnorderedTagValues(error1))
           .orElse(extractBooleanErrorValues(error1, error2))
 
         GenericError(groupedErrors._1, error.getOrElse(Message(defaultMessage)))
@@ -319,6 +316,17 @@ class XmlErrorMessageHelper {
       case format(parent, element) =>
         val formattedElement = element.replaceAll("(.*?):", "")
         Some(Message("xml.empty.tag", Seq(parent, formattedElement)))
+      case _ => None
+    }
+  }
+
+  def extractUnorderedTagValues(errorMessage: String): Option[Message] = {
+    val format =
+      """cvc-complex-type.2.4.d: Invalid content was found starting with element '(.*?)'. No child element is expected at this point.""".stripMargin.r
+
+    errorMessage match {
+      case format("AddressFix") =>
+        Some(Message("xml.addressFix.error"))
       case _ => None
     }
   }
