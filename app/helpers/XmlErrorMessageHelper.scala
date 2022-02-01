@@ -97,6 +97,8 @@ class XmlErrorMessageHelper {
     errorMessage1 match {
       case formatOfFirstError(_, _) =>
         errorMessage2 match {
+          case formatOfSecondError("", attribute, element, _) =>
+            Some(Message("xml.optional.field.empty", Seq(attribute)))
           case formatOfSecondError(_, attribute, element, _) =>
             invalidCodeMessage(element + " " + attribute)
           case _ => None
