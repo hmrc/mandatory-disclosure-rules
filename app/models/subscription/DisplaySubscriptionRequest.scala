@@ -48,11 +48,9 @@ object RequestCommonForSubscription {
   def apply(): RequestCommonForSubscription = {
     //Generate a 32 chars UUID without hyphens
     val acknowledgementReference = UUID.randomUUID().toString.replace("-", "")
-    val conversationID           = UUID.randomUUID().toString
 
     RequestCommonForSubscription(
       regime = "MDR",
-      conversationID = Some(conversationID),
       receiptDate = ZonedDateTime.now().format(formatter),
       acknowledgementReference = acknowledgementReference,
       originatingSystem = "MDTP",
