@@ -67,7 +67,7 @@ class SubscriptionConnector @Inject() (
 
     val serviceName = "update-subscription"
     val extraHeaders = Seq()
-      .withBearerToken(s"${config.bearerToken}")
+      .withBearerToken(s"${config.bearerToken(serviceName)}")
       .withXForwardedHost()
       .withDate()
       .withXCorrelationId()
