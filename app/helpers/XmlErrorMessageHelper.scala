@@ -28,11 +28,7 @@ class XmlErrorMessageHelper {
 
   def generateErrorMessages(errors: ListBuffer[SaxParseError]): List[GenericError] = {
     val errorsGroupedByLineNumber = errors.groupBy(saxParseError => saxParseError.lineNumber)
-    println("********************************************************")
-    println("********************************************************")
-    println(errorsGroupedByLineNumber)
-    println("********************************************************")
-    println("********************************************************")
+
     errorsGroupedByLineNumber.map { groupedErrors =>
       if (groupedErrors._2.length <= 2) {
         val error1 = groupedErrors._2.head.errorMessage
@@ -51,7 +47,6 @@ class XmlErrorMessageHelper {
           .orElse(extractMissingTagValues(error1))
           .orElse(extractEmptyTagValues(error1))
           .orElse(extractUnorderedTagValues(error1))
-          .orElse(extractBooleanErrorValues(error1, error2))
 
         GenericError(groupedErrors._1, error.getOrElse(Message(defaultMessage)))
       } else GenericError(groupedErrors._1, Message(defaultMessage))
@@ -222,27 +217,6 @@ class XmlErrorMessageHelper {
     }
   }
 
-  def extractBooleanErrorValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
-    val formatOfFirstError  = """cvc-datatype-valid.1.2.1: '((?s).*)' is not a valid value for 'boolean'.""".stripMargin.r
-    val formatOfSecondError = """cvc-type.3.1.3: The value '((?s).*)' of element '(.*?)' is not valid.""".stripMargin.r
-
-    errorMessage1 match {
-      case formatOfFirstError(_) =>
-        errorMessage2 match {
-          case formatOfSecondError(entry, element) =>
-            val displayName = if (element.equals("AffectedPerson")) {
-              "AssociatedEnterprise/AffectedPerson"
-            } else element
-
-            if (entry.isEmpty) {
-              Some(missingInfoMessage(displayName))
-            } else Some(Message("xml.must.be.boolean", Seq(displayName)))
-          case _ => None
-        }
-      case _ => None
-    }
-  }
-
   def extractInvalidIntegerErrorValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
     val formatOfFirstError  = """cvc-datatype-valid.1.2.1: '((?s).*)' is not a valid value for 'integer'.""".stripMargin.r
     val formatOfSecondError = """cvc-complex-type.2.2: Element '(.*?)' must have no element (.*?), and the value must be valid.""".stripMargin.r
@@ -305,12 +279,9 @@ class XmlErrorMessageHelper {
       """cvc-complex-type.2.4.b: The content of element '(.*?)' is not complete. One of '"urn:oecd:ties:mdr:v1":(.*?)' is expected.""".stripMargin.r
 
     formattedError match {
-      case format("Arrangement", element) =>
+      case format(parent, element) if parent == "Arrangement" | parent == "ID" =>
         val formattedElement = element.replaceAll(", \"urn:oecd:ties:mdr:v1\":", " or ")
-        Some(Message("xml.empty.tag", Seq("Arrangement", formattedElement)))
-      case format("ID", element) =>
-        val formattedElement = element.replaceAll(", \"urn:oecd:ties:mdr:v1\":", " or ")
-        Some(Message("xml.empty.tag", Seq("ID", formattedElement)))
+        Some(Message("xml.empty.tag", Seq(parent, formattedElement)))
       case format(parent, element) =>
         val formattedElement = element.replaceAll("(.*?):", "")
         Some(Message("xml.empty.tag", Seq(parent, formattedElement)))

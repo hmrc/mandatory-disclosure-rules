@@ -275,45 +275,6 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         result mustBe List(GenericError(20, Message("xml.defaultMessage")))
       }
 
-      "must return correct error for missing boolean value (affected Person)" in {
-
-        val error1 = SaxParseError(lineNumber, "cvc-datatype-valid.1.2.1: '' is not a valid value for 'boolean'.")
-        val error2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value '' of element 'AffectedPerson' is not valid.")
-
-        val result = helper.generateErrorMessages(ListBuffer(error1, error2))
-        result mustBe List(GenericError(lineNumber, Message("xml.add.an.element", List("AssociatedEnterprise/AffectedPerson"))))
-      }
-
-      "must return correct error for missing other boolean value" in {
-
-        val error1 = SaxParseError(lineNumber, "cvc-datatype-valid.1.2.1: '' is not a valid value for 'boolean'.")
-        val error2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value '' of element 'InitialDisclosureMA' is not valid.")
-
-        val result = helper.generateErrorMessages(ListBuffer(error1, error2))
-        result mustBe List(GenericError(lineNumber, Message("xml.add.an.element", List("InitialDisclosureMA"))))
-      }
-
-      "must return correct error for invalid boolean value" in {
-
-        val error1 = SaxParseError(lineNumber, "cvc-datatype-valid.1.2.1: 'yes' is not a valid value for 'boolean'.")
-        val error2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value 'yes' of element 'InitialDisclosureMA' is not valid.")
-
-        val result = helper.generateErrorMessages(ListBuffer(error1, error2))
-        result mustBe List(GenericError(lineNumber, Message("xml.must.be.boolean", List("InitialDisclosureMA"))))
-      }
-
-      "must return correct error for incorrectly formatted arrangement id" in {
-
-        val error1 = SaxParseError(
-          lineNumber,
-          "cvc-pattern-valid: Value 'njinjin' is not facet-valid with respect to pattern '[A-Z]{2}[A]([2]\\d{3}(0[1-9]|1[0-2])(0[1-9]|[12]\\d|3[01]))([A-Z0-9]{6})' for type '#AnonType_ArrangementIDDAC6_Arrangement'."
-        )
-        val error2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value 'njinjin' of element 'ArrangementID' is not valid.")
-
-        val result = helper.generateErrorMessages(ListBuffer(error1, error2))
-        result mustBe List(GenericError(lineNumber, Message("xml.defaultMessage")))
-      }
-
       "must return correct error for incorrectly formatted disclosure id" in {
 
         val error1 = SaxParseError(
