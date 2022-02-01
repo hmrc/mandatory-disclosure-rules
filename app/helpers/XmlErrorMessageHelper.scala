@@ -185,7 +185,11 @@ class XmlErrorMessageHelper {
           case formatOfSecondError(_, element) =>
             Some(Message("xml.not.allowed.length", Seq(element, allowedLength)))
           case formatOfAlternativeSecondError(element) =>
-            Some(Message("xml.not.allowed.length", Seq(element, allowedLength)))
+            if (List("Narrative", "Summary", "OtherInfo").contains(element)) {
+              Some(Message("xml.not.allowed.length.repeatable", Seq(element, allowedLength)))
+            } else {
+              Some(Message("xml.not.allowed.length", Seq(element, allowedLength)))
+            }
           case _ => None
         }
       case _ => None
@@ -200,10 +204,14 @@ class XmlErrorMessageHelper {
     val formatOfSecondError = """cvc-type.3.1.3: The value '((?s).*)' of element '(.*?)' is not valid.""".stripMargin.r
 
     formattedError match {
-      case formatOfFirstError("", "(MDR)") =>
+      case formatOfFirstError(suppliedValue, "(MDR)") =>
         errorMessage2 match {
           case formatOfSecondError(_, element) =>
-            Some(Message("xml.add.line.messageType", Seq(element)))
+            if (suppliedValue == "") {
+              Some(Message("xml.add.line.messageType", Seq(element)))
+            } else {
+              Some(Message("xml.add.mdr"))
+            }
         }
       case formatOfFirstError(suppliedValue, allowedValues) =>
         errorMessage2 match {
