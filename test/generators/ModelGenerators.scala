@@ -49,7 +49,6 @@ trait ModelGenerators {
         acknowledgementRef <- stringsWithMaxLength(32)
       } yield RequestCommonForSubscription(
         regime = "MDR",
-        conversationID = None,
         receiptDate = receiptDate,
         acknowledgementReference = acknowledgementRef,
         originatingSystem = "MDTP",

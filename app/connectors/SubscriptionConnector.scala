@@ -34,14 +34,13 @@ class SubscriptionConnector @Inject() (
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
     val serviceName = "read-subscription"
     //x-conversation-id must match conversationID in RequestCommon otherwise EIS will throw a 400 Bad Request
-    val conversationID = subscription.displaySubscriptionForMDRRequest.requestCommon.conversationID.getOrElse("")
 
     val extraHeaders = Seq()
       .withBearerToken(s"${config.bearerToken}")
       .withXForwardedHost()
       .withDate()
       .withXCorrelationId()
-      .withXConversationId(Some(conversationID))
+      .withXConversationId()
       .withContentType(Some("application/json"))
       .withAccept(Some("application/json"))
       .withEnvironment(Some(config.environment(serviceName)))
