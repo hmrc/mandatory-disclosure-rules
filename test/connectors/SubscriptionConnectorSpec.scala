@@ -34,7 +34,8 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
   override lazy val app: Application = applicationBuilder()
     .configure(
       conf = "microservice.services.update-subscription.port" -> server.port(),
-      "microservice.services.read-subscription.port" -> server.port()
+      "microservice.services.read-subscription.port"         -> server.port(),
+      "microservice.services.read-subscription.bearer-token" -> "local-token"
     )
     .build()
 
@@ -54,6 +55,7 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
 
         forAll(arbitrary[DisplaySubscriptionForMDRRequest]) { sub =>
           val result = connector.readSubscriptionInformation(sub)
+
           result.futureValue.status mustBe OK
         }
       }
