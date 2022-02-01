@@ -37,7 +37,7 @@ class SubscriptionConnector @Inject() (
     val conversationID = subscription.displaySubscriptionForMDRRequest.requestCommon.conversationID.getOrElse("")
 
     val extraHeaders = Seq()
-      .withBearerToken(s"${config.bearerToken}")
+      .withBearerToken(s"${config.bearerToken(serviceName)}")
       .withXForwardedHost()
       .withDate()
       .withXCorrelationId()
