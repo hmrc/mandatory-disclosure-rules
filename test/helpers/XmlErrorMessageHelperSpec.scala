@@ -174,6 +174,18 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         result mustBe List(GenericError(lineNumber, Message("xml.not.allowed.length", List("Warning", "4000"))))
       }
 
+      "must return correct error when invalid enum given for MDR" in {
+
+        val invalidEnumError1 = SaxParseError(
+          lineNumber,
+          "cvc-enumeration-valid: Value 'ABC' is not facet-valid with respect to enumeration '[MDR]'. It must be a value from the enumeration."
+        )
+        val invalidEnumError2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value 'ABC' of element 'MessageType' is not valid.")
+
+        val result = helper.generateErrorMessages(ListBuffer(invalidEnumError1, invalidEnumError2))
+        result mustBe List(GenericError(lineNumber, Message("xml.add.mdr")))
+      }
+
       "must return correct error when invalid enum given for element" in {
 
         val invalidEnumError1 = SaxParseError(
