@@ -33,7 +33,7 @@ class SubmissionConnector @Inject() (
   def submitDisclosure(submission: NodeSeq)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
     val serviceName = "submission"
     val extraHeaders = Seq()
-      .withBearerToken(s"${config.bearerToken}")
+      .withBearerToken(s"${config.bearerToken(serviceName)}")
       .withXForwardedHost()
       .withDate()
       .withXCorrelationId()
