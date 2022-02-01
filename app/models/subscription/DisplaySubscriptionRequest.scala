@@ -31,7 +31,6 @@ object RequestParameter {
 
 case class RequestCommonForSubscription(
   regime: String,
-  conversationID: Option[String] = None,
   receiptDate: String,
   acknowledgementReference: String,
   originatingSystem: String,
