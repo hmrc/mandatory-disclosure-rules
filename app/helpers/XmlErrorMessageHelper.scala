@@ -185,7 +185,11 @@ class XmlErrorMessageHelper {
           case formatOfSecondError(_, element) =>
             Some(Message("xml.not.allowed.length", Seq(element, allowedLength)))
           case formatOfAlternativeSecondError(element) =>
-            Some(Message("xml.not.allowed.length", Seq(element, allowedLength)))
+            if (List("Narrative", "Summary", "OtherInfo").contains(element)) {
+              Some(Message("xml.not.allowed.length.repeatable", Seq(element, allowedLength)))
+            } else {
+              Some(Message("xml.not.allowed.length", Seq(element, allowedLength)))
+            }
           case _ => None
         }
       case _ => None
