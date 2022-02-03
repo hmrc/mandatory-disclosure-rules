@@ -26,7 +26,7 @@ object SourceFaultDetail {
 
 case class ErrorDetail(
   timestamp: String,
-  correlationId: String,
+  correlationId: Option[String],
   errorCode: String,
   errorMessage: String,
   source: String,
