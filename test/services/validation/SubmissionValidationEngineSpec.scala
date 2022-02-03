@@ -162,11 +162,11 @@ class SubmissionValidationEngineSpec extends SpecBase {
       Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
     }
 
-    "must return ValidationFailure for file where element is too long (1-4000 allowed)" in new SetUp {
+    "must return ValidationFailure for file where element is too long (1-4000 allowed) and show the number correctly formatted" in new SetUp {
 
       when(mockXmlValidationService.validateXML(any[Option[String]](), any[Option[NodeSeq]]())).thenReturn(Left(ListBuffer(maxLengthError3, maxlengthError4)))
 
-      val expectedErrors = Seq(GenericError(116, Message("xml.not.allowed.length", List("NationalProvision", "4000"))))
+      val expectedErrors = Seq(GenericError(116, Message("xml.not.allowed.length", List("NationalProvision", "4,000"))))
 
       Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
     }

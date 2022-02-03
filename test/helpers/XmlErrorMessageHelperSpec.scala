@@ -160,7 +160,31 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         result mustBe List(GenericError(lineNumber, Message("xml.not.allowed.length", List("BuildingIdentifier", "400"))))
       }
 
-      "must return correct error when allowed length exceeded 4000" in {
+      "must return unique error when MessageRefId allowed length exceeds 200 but user is told must be 70 characters or less" in {
+
+        val maxLengthError1 = SaxParseError(
+          lineNumber,
+          s"cvc-maxLength-valid: Value '$over400' with length = '201' is not facet-valid with respect to maxLength '400' for type 'StringMin1Max200_Type'."
+        )
+        val maxlengthError2 = SaxParseError(lineNumber, s"cvc-type.3.1.3: The value '$over400' of element 'MessageRefId' is not valid.")
+
+        val result = helper.generateErrorMessages(ListBuffer(maxLengthError1, maxlengthError2))
+        result mustBe List(GenericError(lineNumber, Message("xml.not.allowed.length", List("MessageRefId", "70"))))
+      }
+
+      "must return unique error when DocRefId allowed length exceeds 200 but user is told must be 85 characters or less" in {
+
+        val maxLengthError1 = SaxParseError(
+          lineNumber,
+          s"cvc-maxLength-valid: Value '$over400' with length = '201' is not facet-valid with respect to maxLength '400' for type 'StringMin1Max200_Type'."
+        )
+        val maxlengthError2 = SaxParseError(lineNumber, s"cvc-type.3.1.3: The value '$over400' of element 'DocRefId' is not valid.")
+
+        val result = helper.generateErrorMessages(ListBuffer(maxLengthError1, maxlengthError2))
+        result mustBe List(GenericError(lineNumber, Message("xml.not.allowed.length", List("DocRefId", "85"))))
+      }
+
+      "must return correct error when allowed length exceeded 4000 and the number is formatted corectly" in {
 
         val maxLengthError1 = SaxParseError(
           lineNumber,
@@ -169,7 +193,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         val maxlengthError2 = SaxParseError(lineNumber, s"cvc-type.3.1.3: The value '$over400' of element 'Warning' is not valid.")
 
         val result = helper.generateErrorMessages(ListBuffer(maxLengthError1, maxlengthError2))
-        result mustBe List(GenericError(lineNumber, Message("xml.not.allowed.length", List("Warning", "4000"))))
+        result mustBe List(GenericError(lineNumber, Message("xml.not.allowed.length", List("Warning", "4,000"))))
       }
 
       "must return correct error when invalid enum given for MDR" in {

@@ -171,16 +171,22 @@ class XmlErrorMessageHelper {
 
     val formatOfAlternativeSecondError = """cvc-complex-type.2.2: Element '(.*?)' must have no element children, and the value must be valid.""".stripMargin.r
 
+    val numberFormatter = java.text.NumberFormat.getIntegerInstance
+
     errorMessage1 match {
       case formatOfFirstError(_, _, allowedLength, _) =>
         formattedError match {
+          case formatOfSecondError(_, "MessageRefId") =>
+            Some(Message("xml.not.allowed.length", Seq("MessageRefId", "70")))
+          case formatOfSecondError(_, "DocRefId") =>
+            Some(Message("xml.not.allowed.length", Seq("DocRefId", "85")))
           case formatOfSecondError(_, element) =>
-            Some(Message("xml.not.allowed.length", Seq(element, allowedLength)))
+            Some(Message("xml.not.allowed.length", Seq(element, numberFormatter.format(allowedLength.toInt))))
           case formatOfAlternativeSecondError(element) =>
             if (List("Narrative", "Summary", "OtherInfo").contains(element)) {
-              Some(Message("xml.not.allowed.length.repeatable", Seq(element, allowedLength)))
+              Some(Message("xml.not.allowed.length.repeatable", Seq(element, numberFormatter.format(allowedLength.toInt))))
             } else {
-              Some(Message("xml.not.allowed.length", Seq(element, allowedLength)))
+              Some(Message("xml.not.allowed.length", Seq(element, numberFormatter.format(allowedLength.toInt))))
             }
           case _ => None
         }
