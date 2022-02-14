@@ -16,12 +16,9 @@ class DataExtractionSpec extends SpecBase {
       val extractor = app.injector.instanceOf[DataExtraction]
       val validSubmission = XML.loadFile("test/resources/mdr/validmdr.xml")
 
-      val xml: Either[ListBuffer[SaxParseError], Elem] = service.validateXML(None, Some(validSubmission))
+      val xml = service.validateXML(None, Some(validSubmission)).right.get
 
-      xml match {
-        case Right(validXml) => extractor.messageSpecData(validXml) mustBe Some(MessageSpecData("GBXAMDR1234567", MDR401))
-        case _ => fail("Invalid XML")
-      }
+      extractor.messageSpecData(xml) mustBe Some(MessageSpecData("GBXAMDR1234567", MDR401))
 
     }
   }
