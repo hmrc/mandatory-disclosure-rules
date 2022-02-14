@@ -39,7 +39,7 @@ object UpScanSessionRepository {
     IndexModel(
       ascending("lastUpdated"),
       IndexOptions()
-        .name("upload-last-updated-index")
+        .name("up-scan-last-updated-index")
         .expireAfter(cacheTtl(config), TimeUnit.SECONDS)
     )
   )
@@ -51,7 +51,7 @@ class UpScanSessionRepository @Inject() (
 )(implicit ec: ExecutionContext)
     extends PlayMongoRepository[UploadSessionDetails](
       mongoComponent = mongo,
-      collectionName = "uploadSessionRepository",
+      collectionName = "upScanSessionRepository",
       domainFormat = UploadSessionDetails.format,
       indexes = UpScanSessionRepository.indexes(config),
       replaceIndexes = true
