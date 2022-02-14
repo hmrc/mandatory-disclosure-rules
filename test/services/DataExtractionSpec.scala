@@ -19,7 +19,7 @@ class DataExtractionSpec extends SpecBase {
       val xml: Either[ListBuffer[SaxParseError], Elem] = service.validateXML(None, Some(validSubmission))
 
       xml match {
-        case Right(validXml) => extractor.messageSpecData(validXml) mustBe MessageSpecData("GBXAMDR1234567", MDR401)
+        case Right(validXml) => extractor.messageSpecData(validXml) mustBe Some(MessageSpecData("GBXAMDR1234567", MDR401))
         case _ => fail("Invalid XML")
       }
 

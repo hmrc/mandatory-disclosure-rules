@@ -7,6 +7,14 @@ case object MDR401 extends MessageTypeIndic
 case object MDR402 extends MessageTypeIndic
 
 object MessageTypeIndic {
+
+  def fromString(typeIndic: String): MessageTypeIndic = typeIndic.toUpperCase match
+  {
+    case "MDR401" => MDR401
+    case "MDR402" => MDR402
+    case _ => throw new IllegalArgumentException
+  }
+
   implicit val read: Reads[MessageTypeIndic] = (json: JsValue) => {
     val jsObject = json.asInstanceOf[JsObject]
     jsObject.value.get("_type") match {
