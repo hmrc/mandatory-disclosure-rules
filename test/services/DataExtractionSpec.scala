@@ -2,11 +2,9 @@ package services
 
 import base.SpecBase
 import models.submission.{MDR401, MessageSpecData}
-import models.validation.SaxParseError
 import services.validation.XMLValidationService
 
-import scala.collection.mutable.ListBuffer
-import scala.xml.{Elem, XML}
+import scala.xml.XML
 
 class DataExtractionSpec extends SpecBase {
 
