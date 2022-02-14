@@ -24,8 +24,8 @@ import java.util.UUID
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 
-class UploadSessionRepositorySpec extends SpecBase {
-  lazy val uploadRep = app.injector.instanceOf[UploadSessionRepository]
+class UpScanSessionRepositorySpec extends SpecBase {
+  lazy val uploadRep = app.injector.instanceOf[UpScanSessionRepository]
   val uploadId       = UploadId(UUID.randomUUID().toString)
 
   val uploadDetails = UploadSessionDetails(

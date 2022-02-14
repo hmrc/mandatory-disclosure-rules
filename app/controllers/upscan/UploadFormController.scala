@@ -20,7 +20,7 @@ import com.google.inject.Inject
 import models.upscan.{UploadId, UpscanIdentifiers}
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import repositories.upscan.UploadSessionRepository
+import repositories.upscan.UpScanSessionRepository
 import services.upscan.UploadProgressTracker
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -28,7 +28,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class UploadFormController @Inject() (
   uploadProgressTracker: UploadProgressTracker,
-  repository: UploadSessionRepository,
+  repository: UpScanSessionRepository,
   cc: ControllerComponents
 )(implicit ec: ExecutionContext)
     extends BackendController(cc) {

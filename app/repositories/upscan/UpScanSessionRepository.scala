@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-object UploadSessionRepository {
+object UpScanSessionRepository {
 
   def cacheTtl(config: Configuration): Int =
     config.get[Int]("mongodb.timeToLiveInSeconds")
@@ -45,7 +45,7 @@ object UploadSessionRepository {
   )
 }
 
-class UploadSessionRepository @Inject() (
+class UpScanSessionRepository @Inject() (
   val mongo: MongoComponent,
   config: Configuration
 )(implicit ec: ExecutionContext)
@@ -53,7 +53,7 @@ class UploadSessionRepository @Inject() (
       mongoComponent = mongo,
       collectionName = "uploadSessionRepository",
       domainFormat = UploadSessionDetails.format,
-      indexes = UploadSessionRepository.indexes(config),
+      indexes = UpScanSessionRepository.indexes(config),
       replaceIndexes = true
     ) {
 

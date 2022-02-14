@@ -20,7 +20,7 @@ import base.SpecBase
 import models.upscan.{InProgress, Reference, UploadId, UploadSessionDetails}
 import org.bson.types.ObjectId
 import org.mockito.ArgumentMatchers.any
-import repositories.upscan.UploadSessionRepository
+import repositories.upscan.UpScanSessionRepository
 import scala.language.postfixOps
 
 import scala.concurrent.duration.DurationInt
@@ -28,7 +28,7 @@ import scala.concurrent.{Await, Future}
 
 class MongoBackedUploadProgressTrackerSpec extends SpecBase {
 
-  val mockUploadSessionRepository = mock[UploadSessionRepository]
+  val mockUploadSessionRepository = mock[UpScanSessionRepository]
 
   import scala.concurrent.ExecutionContext.Implicits._
 
