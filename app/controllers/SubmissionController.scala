@@ -16,7 +16,7 @@
 
 package controllers
 
-import connectors.{stripSession, SubmissionConnector}
+import connectors.SubmissionConnector
 import controllers.auth.IdentifierAuthAction
 import models.error.ReadSubscriptionError
 import models.submission.SubmissionMetaData
@@ -48,7 +48,7 @@ class SubmissionController @Inject() (
     val fileName               = (xml \ "fileName").text
     val enrolmentID            = request.enrolmentID
     val submissionTime         = LocalDateTime.now()
-    val conversationID: String = stripSession(hc.sessionId.map(_.value).getOrElse(UUID.randomUUID().toString))
+    val conversationID: String = UUID.randomUUID().toString
 
     val submissionMetaData = SubmissionMetaData.build(submissionTime, conversationID, fileName)
     readSubscriptionService.getContactInformation(enrolmentID).flatMap {
