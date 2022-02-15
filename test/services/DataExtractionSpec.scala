@@ -17,23 +17,29 @@
 package services
 
 import base.SpecBase
+import fixtures.XMLFixtures
 import models.submission.{MDR401, MessageSpecData}
-import services.validation.XMLValidationService
-
-import scala.xml.XML
 
 class DataExtractionSpec extends SpecBase {
 
   "DataExtraction" - {
+    val extractor = app.injector.instanceOf[DataExtraction]
     "messageSpecData must return messageSpec data from a valid XML file" in {
-      val service         = app.injector.instanceOf[XMLValidationService]
-      val extractor       = app.injector.instanceOf[DataExtraction]
-      val validSubmission = XML.loadFile("test/resources/mdr/validmdr.xml")
+      extractor.messageSpecData(XMLFixtures.validMessageSpec) mustBe Some(MessageSpecData("GBXAMDR1234567", MDR401))
+    }
 
-      val xml = service.validateXML(None, Some(validSubmission)).right.get
+    "messageSpecData must return None when messageRefId is missing" in {
+      extractor.messageSpecData(XMLFixtures.missingMessageRefId) mustBe None
+    }
 
-      extractor.messageSpecData(xml) mustBe Some(MessageSpecData("GBXAMDR1234567", MDR401))
+    "messageSpecData must return None when messageTypeIndic is missing" in {
+      extractor.messageSpecData(XMLFixtures.missingMessageTypeIndic) mustBe None
+    }
 
+    "messageSpecData must throw NoSuchElement when messageTypeIndic invalid " in {
+      assertThrows[NoSuchElementException] {
+        extractor.messageSpecData(XMLFixtures.invalidMessageTypeIndic) mustBe None
+      }
     }
   }
 }

@@ -27,7 +27,7 @@ object MessageTypeIndic {
   def fromString(typeIndic: String): MessageTypeIndic = typeIndic.toUpperCase match {
     case "MDR401" => MDR401
     case "MDR402" => MDR402
-    case _        => throw new IllegalArgumentException
+    case _        => throw new NoSuchElementException
   }
 
   implicit val read: Reads[MessageTypeIndic] = (json: JsValue) => {

@@ -38,10 +38,10 @@ class SubmissionValidationEngine @Inject() (xmlValidationService: XMLValidationS
       case Right(messageSpecData) =>
         messageSpecData match {
           case Some(msd) => Future.successful(SubmissionValidationSuccess(msd))
-          case None => //ToDo Confirm error handling
+          case None =>
             val errorMessage = "Could not retrieve messageSpec information from the submission"
             logger.warn(errorMessage)
-            throw new RuntimeException(errorMessage)
+            Future.successful(InvalidXmlError(errorMessage))
         }
 
       case Left(errors) =>

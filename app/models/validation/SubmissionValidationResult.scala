@@ -45,7 +45,7 @@ object ValidationErrors {
   implicit val format = Json.format[ValidationErrors]
 }
 
-case class SubmissionValidationSuccess(messageSpecData: MessageSpecData) extends SubmissionValidationResult // ToDo change to metadata when available
+case class SubmissionValidationSuccess(messageSpecData: MessageSpecData) extends SubmissionValidationResult
 
 object SubmissionValidationSuccess {
   implicit val format: OFormat[SubmissionValidationSuccess] = Json.format[SubmissionValidationSuccess]
