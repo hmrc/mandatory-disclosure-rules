@@ -46,7 +46,7 @@ class SubmissionController @Inject() (
     //TODO receive xml and read details not sure what I need
     val xml                    = request.body
     val fileName               = (xml \ "fileName").text
-    val enrolmentID            = request.enrolmentID
+    val enrolmentID            = request.subscriptionId
     val submissionTime         = LocalDateTime.now()
     val conversationID: String = UUID.randomUUID().toString
 

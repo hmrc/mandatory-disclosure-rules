@@ -18,4 +18,4 @@ package controllers.auth
 
 import play.api.mvc.{Request, WrappedRequest}
 
-case class UserRequest[+A](enrolmentID: String, request: Request[A]) extends WrappedRequest[A](request)
+case class UserRequest[+A](subscriptionId: String, request: Request[A]) extends WrappedRequest[A](request)
