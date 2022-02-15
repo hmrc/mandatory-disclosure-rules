@@ -17,22 +17,34 @@
 package services.validation
 
 import helpers.XmlErrorMessageHelper
+import models.submission.MessageSpecData
 import models.validation._
 import org.xml.sax.SAXParseException
 import play.api.Logging
+import services.DataExtraction
 
 import javax.inject.Inject
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
 import scala.xml.Elem
 
-class SubmissionValidationEngine @Inject() (xmlValidationService: XMLValidationService, xmlErrorMessageHelper: XmlErrorMessageHelper) extends Logging {
+class SubmissionValidationEngine @Inject() (xmlValidationService: XMLValidationService,
+                                            xmlErrorMessageHelper: XmlErrorMessageHelper,
+                                            dataExtraction: DataExtraction
+) extends Logging {
 
   def validateUploadSubmission(upScanUrl: Option[String]): Future[SubmissionValidationResult] =
     try performXmlValidation(upScanUrl) match {
-      case None =>
-        Future.successful(SubmissionValidationSuccess(true))
-      case Some(errors) =>
+      case Right(messageSpecData) =>
+        messageSpecData match {
+          case Some(msd) => Future.successful(SubmissionValidationSuccess(msd))
+          case None => //ToDo Confirm error handling
+            val errorMessage = "Could not retrieve messageSpec information from the submission"
+            logger.warn(errorMessage)
+            throw new RuntimeException(errorMessage)
+        }
+
+      case Left(errors) =>
         Future.successful(SubmissionValidationFailure(ValidationErrors(errors)))
     } catch {
       case e: SAXParseException =>
@@ -40,8 +52,11 @@ class SubmissionValidationEngine @Inject() (xmlValidationService: XMLValidationS
         Future.successful(InvalidXmlError(e.getMessage))
     }
 
-  def performXmlValidation(upScanUrl: Option[String]): Option[Seq[GenericError]] = {
+  def performXmlValidation(upScanUrl: Option[String]): Either[List[GenericError], Option[MessageSpecData]] = {
     val xmlOrErrors: Either[ListBuffer[SaxParseError], Elem] = xmlValidationService.validateXML(upScanUrl)
-    xmlOrErrors.fold(list => Some(xmlErrorMessageHelper.generateErrorMessages(list)), _ => None)
+    xmlOrErrors match {
+      case Right(xml) => Right(dataExtraction.messageSpecData(xml))
+      case Left(list) => Left(xmlErrorMessageHelper.generateErrorMessages(list))
+    }
   }
 }

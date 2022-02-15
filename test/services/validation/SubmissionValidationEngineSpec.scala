@@ -18,8 +18,10 @@ package services.validation
 
 import base.SpecBase
 import helpers.XmlErrorMessageHelper
+import models.submission.{MDR401, MessageSpecData}
 import models.validation._
 import org.mockito.ArgumentMatchers.any
+import services.DataExtraction
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Await
@@ -32,13 +34,14 @@ class SubmissionValidationEngineSpec extends SpecBase {
   val defaultError                        = "There is a problem with this line number"
   val lineNumber                          = 0
   val noErrors: ListBuffer[SaxParseError] = ListBuffer()
+  val messageSpecData: MessageSpecData    = MessageSpecData("XBC99999999999", MDR401)
 
-  val addressError1 = SaxParseError(20,
-                                    "cvc-minLength-valid: Value '' with length = '0' is " +
-                                      "not facet-valid with respect to minLength '1' for type 'StringMin1Max400_Type'."
+  val addressError1: SaxParseError = SaxParseError(20,
+                                                   "cvc-minLength-valid: Value '' with length = '0' is " +
+                                                     "not facet-valid with respect to minLength '1' for type 'StringMin1Max400_Type'."
   )
 
-  val addressError2 = SaxParseError(20, "cvc-type.3.1.3: The value '' of element 'Street' is not valid.")
+  val addressError2: SaxParseError = SaxParseError(20, "cvc-type.3.1.3: The value '' of element 'Street' is not valid.")
 
   val over400  = "a" * 401
   val over4000 = "a" * 4001
@@ -114,8 +117,9 @@ class SubmissionValidationEngineSpec extends SpecBase {
 
     val mockXmlValidationService: XMLValidationService   = mock[XMLValidationService]
     val mockXmlErrorMessageHelper: XmlErrorMessageHelper = new XmlErrorMessageHelper
+    val mockDataExtraction: DataExtraction               = mock[DataExtraction]
 
-    val validationEngine = new SubmissionValidationEngine(mockXmlValidationService, mockXmlErrorMessageHelper)
+    val validationEngine = new SubmissionValidationEngine(mockXmlValidationService, mockXmlErrorMessageHelper, mockDataExtraction)
 
     val source        = "src"
     val elem: Elem    = <dummyElement>Test</dummyElement>
@@ -127,8 +131,9 @@ class SubmissionValidationEngineSpec extends SpecBase {
     "must return UploadSubmissionValidationSuccess when xml with no errors received" in new SetUp {
 
       when(mockXmlValidationService.validateXML(any[Option[String]](), any[Option[NodeSeq]]())).thenReturn(Right(elem))
+      when(mockDataExtraction.messageSpecData(any[Elem])).thenReturn(Some(messageSpecData))
 
-      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationSuccess(true)
+      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationSuccess(messageSpecData)
     }
 
     "must return ValidationFailure for file which multiple pieces of mandatory information missing" in new SetUp {

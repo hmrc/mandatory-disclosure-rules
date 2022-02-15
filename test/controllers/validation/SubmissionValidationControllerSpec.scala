@@ -17,6 +17,7 @@
 package controllers.validation
 
 import base.SpecBase
+import models.submission.{MDR401, MessageSpecData}
 import models.validation._
 import org.mockito.ArgumentMatchers.any
 import org.scalatest.BeforeAndAfterEach
@@ -30,7 +31,8 @@ import scala.concurrent.Future
 
 class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEach {
 
-  val mockUploadSubmissionValidationEngine = mock[SubmissionValidationEngine]
+  val mockUploadSubmissionValidationEngine: SubmissionValidationEngine = mock[SubmissionValidationEngine]
+  val messageSpecData: MessageSpecData                                 = MessageSpecData("XBC99999999999", MDR401)
 
   val application: Application =
     applicationBuilder()
@@ -55,7 +57,7 @@ class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEac
 
     "must return 200 and Validation success object " in {
       when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[Option[String]]()))
-        .thenReturn(Future.successful(SubmissionValidationSuccess(true)))
+        .thenReturn(Future.successful(SubmissionValidationSuccess(messageSpecData)))
 
       val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url)
       val result  = route(application, request).value

@@ -36,8 +36,8 @@ class SubmissionValidationController @Inject() (
   //TODO replace Action.async with IdentifierAuthAction and instead of request.body.asText read it as a json
   def validateSubmission: Action[AnyContent] = Action.async { implicit request =>
     validationEngine.validateUploadSubmission(request.body.asText) map {
-      case SubmissionValidationSuccess(_) =>
-        Ok(Json.toJsObject(SubmissionValidationSuccess(true)))
+      case SubmissionValidationSuccess(msd) =>
+        Ok(Json.toJsObject(SubmissionValidationSuccess(msd)))
 
       case SubmissionValidationFailure(errors) =>
         Ok(Json.toJson(SubmissionValidationFailure(errors)))

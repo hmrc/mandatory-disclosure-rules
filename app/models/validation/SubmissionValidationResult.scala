@@ -16,6 +16,7 @@
 
 package models.validation
 
+import models.submission.MessageSpecData
 import play.api.libs.json._
 
 sealed trait SubmissionValidationResult
@@ -44,7 +45,7 @@ object ValidationErrors {
   implicit val format = Json.format[ValidationErrors]
 }
 
-case class SubmissionValidationSuccess(boolean: Boolean) extends SubmissionValidationResult // ToDo change to metadata when available
+case class SubmissionValidationSuccess(messageSpecData: MessageSpecData) extends SubmissionValidationResult // ToDo change to metadata when available
 
 object SubmissionValidationSuccess {
   implicit val format: OFormat[SubmissionValidationSuccess] = Json.format[SubmissionValidationSuccess]
