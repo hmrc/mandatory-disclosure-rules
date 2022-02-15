@@ -16,7 +16,7 @@
 
 package controllers
 
-import connectors.{stripSession, SubmissionConnector}
+import connectors.SubmissionConnector
 import controllers.auth.IdentifierAuthAction
 import models.error.ReadSubscriptionError
 import models.submission.SubmissionMetaData
