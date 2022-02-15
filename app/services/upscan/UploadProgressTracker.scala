@@ -19,7 +19,7 @@ package services.upscan
 import models.upscan.{InProgress, Reference, UploadId, UploadSessionDetails, UploadStatus}
 import org.bson.types.ObjectId
 import play.api.Logging
-import repositories.upscan.UploadSessionRepository
+import repositories.upscan.UpScanSessionRepository
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,7 +41,7 @@ trait UploadProgressTracker {
 }
 
 class MongoBackedUploadProgressTracker @Inject() (
-  repository: UploadSessionRepository
+  repository: UpScanSessionRepository
 )(implicit ec: ExecutionContext)
     extends UploadProgressTracker
     with Logging {

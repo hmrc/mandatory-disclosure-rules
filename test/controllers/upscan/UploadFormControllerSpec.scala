@@ -25,7 +25,7 @@ import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import repositories.upscan.UploadSessionRepository
+import repositories.upscan.UpScanSessionRepository
 import services.upscan.UploadProgressTracker
 
 import java.util.UUID
@@ -33,8 +33,8 @@ import scala.concurrent.Future
 
 class UploadFormControllerSpec extends SpecBase with BeforeAndAfterEach {
 
-  val mockUploadSessionRepository: UploadSessionRepository =
-    mock[UploadSessionRepository]
+  val mockUploadSessionRepository: UpScanSessionRepository =
+    mock[UpScanSessionRepository]
 
   val mockUploadProgressTracker: UploadProgressTracker =
     mock[UploadProgressTracker]
@@ -43,7 +43,7 @@ class UploadFormControllerSpec extends SpecBase with BeforeAndAfterEach {
     applicationBuilder()
       .overrides(
         bind[UploadProgressTracker].toInstance(mockUploadProgressTracker),
-        bind[UploadSessionRepository].toInstance(mockUploadSessionRepository)
+        bind[UpScanSessionRepository].toInstance(mockUploadSessionRepository)
       )
       .build()
 
