@@ -17,7 +17,7 @@
 package repositories.submission
 
 import base.SpecBase
-import models.submission.{Accepted, Pending, SubmissionDetails}
+import models.submission.{Accepted, FileError, Pending, Rejected, SubmissionDetails}
 import play.api.Configuration
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
@@ -62,7 +62,7 @@ class SubmissionRepositorySpec extends SpecBase with DefaultPlayMongoRepositoryS
       }
     }
 
-    "must update SubmissionDetails status by ConversationId" in {
+    "must update SubmissionDetails status to Accepted by ConversationId" in {
       val insert = repository.insert(submissionDetails)
       whenReady(insert) { result =>
         result mustBe true
@@ -74,6 +74,21 @@ class SubmissionRepositorySpec extends SpecBase with DefaultPlayMongoRepositoryS
       val updatedResponse = repository.findByConversationId("conversationId123456")
       whenReady(updatedResponse) { result =>
         result mustBe Seq(submissionDetails.copy(status = Accepted))
+      }
+    }
+
+    "must update SubmissionDetails status to Rejected by ConversationId" in {
+      val insert = repository.insert(submissionDetails)
+      whenReady(insert) { result =>
+        result mustBe true
+      }
+      val res = repository.updateStatus("conversationId123456", Rejected(FileError("error in file")))
+      whenReady(res) { result =>
+        result mustBe true
+      }
+      val updatedResponse = repository.findByConversationId("conversationId123456")
+      whenReady(updatedResponse) { result =>
+        result mustBe Seq(submissionDetails.copy(status = Rejected(FileError("error in file"))))
       }
     }
 
