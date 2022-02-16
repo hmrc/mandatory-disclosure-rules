@@ -19,9 +19,10 @@ package controllers
 import connectors.SubmissionConnector
 import controllers.auth.IdentifierAuthAction
 import models.error.ReadSubscriptionError
-import models.submission.SubmissionMetaData
+import models.submission.{Pending, SubmissionDetails, SubmissionMetaData}
 import play.api.Logging
 import play.api.mvc.{Action, ControllerComponents}
+import repositories.submission.SubmissionRepository
 import services.submission.TransformService
 import services.subscription.SubscriptionService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -37,7 +38,8 @@ class SubmissionController @Inject() (
   cc: ControllerComponents,
   transformService: TransformService,
   readSubscriptionService: SubscriptionService,
-  submissionConnector: SubmissionConnector
+  submissionConnector: SubmissionConnector,
+  submissionRepository: SubmissionRepository
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
@@ -46,21 +48,25 @@ class SubmissionController @Inject() (
     //TODO receive xml and read details not sure what I need
     val xml                    = request.body
     val fileName               = (xml \ "fileName").text
-    val enrolmentID            = request.subscriptionId
+    val subscriptionId         = request.subscriptionId
     val submissionTime         = LocalDateTime.now()
-    val conversationID: String = UUID.randomUUID().toString
+    val conversationId: String = UUID.randomUUID().toString
+    val messageRefId           = (xml \\ "MessageRefId").text
+    val submissionDetails      = SubmissionDetails(conversationId, subscriptionId, messageRefId, Pending, fileName, submissionTime, submissionTime)
 
-    val submissionMetaData = SubmissionMetaData.build(submissionTime, conversationID, fileName)
-    readSubscriptionService.getContactInformation(enrolmentID).flatMap {
-      case Right(value) =>
-        // Add metadata
-        val submission: NodeSeq = transformService.addSubscriptionDetailsToSubmission(xml, value, submissionMetaData)
-        //TODO validate XML
-        //Submit disclosure
-        submissionConnector.submitDisclosure(submission).map(_.handleResponse(logger))
-      case Left(ReadSubscriptionError(value)) =>
-        logger.warn(s"ReadSubscriptionError $value")
-        Future.successful(InternalServerError)
+    submissionRepository.insert(submissionDetails).flatMap { _ =>
+      val submissionMetaData = SubmissionMetaData.build(submissionTime, conversationId, fileName)
+      readSubscriptionService.getContactInformation(subscriptionId).flatMap {
+        case Right(value) =>
+          // Add metadata
+          val submission: NodeSeq = transformService.addSubscriptionDetailsToSubmission(xml, value, submissionMetaData)
+          //TODO validate XML
+          //Submit disclosure
+          submissionConnector.submitDisclosure(submission).map(_.handleResponse(logger))
+        case Left(ReadSubscriptionError(value)) =>
+          logger.warn(s"ReadSubscriptionError $value")
+          Future.successful(InternalServerError)
+      }
     }
 
   }

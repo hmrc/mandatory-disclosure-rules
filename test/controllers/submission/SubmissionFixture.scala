@@ -24,27 +24,274 @@ object SubmissionFixture {
       <fileName>my-file.xml</fileName>
       <enrolmentID>enrolmentID</enrolmentID>
       <file>
-        <DAC6_Arrangement version="First">
-          <Header>
-            <MessageRefId>GB0000000XXX</MessageRefId>
+        <MDR_OECD xmlns="urn:oecd:ties:mdr:v1" >
+          <MessageSpec>
+            <TransmittingCountry>AF</TransmittingCountry>
+            <ReceivingCountry>AF</ReceivingCountry>
+            <MessageType>MDR</MessageType>
+            <Language>EN</Language>
+            <Warning>This is a warning</Warning>
+            <Contact>This is a Contact</Contact>
+            <MessageRefId>GBXAMDR1234567</MessageRefId>
+            <MessageTypeIndic>MDR401</MessageTypeIndic>
             <Timestamp>2020-05-14T17:10:00</Timestamp>
-          </Header>
-          <ArrangementID>GBA20200601AAA000</ArrangementID>
-          <DAC6Disclosures>
-            <DisclosureImportInstruction>DAC6ADD</DisclosureImportInstruction>
+          </MessageSpec>
+          <MdrBody>
             <Disclosing>
               <ID>
-                <Individual>
-                  <IndividualName><FirstName>a</FirstName><LastName>b</LastName></IndividualName>
-                  <BirthDate>2020-05-14</BirthDate>
-                  <BirthPlace>a</BirthPlace>
+                <Organisation>
                   <ResCountryCode>VU</ResCountryCode>
-                </Individual>
+                  <TIN>AA000000D</TIN>
+                  <IN>AA000000D</IN>
+                  <Name>organisationName</Name>
+                  <Address>
+                    <CountryCode>GB</CountryCode>
+                    <AddressFix>
+                      <Street>Downing Street</Street>
+                      <BuildingIdentifier>No 10</BuildingIdentifier>
+                      <SuiteIdentifier>Sir Humphrey Suite</SuiteIdentifier>
+                      <FloorIdentifier>Second</FloorIdentifier>
+                      <DistrictName>Westminster</DistrictName>
+                      <POB>48</POB>
+                      <PostCode>SW1A 4GG</PostCode>
+                      <City>London</City>
+                      <CountrySubentity>GB</CountrySubentity>
+                    </AddressFix>
+                    <AddressFree>Address is Free</AddressFree>
+                  </Address>
+                </Organisation>
               </ID>
+              <Capacity>MDR501</Capacity>
+              <Nexus>MDR601</Nexus>
+              <Nexus>MDR602</Nexus>
+              <DocSpec>
+                <DocTypeIndic>OECD0</DocTypeIndic>
+                <DocRefId>GB123456</DocRefId>
+                <CorrDocRefId>This is corr ref ID</CorrDocRefId>
+              </DocSpec>
             </Disclosing>
-            <InitialDisclosureMA>false</InitialDisclosureMA>
-          </DAC6Disclosures>
-        </DAC6_Arrangement>
+            <MdrReport>
+              <ReportableTaxPayer>
+                <ID>
+                  <Individual>
+                    <ResCountryCode>VU</ResCountryCode>
+                    <TIN>AA000000D</TIN>
+                    <Name>
+                      <PrecedingTitle>His Excellency</PrecedingTitle>
+                      <Title>MR</Title>
+                      <FirstName>Larry</FirstName>
+                      <MiddleName>David</MiddleName>
+                      <NamePrefix>van</NamePrefix>
+                      <LastName>David</LastName>
+                      <GenerationIdentifier>Jnr</GenerationIdentifier>
+                      <Suffix>(Cat)</Suffix>
+                      <GeneralSuffix>Deceased</GeneralSuffix>
+                    </Name>
+                    <Address>
+                      <CountryCode>GB</CountryCode>
+                      <AddressFix>
+                        <Street>Downing Street</Street>
+                        <BuildingIdentifier>No 10</BuildingIdentifier>
+                        <SuiteIdentifier>Sir Humphrey Suite</SuiteIdentifier>
+                        <FloorIdentifier>Second</FloorIdentifier>
+                        <DistrictName>Westminster</DistrictName>
+                        <POB>48</POB>
+                        <PostCode>SW1A 4GG</PostCode>
+                        <City>London</City>
+                        <CountrySubentity>GB</CountrySubentity>
+                      </AddressFix>
+                      <AddressFree>Address is Free</AddressFree>
+                    </Address>
+                    <BirthDate>2007-01-14</BirthDate>
+                  </Individual>
+                </ID>
+              </ReportableTaxPayer>
+              <ReportableTaxPayer>
+                <ID>
+                  <Organisation>
+                    <ResCountryCode>VU</ResCountryCode>
+                    <TIN>AA000000D</TIN>
+                    <IN>AA000000D</IN>
+                    <Name>organisationName</Name>
+                    <Address>
+                      <CountryCode>GB</CountryCode>
+                      <AddressFix>
+                        <Street>Downing Street</Street>
+                        <BuildingIdentifier>No 10</BuildingIdentifier>
+                        <SuiteIdentifier>Sir Humphrey Suite</SuiteIdentifier>
+                        <FloorIdentifier>Second</FloorIdentifier>
+                        <DistrictName>Westminster</DistrictName>
+                        <POB>48</POB>
+                        <PostCode>SW1A 4GG</PostCode>
+                        <City>London</City>
+                        <CountrySubentity>GB</CountrySubentity>
+                      </AddressFix>
+                      <AddressFree>Address is Free</AddressFree>
+                    </Address>
+                  </Organisation>
+                </ID>
+              </ReportableTaxPayer>
+              <Intermediaries>
+                <ID>
+                  <Individual>
+                    <ResCountryCode>VU</ResCountryCode>
+                    <TIN>AA000000D</TIN>
+                    <Name>
+                      <PrecedingTitle>His Excellency</PrecedingTitle>
+                      <Title>MR</Title>
+                      <FirstName>Larry</FirstName>
+                      <MiddleName>David</MiddleName>
+                      <NamePrefix>van</NamePrefix>
+                      <LastName>David</LastName>
+                      <GenerationIdentifier>Jnr</GenerationIdentifier>
+                      <Suffix>(Cat)</Suffix>
+                      <GeneralSuffix>Deceased</GeneralSuffix>
+                    </Name>
+                    <Address>
+                      <CountryCode>GB</CountryCode>
+                      <AddressFix>
+                        <Street>Downing Street</Street>
+                        <BuildingIdentifier>No 10</BuildingIdentifier>
+                        <SuiteIdentifier>Sir Humphrey Suite</SuiteIdentifier>
+                        <FloorIdentifier>Second</FloorIdentifier>
+                        <DistrictName>Westminster</DistrictName>
+                        <POB>48</POB>
+                        <PostCode>SW1A 4GG</PostCode>
+                        <City>London</City>
+                        <CountrySubentity>GB</CountrySubentity>
+                      </AddressFix>
+                      <AddressFree>Address is Free</AddressFree>
+                    </Address>
+                    <BirthDate>2007-01-14</BirthDate>
+                  </Individual>
+                </ID>
+                <Role>MDR1101</Role>
+              </Intermediaries>
+              <Intermediaries>
+                <ID>
+                  <Organisation>
+                    <ResCountryCode>VU</ResCountryCode>
+                    <TIN>AA000000D</TIN>
+                    <IN>AA000000D</IN>
+                    <Name>organisationName</Name>
+                    <Address>
+                      <CountryCode>GB</CountryCode>
+                      <AddressFix>
+                        <Street>Downing Street</Street>
+                        <BuildingIdentifier>No 10</BuildingIdentifier>
+                        <SuiteIdentifier>Sir Humphrey Suite</SuiteIdentifier>
+                        <FloorIdentifier>Second</FloorIdentifier>
+                        <DistrictName>Westminster</DistrictName>
+                        <POB>48</POB>
+                        <PostCode>SW1A 4GG</PostCode>
+                        <City>London</City>
+                        <CountrySubentity>GB</CountrySubentity>
+                      </AddressFix>
+                      <AddressFree>Address is Free</AddressFree>
+                    </Address>
+                  </Organisation>
+                </ID>
+                <Role>MDR1102</Role>
+              </Intermediaries>
+              <Structure>
+                <Arrangement>
+                  <CrsAvoidance>
+                    <DisclosureDate>2021-12-04</DisclosureDate>
+                    <Reason>MDR701</Reason>
+                    <Type>MDR801</Type>
+                    <OtherInfo>Other inforamtion</OtherInfo>
+                    <StructureChart>
+                      <ID>
+                        <Individual>
+                          <ResCountryCode>VU</ResCountryCode>
+                          <TIN>AA000000D</TIN>
+                          <Name>
+                            <PrecedingTitle>His Excellency</PrecedingTitle>
+                            <Title>MR</Title>
+                            <FirstName>Larry</FirstName>
+                            <MiddleName>David</MiddleName>
+                            <NamePrefix>van</NamePrefix>
+                            <LastName>David</LastName>
+                            <GenerationIdentifier>Jnr</GenerationIdentifier>
+                            <Suffix>(Cat)</Suffix>
+                            <GeneralSuffix>Deceased</GeneralSuffix>
+                          </Name>
+                          <Address>
+                            <CountryCode>GB</CountryCode>
+                            <AddressFix>
+                              <Street>Downing Street</Street>
+                              <BuildingIdentifier>No 10</BuildingIdentifier>
+                              <SuiteIdentifier>Sir Humphrey Suite</SuiteIdentifier>
+                              <FloorIdentifier>Second</FloorIdentifier>
+                              <DistrictName>Westminster</DistrictName>
+                              <POB>48</POB>
+                              <PostCode>SW1A 4GG</PostCode>
+                              <City>London</City>
+                              <CountrySubentity>GB</CountrySubentity>
+                            </AddressFix>
+                            <AddressFree>Address is Free</AddressFree>
+                          </Address>
+                          <BirthDate>2007-01-14</BirthDate>
+                        </Individual>
+                      </ID>
+                      <Ownership>90</Ownership>
+                      <InvestAmount currCode="VUV">2000000</InvestAmount>
+                      <OtherInfo>Other inforamtion</OtherInfo>
+                      <ListChilds>
+                        <ChildRTP>
+                          <ID>
+                            <Individual>
+                              <ResCountryCode>VU</ResCountryCode>
+                              <TIN>AA000000D</TIN>
+                              <Name>
+                                <PrecedingTitle>His Excellency</PrecedingTitle>
+                                <Title>MR</Title>
+                                <FirstName>Larry</FirstName>
+                                <MiddleName>David</MiddleName>
+                                <NamePrefix>van</NamePrefix>
+                                <LastName>David</LastName>
+                                <GenerationIdentifier>Jnr</GenerationIdentifier>
+                                <Suffix>(Cat)</Suffix>
+                                <GeneralSuffix>Deceased</GeneralSuffix>
+                              </Name>
+                              <Address>
+                                <CountryCode>GB</CountryCode>
+                                <AddressFix>
+                                  <Street>Downing Street</Street>
+                                  <BuildingIdentifier>No 10</BuildingIdentifier>
+                                  <SuiteIdentifier>Sir Humphrey Suite</SuiteIdentifier>
+                                  <FloorIdentifier>Second</FloorIdentifier>
+                                  <DistrictName>Westminster</DistrictName>
+                                  <POB>48</POB>
+                                  <PostCode>SW1A 4GG</PostCode>
+                                  <City>London</City>
+                                  <CountrySubentity>GB</CountrySubentity>
+                                </AddressFix>
+                                <AddressFree>Address is Free</AddressFree>
+                              </Address>
+                              <BirthDate>2007-01-14</BirthDate>
+                            </Individual>
+                          </ID>
+                          <Ownership>90</Ownership>
+                          <InvestAmount currCode="VUV">2000000</InvestAmount>
+                          <OtherInfo>Other inforamtion</OtherInfo>
+                        </ChildRTP>
+                      </ListChilds>
+                    </StructureChart>
+                    <Narrative>this is narrative</Narrative>
+                    <Jurisdictions>IN</Jurisdictions>
+                    <Summary>this is a summary of narrative CSR AVOIDANCE</Summary>
+                  </CrsAvoidance>
+                </Arrangement>
+              </Structure>
+              <DocSpec>
+                <DocTypeIndic>OECD0</DocTypeIndic>
+                <DocRefId>GB123456</DocRefId>
+                <CorrDocRefId>This is corr ref ID</CorrDocRefId>
+              </DocSpec>
+            </MdrReport>
+          </MdrBody>
+        </MDR_OECD>
       </file>
     </submission>
 
