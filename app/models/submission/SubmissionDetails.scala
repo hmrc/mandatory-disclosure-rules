@@ -15,10 +15,11 @@
  */
 
 package models.submission
-import play.api.libs.json.{Format, JsString, JsSuccess, Json, OFormat, Reads, Writes}
+import play.api.libs.json.{Format, JsPath, JsString, JsSuccess, Json, OFormat, Reads, Writes}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.LocalDateTime
+import java.util.UUID
 
 sealed trait FileStatus
 case object Pending extends FileStatus
@@ -50,7 +51,14 @@ object FileError {
   implicit val format: OFormat[FileError] = Json.format[FileError]
 }
 
-case class SubmissionDetails(_id: String, /* conversationId */
+case class ConversationId(value: String)
+object ConversationId {
+  def apply(): ConversationId                 = ConversationId(UUID.randomUUID().toString)
+  implicit val writes: Writes[ConversationId] = conversationId => JsString(conversationId.value)
+  implicit val reads: Reads[ConversationId]   = (JsPath \ "_id").read[String].map(id => ConversationId(id))
+}
+
+case class SubmissionDetails(_id: ConversationId,
                              subscriptionId: String,
                              messageRefId: String,
                              status: FileStatus,

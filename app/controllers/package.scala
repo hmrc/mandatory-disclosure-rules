@@ -15,6 +15,7 @@
  */
 
 import models.error.ErrorDetails
+import models.submission.ConversationId
 import play.api.Logger
 import play.api.http.Status._
 import play.api.libs.json.{JsSuccess, Json}
@@ -27,9 +28,9 @@ import scala.util.{Success, Try}
 package object controllers {
 
   implicit class HttpResponseExt(httpResponse: HttpResponse) {
-    def handleResponse(implicit logger: Logger): Result =
+    def handleResponse(conversationId: ConversationId)(implicit logger: Logger): Result =
       httpResponse.status match {
-        case OK        => Ok(httpResponse.body)
+        case OK        => Ok(Json.toJson(conversationId))
         case NOT_FOUND => NotFound(httpResponse.body)
         case BAD_REQUEST =>
           logDownStreamError(httpResponse.body)
