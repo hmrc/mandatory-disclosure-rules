@@ -20,11 +20,12 @@ import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.Updates.set
-import org.mongodb.scala.model.{FindOneAndUpdateOptions, IndexModel, IndexOptions}
+import org.mongodb.scala.model.{FindOneAndUpdateOptions, IndexModel, IndexOptions, Updates}
 import play.api.Configuration
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import scala.concurrent.duration.Duration
@@ -47,8 +48,12 @@ class SubmissionRepository @Inject() (
     newStatus: FileStatus
   ): Future[Boolean] = {
 
-    val filter: Bson   = equal("_id", conversationId)
-    val modifier: Bson = set("status", Codecs.toBson(newStatus))
+    val filter: Bson = equal("_id", conversationId)
+    //val modifier: Bson = set("status", Codecs.toBson(newStatus))
+    val modifier = Updates.combine(
+      set("status", Codecs.toBson(newStatus)),
+      set("lastUpdated", LocalDateTime.now)
+    )
     val options: FindOneAndUpdateOptions =
       FindOneAndUpdateOptions().upsert(true)
 

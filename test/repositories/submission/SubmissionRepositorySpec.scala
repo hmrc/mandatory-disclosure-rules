@@ -17,7 +17,7 @@
 package repositories.submission
 
 import base.SpecBase
-import models.submission.{Accepted, FileError, Pending, Rejected, SubmissionDetails}
+import models.submission.{Accepted, ConversationId, FileError, Pending, Rejected, SubmissionDetails}
 import play.api.Configuration
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
@@ -30,7 +30,7 @@ class SubmissionRepositorySpec extends SpecBase with DefaultPlayMongoRepositoryS
 
   val dateTimeNow: LocalDateTime = LocalDateTime.now()
   val submissionDetails: SubmissionDetails =
-    SubmissionDetails("conversationId123456", "subscriptionId", "messageRefId", Pending, "file1.xml", dateTimeNow, dateTimeNow)
+    SubmissionDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Pending, "file1.xml", dateTimeNow, dateTimeNow)
 
   "Insert" - {
     "must insert SubmissionDetails" in {
@@ -72,8 +72,11 @@ class SubmissionRepositorySpec extends SpecBase with DefaultPlayMongoRepositoryS
         result mustBe true
       }
       val updatedResponse = repository.findByConversationId("conversationId123456")
+
       whenReady(updatedResponse) { result =>
-        result mustBe Seq(submissionDetails.copy(status = Accepted))
+        result must matchPattern {
+          case Seq(SubmissionDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Accepted, "file1.xml", _, _)) =>
+        }
       }
     }
 
@@ -88,7 +91,18 @@ class SubmissionRepositorySpec extends SpecBase with DefaultPlayMongoRepositoryS
       }
       val updatedResponse = repository.findByConversationId("conversationId123456")
       whenReady(updatedResponse) { result =>
-        result mustBe Seq(submissionDetails.copy(status = Rejected(FileError("error in file"))))
+        result must matchPattern {
+          case Seq(
+                SubmissionDetails(ConversationId("conversationId123456"),
+                                  "subscriptionId",
+                                  "messageRefId",
+                                  Rejected(FileError("error in file")),
+                                  "file1.xml",
+                                  _,
+                                  _
+                )
+              ) =>
+        }
       }
     }
 

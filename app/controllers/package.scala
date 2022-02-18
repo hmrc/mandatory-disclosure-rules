@@ -28,9 +28,9 @@ import scala.util.{Success, Try}
 package object controllers {
 
   implicit class HttpResponseExt(httpResponse: HttpResponse) {
-    def handleResponse(conversationId: ConversationId)(implicit logger: Logger): Result =
+    def handleResponse(implicit logger: Logger): Result =
       httpResponse.status match {
-        case OK        => Ok(Json.toJson(conversationId))
+        case OK        => Ok
         case NOT_FOUND => NotFound(httpResponse.body)
         case BAD_REQUEST =>
           logDownStreamError(httpResponse.body)

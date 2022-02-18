@@ -15,9 +15,9 @@
  */
 
 package models.submission
-import play.api.libs.json.{Format, JsPath, JsString, JsSuccess, Json, OFormat, Reads, Writes}
+import play.api.libs.json._
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
-
+import julienrf.json.derived
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -25,24 +25,11 @@ sealed trait FileStatus
 case object Pending extends FileStatus
 case object Accepted extends FileStatus
 case class Rejected(error: FileError) extends FileStatus {
-  override def toString: String            = "Rejected"
-  implicit def rejected: OFormat[Rejected] = Json.format[Rejected]
+  override def toString: String = "Rejected"
 }
 
 object FileStatus {
-  implicit def rejected: OFormat[Rejected] = Json.format[Rejected]
-
-  implicit val writes: Writes[FileStatus] = Writes[FileStatus] {
-    case Pending            => JsString("Pending")
-    case Accepted           => JsString("Accepted")
-    case rejected: Rejected => Json.toJson(rejected)
-  }
-
-  implicit val reads: Reads[FileStatus] = Reads[FileStatus] {
-    case JsString("Pending")  => JsSuccess(Pending)
-    case JsString("Accepted") => JsSuccess(Accepted)
-    case rejected             => JsSuccess(rejected.as[Rejected])
-  }
+  implicit val format: OFormat[FileStatus] = derived.oformat()
 }
 
 case class FileError(detail: String)
@@ -55,7 +42,7 @@ case class ConversationId(value: String)
 object ConversationId {
   def apply(): ConversationId                 = ConversationId(UUID.randomUUID().toString)
   implicit val writes: Writes[ConversationId] = conversationId => JsString(conversationId.value)
-  implicit val reads: Reads[ConversationId]   = (JsPath \ "_id").read[String].map(id => ConversationId(id))
+  implicit val reads: Reads[ConversationId]   = __.read[String].map(id => ConversationId(id))
 }
 
 case class SubmissionDetails(_id: ConversationId,

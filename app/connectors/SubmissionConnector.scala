@@ -17,6 +17,7 @@
 package connectors
 
 import config.AppConfig
+import models.submission.ConversationId
 import play.api.Logging
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
@@ -30,14 +31,14 @@ class SubmissionConnector @Inject() (
 )(implicit ec: ExecutionContext)
     extends Logging {
 
-  def submitDisclosure(submission: NodeSeq)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
+  def submitDisclosure(submission: NodeSeq, conversationId: ConversationId)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
     val serviceName = "submission"
     val extraHeaders = Seq()
       .withBearerToken(s"${config.bearerToken(serviceName)}")
       .withXForwardedHost()
       .withDate()
       .withXCorrelationId()
-      .withXConversationId()
+      .withXConversationId(Some(conversationId.value))
       .withContentType(Some("application/xml"))
       .withAccept(Some("application/xml"))
       .withEnvironment(Some(config.environment(serviceName)))
