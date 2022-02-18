@@ -49,7 +49,6 @@ class SubmissionRepository @Inject() (
   ): Future[Boolean] = {
 
     val filter: Bson = equal("_id", conversationId)
-    //val modifier: Bson = set("status", Codecs.toBson(newStatus))
     val modifier = Updates.combine(
       set("status", Codecs.toBson(newStatus)),
       set("lastUpdated", LocalDateTime.now)
