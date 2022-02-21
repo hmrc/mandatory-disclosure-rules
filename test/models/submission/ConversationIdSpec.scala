@@ -26,9 +26,6 @@ class ConversationIdSpec extends SpecBase {
 
       val json: JsValue = JsString("conversationId")
 
-      println(json)
-      println(Json.toJson(ConversationId()))
-
       val cid = json.as[ConversationId]
       cid mustBe ConversationId("conversationId")
     }
