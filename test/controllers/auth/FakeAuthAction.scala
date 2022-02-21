@@ -36,5 +36,5 @@ class FakeIdentifierAuthAction @Inject() (
     extends IdentifierAuthAction {
 
   override def invokeBlock[A](request: Request[A], block: UserRequest[A] => Future[Result]): Future[Result] =
-    block(UserRequest("enrolmentID", request))
+    block(UserRequest("XAMDR0009234568", request))
 }

@@ -39,21 +39,21 @@ class IdentifierAuthActionImpl @Inject() (
 
   private val serviceName: String = "mdr"
   val enrolmentKey: String        = config.enrolmentKey(serviceName)
-  val enrolmentId: String         = config.enrolmentId(serviceName)
+  val enrolmentIdentifier: String = config.enrolmentId(serviceName)
 
   override def invokeBlock[A](request: Request[A], block: UserRequest[A] => Future[Result]): Future[Result] = {
     implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
 
     authorised(Enrolment(enrolmentKey)).retrieve(Retrievals.authorisedEnrolments) {
       case Enrolments(enrolments) =>
-        val enrolmentID =
+        val subscriptionId =
           (for {
             enrolment           <- enrolments.find(_.key.equals(enrolmentKey))
-            enrolmentIdentifier <- enrolment.getIdentifier(enrolmentId)
+            enrolmentIdentifier <- enrolment.getIdentifier(enrolmentIdentifier)
           } yield enrolmentIdentifier.value)
-            .getOrElse(throw new IllegalAccessException("EnrolmentID Required"))
+            .getOrElse(throw new IllegalAccessException("SubscriptionId Required"))
 
-        block(UserRequest(enrolmentID, request))
+        block(UserRequest(subscriptionId, request))
       case _ => Future.successful(Status(UNAUTHORIZED))
     } recover { case _: NoActiveSession =>
       Status(UNAUTHORIZED)

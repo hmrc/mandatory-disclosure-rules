@@ -19,15 +19,16 @@ package controllers
 import connectors.SubmissionConnector
 import controllers.auth.IdentifierAuthAction
 import models.error.ReadSubscriptionError
-import models.submission.SubmissionMetaData
-import play.api.Logging
-import play.api.mvc.{Action, ControllerComponents}
+import models.submission.{ConversationId, Pending, SubmissionDetails, SubmissionMetaData}
+import play.api.libs.json.Json
+import play.api.{Logger, Logging}
+import play.api.mvc.{Action, ControllerComponents, Results}
+import repositories.submission.SubmissionRepository
 import services.submission.TransformService
 import services.subscription.SubscriptionService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import java.time.LocalDateTime
-import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
@@ -37,27 +38,37 @@ class SubmissionController @Inject() (
   cc: ControllerComponents,
   transformService: TransformService,
   readSubscriptionService: SubscriptionService,
-  submissionConnector: SubmissionConnector
+  submissionConnector: SubmissionConnector,
+  submissionRepository: SubmissionRepository
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
   def submitDisclosure: Action[NodeSeq] = authenticate.async(parse.xml) { implicit request =>
     //TODO receive xml and read details not sure what I need
-    val xml                    = request.body
-    val fileName               = (xml \ "fileName").text
-    val enrolmentID            = request.enrolmentID
-    val submissionTime         = LocalDateTime.now()
-    val conversationID: String = UUID.randomUUID().toString
+    val xml                  = request.body
+    val fileName             = (xml \ "fileName").text
+    val messageRefId         = (xml \\ "MessageRefId").text
+    val subscriptionId       = request.subscriptionId
+    val submissionTime       = LocalDateTime.now()
+    val conversationId       = ConversationId()
+    val submissionDetails    = SubmissionDetails(conversationId, subscriptionId, messageRefId, Pending, fileName, submissionTime, submissionTime)
+    implicit val log: Logger = logger
 
-    val submissionMetaData = SubmissionMetaData.build(submissionTime, conversationID, fileName)
-    readSubscriptionService.getContactInformation(enrolmentID).flatMap {
+    //TODO verify submissionTime and conversationId if this is needed
+    val submissionMetaData = SubmissionMetaData.build(submissionTime, conversationId.value, fileName)
+    readSubscriptionService.getContactInformation(subscriptionId).flatMap {
       case Right(value) =>
         // Add metadata
         val submission: NodeSeq = transformService.addSubscriptionDetailsToSubmission(xml, value, submissionMetaData)
         //TODO validate XML
         //Submit disclosure
-        submissionConnector.submitDisclosure(submission).map(_.handleResponse(logger))
+        submissionConnector.submitDisclosure(submission, conversationId).flatMap { httpResponse =>
+          httpResponse.status match {
+            case OK => submissionRepository.insert(submissionDetails).map(_ => Ok(Json.toJson(conversationId)))
+            case _  => Future.successful(httpResponse.handleResponse)
+          }
+        }
       case Left(ReadSubscriptionError(value)) =>
         logger.warn(s"ReadSubscriptionError $value")
         Future.successful(InternalServerError)

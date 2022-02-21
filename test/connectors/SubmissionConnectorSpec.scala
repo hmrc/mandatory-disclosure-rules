@@ -18,6 +18,7 @@ package connectors
 
 import base.{SpecBase, WireMockServerHandler}
 import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, urlEqualTo}
+import models.submission.ConversationId
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
@@ -49,7 +50,7 @@ class SubmissionConnectorSpec extends SpecBase with GuiceOneAppPerSuite with Wir
 
         val xml = <test></test>
 
-        whenReady(connector.submitDisclosure(xml)) { result =>
+        whenReady(connector.submitDisclosure(xml, ConversationId())) { result =>
           result.status mustBe OK
         }
       }
@@ -71,7 +72,7 @@ class SubmissionConnectorSpec extends SpecBase with GuiceOneAppPerSuite with Wir
         )
 
         val xml    = <test></test>
-        val result = connector.submitDisclosure(xml)
+        val result = connector.submitDisclosure(xml, ConversationId())
 
         result.futureValue.status mustBe BAD_REQUEST
       }
@@ -86,7 +87,7 @@ class SubmissionConnectorSpec extends SpecBase with GuiceOneAppPerSuite with Wir
         )
 
         val xml    = <test></test>
-        val result = connector.submitDisclosure(xml)
+        val result = connector.submitDisclosure(xml, ConversationId())
         result.futureValue.status mustBe SERVICE_UNAVAILABLE
       }
     }

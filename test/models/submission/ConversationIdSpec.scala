@@ -14,8 +14,20 @@
  * limitations under the License.
  */
 
-package controllers.auth
+package models.submission
 
-import play.api.mvc.{Request, WrappedRequest}
+import base.SpecBase
+import play.api.libs.json.{JsString, JsValue, Json}
 
-case class UserRequest[+A](subscriptionId: String, request: Request[A]) extends WrappedRequest[A](request)
+class ConversationIdSpec extends SpecBase {
+
+  "ConversationId" - {
+    "must serialise and de-serialise ConversationId" in {
+
+      val json: JsValue = JsString("conversationId")
+
+      val cid = json.as[ConversationId]
+      cid mustBe ConversationId("conversationId")
+    }
+  }
+}
