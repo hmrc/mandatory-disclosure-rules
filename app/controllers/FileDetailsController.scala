@@ -45,7 +45,10 @@ class FileDetailsController @Inject() (
   }
 
   def getAllFileDetails: Action[AnyContent] = authenticate.async { implicit request =>
-    ???
+    fileDetailsRepository.findBySubscriptionId(request.subscriptionId).map {
+      case Nil     => NotFound
+      case details => Ok(Json.toJson(details))
+    }
   }
 
 }

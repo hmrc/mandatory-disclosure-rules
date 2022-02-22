@@ -29,41 +29,52 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
   override lazy val repository = new FileDetailsRepository(mongoComponent, config)
 
   val dateTimeNow: LocalDateTime = LocalDateTime.now()
-  val submissionDetails: FileDetails =
+  val filedetails: FileDetails =
     FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Pending, "file1.xml", dateTimeNow, dateTimeNow)
 
   "Insert" - {
-    "must insert SubmissionDetails" in {
-      val res = repository.insert(submissionDetails)
+    "must insert Filedetails" in {
+      val res = repository.insert(filedetails)
       whenReady(res) { result =>
         result mustBe true
       }
     }
 
-    "must read SubmissionDetails by SubscriptionId" in {
-      val insert = repository.insert(submissionDetails)
+    "must read Filedetails by SubscriptionId" in {
+      val insert = repository.insert(filedetails)
       whenReady(insert) { result =>
         result mustBe true
       }
       val res = repository.findBySubscriptionId("subscriptionId")
       whenReady(res) { result =>
-        result mustBe Seq(submissionDetails)
+        result mustBe Seq(filedetails)
       }
     }
 
-    "must read SubmissionDetails by ConversationId" in {
-      val insert = repository.insert(submissionDetails)
+    "must read Filedetails by ConversationId" in {
+      val insert = repository.insert(filedetails)
       whenReady(insert) { result =>
         result mustBe true
       }
       val res = repository.findByConversationId("conversationId123456")
       whenReady(res) { result =>
-        result mustBe Some(submissionDetails)
+        result mustBe Some(filedetails)
       }
     }
 
-    "must update SubmissionDetails status to Accepted by ConversationId" in {
-      val insert = repository.insert(submissionDetails)
+    "must read Filedetails by ConversationId doesn't exists" in {
+      val insert = repository.insert(filedetails)
+      whenReady(insert) { result =>
+        result mustBe true
+      }
+      val res = repository.findByConversationId("conversationId12345678")
+      whenReady(res) { result =>
+        result mustBe None
+      }
+    }
+
+    "must update Filedetails status to Accepted by ConversationId" in {
+      val insert = repository.insert(filedetails)
       whenReady(insert) { result =>
         result mustBe true
       }
@@ -80,8 +91,8 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
       }
     }
 
-    "must update SubmissionDetails status to Rejected by ConversationId" in {
-      val insert = repository.insert(submissionDetails)
+    "must update Filedetails status to Rejected by ConversationId" in {
+      val insert = repository.insert(filedetails)
       whenReady(insert) { result =>
         result mustBe true
       }
