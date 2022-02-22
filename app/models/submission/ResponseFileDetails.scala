@@ -21,19 +21,19 @@ import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.LocalDateTime
 
-case class DisplayFileDetails(conversationId: ConversationId,
-                              subscriptionId: String,
-                              messageRefId: String,
-                              status: FileStatus,
-                              fileName: String,
-                              submitted: LocalDateTime,
-                              lastUpdated: LocalDateTime
+case class ResponseFileDetails(conversationId: ConversationId,
+                               subscriptionId: String,
+                               messageRefId: String,
+                               status: FileStatus,
+                               fileName: String,
+                               submitted: LocalDateTime,
+                               lastUpdated: LocalDateTime
 )
-object DisplayFileDetails {
+object ResponseFileDetails {
 
   import play.api.libs.functional.syntax._
 
-  implicit val reads: Reads[DisplayFileDetails] = (
+  implicit val reads: Reads[ResponseFileDetails] = (
     (__ \ "_id").read[ConversationId] and
       (__ \ "subscriptionId").read[String] and
       (__ \ "messageRefId").read[String] and
@@ -41,11 +41,11 @@ object DisplayFileDetails {
       (__ \ "fileName").read[String] and
       (__ \ "created").read[LocalDateTime](MongoJavatimeFormats.localDateTimeReads) and
       (__ \ "updated").read[LocalDateTime](MongoJavatimeFormats.localDateTimeReads)
-  )(DisplayFileDetails.apply _)
+  )(ResponseFileDetails.apply _)
 
-  implicit val writes: OWrites[DisplayFileDetails] = Json.writes[DisplayFileDetails]
+  implicit val writes: OWrites[ResponseFileDetails] = Json.writes[ResponseFileDetails]
 
-  def build(fileDetails: FileDetails): DisplayFileDetails = DisplayFileDetails(
+  def build(fileDetails: FileDetails): ResponseFileDetails = ResponseFileDetails(
     fileDetails._id,
     fileDetails.subscriptionId,
     fileDetails.messageRefId,
