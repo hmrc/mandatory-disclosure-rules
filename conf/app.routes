@@ -15,3 +15,4 @@ POST    /subscription/update-subscription           controllers.SubscriptionCont
 
 GET     /files/:conversationId/details               controllers.FileDetailsController.getFileDetails(conversationId: models.submission.ConversationId)
 GET     /files/details                               controllers.FileDetailsController.getAllFileDetails
+GET     /files/:conversationId/status                controllers.FileDetailsController.getStatus(conversationId: models.submission.ConversationId)
