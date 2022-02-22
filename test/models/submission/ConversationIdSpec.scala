@@ -17,7 +17,7 @@
 package models.submission
 
 import base.SpecBase
-import play.api.libs.json.{JsString, JsValue, Json}
+import play.api.libs.json.{JsString, JsValue}
 
 class ConversationIdSpec extends SpecBase {
 

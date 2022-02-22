@@ -15,7 +15,6 @@
  */
 
 import models.error.ErrorDetails
-import models.submission.ConversationId
 import play.api.Logger
 import play.api.http.Status._
 import play.api.libs.json.{JsSuccess, Json}

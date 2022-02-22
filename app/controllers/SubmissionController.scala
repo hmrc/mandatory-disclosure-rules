@@ -19,11 +19,11 @@ package controllers
 import connectors.SubmissionConnector
 import controllers.auth.IdentifierAuthAction
 import models.error.ReadSubscriptionError
-import models.submission.{ConversationId, Pending, SubmissionDetails, SubmissionMetaData}
+import models.submission.{ConversationId, FileDetails, Pending, SubmissionMetaData}
 import play.api.libs.json.Json
+import play.api.mvc.{Action, ControllerComponents}
 import play.api.{Logger, Logging}
-import play.api.mvc.{Action, ControllerComponents, Results}
-import repositories.submission.SubmissionRepository
+import repositories.submission.FileDetailsRepository
 import services.submission.TransformService
 import services.subscription.SubscriptionService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
@@ -39,7 +39,7 @@ class SubmissionController @Inject() (
   transformService: TransformService,
   readSubscriptionService: SubscriptionService,
   submissionConnector: SubmissionConnector,
-  submissionRepository: SubmissionRepository
+  fileDetailsRepository: FileDetailsRepository
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
@@ -52,7 +52,7 @@ class SubmissionController @Inject() (
     val subscriptionId       = request.subscriptionId
     val submissionTime       = LocalDateTime.now()
     val conversationId       = ConversationId()
-    val submissionDetails    = SubmissionDetails(conversationId, subscriptionId, messageRefId, Pending, fileName, submissionTime, submissionTime)
+    val submissionDetails    = FileDetails(conversationId, subscriptionId, messageRefId, Pending, fileName, submissionTime, submissionTime)
     implicit val log: Logger = logger
 
     //TODO verify submissionTime and conversationId if this is needed
@@ -65,7 +65,7 @@ class SubmissionController @Inject() (
         //Submit disclosure
         submissionConnector.submitDisclosure(submission, conversationId).flatMap { httpResponse =>
           httpResponse.status match {
-            case OK => submissionRepository.insert(submissionDetails).map(_ => Ok(Json.toJson(conversationId)))
+            case OK => fileDetailsRepository.insert(submissionDetails).map(_ => Ok(Json.toJson(conversationId)))
             case _  => Future.successful(httpResponse.handleResponse)
           }
         }

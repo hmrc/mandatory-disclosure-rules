@@ -17,20 +17,20 @@
 package repositories.submission
 
 import base.SpecBase
-import models.submission.{Accepted, ConversationId, FileError, Pending, Rejected, SubmissionDetails}
+import models.submission._
 import play.api.Configuration
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
 import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
-class SubmissionRepositorySpec extends SpecBase with DefaultPlayMongoRepositorySupport[SubmissionDetails] {
+class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepositorySupport[FileDetails] {
 
   lazy val config              = app.injector.instanceOf[Configuration]
-  override lazy val repository = new SubmissionRepository(mongoComponent, config)
+  override lazy val repository = new FileDetailsRepository(mongoComponent, config)
 
   val dateTimeNow: LocalDateTime = LocalDateTime.now()
-  val submissionDetails: SubmissionDetails =
-    SubmissionDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Pending, "file1.xml", dateTimeNow, dateTimeNow)
+  val submissionDetails: FileDetails =
+    FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Pending, "file1.xml", dateTimeNow, dateTimeNow)
 
   "Insert" - {
     "must insert SubmissionDetails" in {
@@ -58,7 +58,7 @@ class SubmissionRepositorySpec extends SpecBase with DefaultPlayMongoRepositoryS
       }
       val res = repository.findByConversationId("conversationId123456")
       whenReady(res) { result =>
-        result mustBe Seq(submissionDetails)
+        result mustBe Some(submissionDetails)
       }
     }
 
@@ -75,7 +75,7 @@ class SubmissionRepositorySpec extends SpecBase with DefaultPlayMongoRepositoryS
 
       whenReady(updatedResponse) { result =>
         result must matchPattern {
-          case Seq(SubmissionDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Accepted, "file1.xml", _, _)) =>
+          case Some(FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Accepted, "file1.xml", _, _)) =>
         }
       }
     }
@@ -92,15 +92,8 @@ class SubmissionRepositorySpec extends SpecBase with DefaultPlayMongoRepositoryS
       val updatedResponse = repository.findByConversationId("conversationId123456")
       whenReady(updatedResponse) { result =>
         result must matchPattern {
-          case Seq(
-                SubmissionDetails(ConversationId("conversationId123456"),
-                                  "subscriptionId",
-                                  "messageRefId",
-                                  Rejected(FileError("error in file")),
-                                  "file1.xml",
-                                  _,
-                                  _
-                )
+          case Some(
+                FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Rejected(FileError("error in file")), "file1.xml", _, _)
               ) =>
         }
       }

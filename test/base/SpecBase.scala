@@ -42,13 +42,9 @@ trait SpecBase
 
   def injector: Injector = app.injector
 
-  def messagesApi: MessagesApi = injector.instanceOf[MessagesApi]
-
   def fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("", "")
 
   implicit val hc: HeaderCarrier = HeaderCarrier()
-
-  implicit def messages: Messages = messagesApi.preferred(fakeRequest)
 
   protected def applicationBuilder(): GuiceApplicationBuilder =
     new GuiceApplicationBuilder()
