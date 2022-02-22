@@ -13,5 +13,5 @@ POST    /subscription/read-subscription             controllers.SubscriptionCont
 
 POST    /subscription/update-subscription           controllers.SubscriptionController.updateSubscription
 
-GET     /file/details/:conversationId               controllers.FileDetailsController.getFileDetails(conversationId: models.submission.ConversationId)
-GET     /all-file/details                           controllers.FileDetailsController.getAllFileDetails
+GET     /files/:conversationId/details               controllers.FileDetailsController.getFileDetails(conversationId: models.submission.ConversationId)
+GET     /files/details                               controllers.FileDetailsController.getAllFileDetails
