@@ -18,7 +18,7 @@ package controllers
 
 import base.SpecBase
 import controllers.auth.{FakeIdentifierAuthAction, IdentifierAuthAction}
-import models.submission.{ConversationId, FileDetails, Pending}
+import models.submission.{Accepted, ConversationId, FileDetails, Pending}
 import org.mockito.ArgumentMatchers.any
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
@@ -43,6 +43,12 @@ class FileDetailsControllerSpec extends SpecBase with BeforeAndAfterEach {
       bind[IdentifierAuthAction].to[FakeIdentifierAuthAction]
     )
     .build()
+
+  val submissionTime1 = LocalDateTime.now()
+  val fileDetails1    = FileDetails(ConversationId(), "subscriptionId1", "messageRefId1", Pending, "fileName1", submissionTime1, submissionTime1)
+  val submissionTime2 = LocalDateTime.now()
+  val fileDetails2    = FileDetails(ConversationId(), "subscriptionId1", "messageRefId1", Accepted, "fileName2", submissionTime2, submissionTime2)
+  val files           = Seq(fileDetails1, fileDetails2)
 
   "FileDetailsController" - {
     "must return FileDetails for the input 'conversationId'" in {
@@ -76,5 +82,44 @@ class FileDetailsControllerSpec extends SpecBase with BeforeAndAfterEach {
       val result = route(application, request).value
       status(result) mustBe NOT_FOUND
     }
+
+    "Get All files should return OK when files exist" in {
+      when(
+        mockFileDetailsRepository
+          .findBySubscriptionId(any[String]())
+      ).thenReturn(
+        Future.successful(files)
+      )
+
+      val request =
+        FakeRequest(
+          GET,
+          routes.FileDetailsController.getAllFileDetails().url
+        )
+
+      val result = route(application, request).value
+      status(result) mustEqual OK
+
+    }
+
+    "Get All files should return NotFound when files doesn't exist" in {
+      when(
+        mockFileDetailsRepository
+          .findBySubscriptionId(any[String]())
+      ).thenReturn(
+        Future.successful(Nil)
+      )
+
+      val request =
+        FakeRequest(
+          GET,
+          routes.FileDetailsController.getAllFileDetails().url
+        )
+
+      val result = route(application, request).value
+      status(result) mustEqual NOT_FOUND
+
+    }
+
   }
 }
