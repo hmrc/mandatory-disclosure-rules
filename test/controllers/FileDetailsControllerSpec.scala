@@ -63,7 +63,7 @@ class FileDetailsControllerSpec extends SpecBase with BeforeAndAfterEach {
         lastUpdated = LocalDateTime.now()
       )
 
-      when(mockFileDetailsRepository.findByConversationId(any[String]())).thenReturn(Future.successful(Some(fileDetails)))
+      when(mockFileDetailsRepository.findByConversationId(any[ConversationId]())).thenReturn(Future.successful(Some(fileDetails)))
 
       val request =
         FakeRequest(GET, routes.FileDetailsController.getFileDetails(conversationId).url)
@@ -74,7 +74,7 @@ class FileDetailsControllerSpec extends SpecBase with BeforeAndAfterEach {
 
     "must return NotFound status when no record found for the input 'conversationId'" in {
 
-      when(mockFileDetailsRepository.findByConversationId(any[String]())).thenReturn(Future.successful(None))
+      when(mockFileDetailsRepository.findByConversationId(any[ConversationId]())).thenReturn(Future.successful(None))
 
       val request =
         FakeRequest(GET, routes.FileDetailsController.getFileDetails(ConversationId()).url)
