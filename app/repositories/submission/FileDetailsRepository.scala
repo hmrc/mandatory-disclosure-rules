@@ -15,7 +15,7 @@
  */
 
 package repositories.submission
-import models.submission.{FileStatus, SubmissionDetails}
+import models.submission.{FileDetails, FileStatus}
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
@@ -31,15 +31,15 @@ import javax.inject.Inject
 import scala.concurrent.duration.Duration
 import scala.concurrent.{ExecutionContext, Future}
 
-class SubmissionRepository @Inject() (
+class FileDetailsRepository @Inject() (
   val mongo: MongoComponent,
   config: Configuration
 )(implicit ec: ExecutionContext)
-    extends PlayMongoRepository[SubmissionDetails](
+    extends PlayMongoRepository[FileDetails](
       mongoComponent = mongo,
       collectionName = "submission-details",
-      domainFormat = SubmissionDetails.format,
-      indexes = SubmissionRepository.indexes(config),
+      domainFormat = FileDetails.format,
+      indexes = FileDetailsRepository.indexes(config),
       replaceIndexes = true
     ) {
 
@@ -62,29 +62,30 @@ class SubmissionRepository @Inject() (
       .map(_ => true)
   }
 
-  def findByConversationId(conversationId: String): Future[Seq[SubmissionDetails]] = {
+  def findByConversationId(conversationId: String): Future[Option[FileDetails]] = {
     val filter: Bson = equal("_id", conversationId)
     collection
       .find(filter)
-      .toFuture
+      .first()
+      .toFutureOption()
   }
 
-  def findBySubscriptionId(subscriptionId: String): Future[Seq[SubmissionDetails]] = {
+  def findBySubscriptionId(subscriptionId: String): Future[Seq[FileDetails]] = {
     val filter: Bson = equal("subscriptionId", subscriptionId)
     collection
       .find(filter)
       .toFuture
   }
 
-  def insert(submissionDetails: SubmissionDetails): Future[Boolean] =
+  def insert(fileDetails: FileDetails): Future[Boolean] =
     collection
-      .insertOne(submissionDetails)
+      .insertOne(fileDetails)
       .toFuture
       .map(_ => true)
 
 }
 
-object SubmissionRepository {
+object FileDetailsRepository {
 
   def cacheTtl(config: Configuration): Long =
     Duration(config.get[Int]("mongodb.submission.timeToLiveInDays"), "days").toSeconds

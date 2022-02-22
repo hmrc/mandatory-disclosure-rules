@@ -33,6 +33,7 @@ class SubmissionValidationController @Inject() (
     extends BackendController(cc)
     with Logging {
 
+  //TODO replace Action.async with IdentifierAuthAction and instead of request.body.asText read it as a json
   def validateSubmission: Action[AnyContent] = Action.async { implicit request =>
     validationEngine.validateUploadSubmission(request.body.asText) map {
       case SubmissionValidationSuccess(_) =>

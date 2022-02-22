@@ -15,11 +15,11 @@
  */
 
 package models.submission
+import julienrf.json.derived
 import play.api.libs.json._
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
-import julienrf.json.derived
+
 import java.time.LocalDateTime
-import java.util.UUID
 
 sealed trait FileStatus
 case object Pending extends FileStatus
@@ -38,22 +38,15 @@ object FileError {
   implicit val format: OFormat[FileError] = Json.format[FileError]
 }
 
-case class ConversationId(value: String)
-object ConversationId {
-  def apply(): ConversationId                 = ConversationId(UUID.randomUUID().toString)
-  implicit val writes: Writes[ConversationId] = conversationId => JsString(conversationId.value)
-  implicit val reads: Reads[ConversationId]   = __.read[String].map(id => ConversationId(id))
-}
-
-case class SubmissionDetails(_id: ConversationId,
-                             subscriptionId: String,
-                             messageRefId: String,
-                             status: FileStatus,
-                             fileName: String,
-                             submitted: LocalDateTime,
-                             lastUpdated: LocalDateTime
+case class FileDetails(_id: ConversationId,
+                       subscriptionId: String,
+                       messageRefId: String,
+                       status: FileStatus,
+                       fileName: String,
+                       submitted: LocalDateTime,
+                       lastUpdated: LocalDateTime
 )
-object SubmissionDetails {
+object FileDetails {
   implicit val mongoDateTime: Format[LocalDateTime] = MongoJavatimeFormats.localDateTimeFormat
-  implicit val format: OFormat[SubmissionDetails]   = Json.format[SubmissionDetails]
+  implicit val format: OFormat[FileDetails]         = Json.format[FileDetails]
 }
