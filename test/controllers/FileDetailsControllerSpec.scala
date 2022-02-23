@@ -56,7 +56,7 @@ class FileDetailsControllerSpec extends SpecBase with BeforeAndAfterEach {
     subscriptionId = "subscriptionId",
     messageRefId = "messageRefId",
     status = Pending,
-    fileName = "test.xml",
+    name = "test.xml",
     submitted = LocalDateTime.now(),
     lastUpdated = LocalDateTime.now()
   )
@@ -134,7 +134,7 @@ class FileDetailsControllerSpec extends SpecBase with BeforeAndAfterEach {
 
     "must return Pending FileStatus for the given 'conversationId'" in {
 
-      when(mockFileDetailsRepository.findByConversationId(any[String]())).thenReturn(Future.successful(Some(fileDetails)))
+      when(mockFileDetailsRepository.findByConversationId(any[ConversationId]())).thenReturn(Future.successful(Some(fileDetails)))
 
       val request =
         FakeRequest(GET, routes.FileDetailsController.getStatus(conversationId).url)
@@ -146,7 +146,7 @@ class FileDetailsControllerSpec extends SpecBase with BeforeAndAfterEach {
 
     "must return Accepted FileStatus for the given 'conversationId'" in {
 
-      when(mockFileDetailsRepository.findByConversationId(any[String]())).thenReturn(Future.successful(Some(fileDetails.copy(status = Accepted))))
+      when(mockFileDetailsRepository.findByConversationId(any[ConversationId]())).thenReturn(Future.successful(Some(fileDetails.copy(status = Accepted))))
 
       val request =
         FakeRequest(GET, routes.FileDetailsController.getStatus(conversationId).url)
@@ -158,7 +158,7 @@ class FileDetailsControllerSpec extends SpecBase with BeforeAndAfterEach {
 
     "must return Rejected FileStatus for the given 'conversationId'" in {
 
-      when(mockFileDetailsRepository.findByConversationId(any[String]()))
+      when(mockFileDetailsRepository.findByConversationId(any[ConversationId]()))
         .thenReturn(Future.successful(Some(fileDetails.copy(status = Rejected(FileError("Error Processing"))))))
 
       val request =
