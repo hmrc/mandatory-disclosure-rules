@@ -24,7 +24,7 @@ case class FileDetails(_id: ConversationId,
                        subscriptionId: String,
                        messageRefId: String,
                        status: FileStatus,
-                       fileName: String,
+                       name: String,
                        submitted: LocalDateTime,
                        lastUpdated: LocalDateTime
 )
