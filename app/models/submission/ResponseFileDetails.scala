@@ -25,7 +25,7 @@ case class ResponseFileDetails(conversationId: ConversationId,
                                subscriptionId: String,
                                messageRefId: String,
                                status: FileStatus,
-                               fileName: String,
+                               name: String,
                                submitted: LocalDateTime,
                                lastUpdated: LocalDateTime
 )
@@ -38,7 +38,7 @@ object ResponseFileDetails {
       (__ \ "subscriptionId").read[String] and
       (__ \ "messageRefId").read[String] and
       (__ \ "status").read[FileStatus] and
-      (__ \ "fileName").read[String] and
+      (__ \ "name").read[String] and
       (__ \ "created").read[LocalDateTime](MongoJavatimeFormats.localDateTimeReads) and
       (__ \ "updated").read[LocalDateTime](MongoJavatimeFormats.localDateTimeReads)
   )(ResponseFileDetails.apply _)
@@ -50,7 +50,7 @@ object ResponseFileDetails {
     fileDetails.subscriptionId,
     fileDetails.messageRefId,
     fileDetails.status,
-    fileDetails.fileName,
+    fileDetails.name,
     fileDetails.submitted,
     fileDetails.lastUpdated
   )

@@ -58,7 +58,7 @@ class FileDetailsControllerSpec extends SpecBase with BeforeAndAfterEach {
         subscriptionId = "subscriptionId",
         messageRefId = "messageRefId",
         status = Pending,
-        fileName = "test.xml",
+        name = "test.xml",
         submitted = LocalDateTime.now(),
         lastUpdated = LocalDateTime.now()
       )
