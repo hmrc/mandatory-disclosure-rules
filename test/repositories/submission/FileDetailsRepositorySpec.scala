@@ -56,7 +56,7 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
       whenReady(insert) { result =>
         result mustBe true
       }
-      val res = repository.findByConversationId("conversationId123456")
+      val res = repository.findByConversationId(ConversationId("conversationId123456"))
       whenReady(res) { result =>
         result mustBe Some(filedetails)
       }
@@ -67,7 +67,7 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
       whenReady(insert) { result =>
         result mustBe true
       }
-      val res = repository.findByConversationId("conversationId12345678")
+      val res = repository.findByConversationId(ConversationId("conversationId12345678"))
       whenReady(res) { result =>
         result mustBe None
       }
@@ -82,7 +82,7 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
       whenReady(res) { result =>
         result mustBe true
       }
-      val updatedResponse = repository.findByConversationId("conversationId123456")
+      val updatedResponse = repository.findByConversationId(ConversationId("conversationId123456"))
 
       whenReady(updatedResponse) { result =>
         result must matchPattern {
@@ -100,7 +100,7 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
       whenReady(res) { result =>
         result mustBe true
       }
-      val updatedResponse = repository.findByConversationId("conversationId123456")
+      val updatedResponse = repository.findByConversationId(ConversationId("conversationId123456"))
       whenReady(updatedResponse) { result =>
         result must matchPattern {
           case Some(

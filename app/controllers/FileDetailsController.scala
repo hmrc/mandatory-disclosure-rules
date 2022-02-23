@@ -17,7 +17,7 @@
 package controllers
 
 import controllers.auth.IdentifierAuthAction
-import models.submission.ConversationId
+import models.submission.{ConversationId, ResponseFileDetails}
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
@@ -36,10 +36,10 @@ class FileDetailsController @Inject() (
     with Logging {
 
   def getFileDetails(conversationId: ConversationId): Action[AnyContent] = authenticate.async { implicit request =>
-    fileDetailsRepository.findByConversationId(conversationId.value) map {
-      case Some(fileDetails) => Ok(Json.toJson(fileDetails))
+    fileDetailsRepository.findByConversationId(conversationId) map {
+      case Some(fileDetails) => Ok(Json.toJson(ResponseFileDetails.build(fileDetails)))
       case _ =>
-        logger.info(s"No record found for the conversationId: $conversationId")
+        logger.info(s"No record found for the conversationId: ${conversationId.value}")
         NotFound
     }
   }
@@ -47,7 +47,7 @@ class FileDetailsController @Inject() (
   def getAllFileDetails: Action[AnyContent] = authenticate.async { implicit request =>
     fileDetailsRepository.findBySubscriptionId(request.subscriptionId).map {
       case Nil     => NotFound
-      case details => Ok(Json.toJson(details))
+      case details => Ok(Json.toJson(details.map(ResponseFileDetails.build)))
     }
   }
 

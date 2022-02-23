@@ -15,28 +15,10 @@
  */
 
 package models.submission
-import julienrf.json.derived
 import play.api.libs.json._
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.LocalDateTime
-
-sealed trait FileStatus
-case object Pending extends FileStatus
-case object Accepted extends FileStatus
-case class Rejected(error: FileError) extends FileStatus {
-  override def toString: String = "Rejected"
-}
-
-object FileStatus {
-  implicit val format: OFormat[FileStatus] = derived.oformat()
-}
-
-case class FileError(detail: String)
-
-object FileError {
-  implicit val format: OFormat[FileError] = Json.format[FileError]
-}
 
 case class FileDetails(_id: ConversationId,
                        subscriptionId: String,

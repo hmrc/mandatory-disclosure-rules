@@ -15,7 +15,7 @@
  */
 
 package repositories.submission
-import models.submission.{FileDetails, FileStatus}
+import models.submission.{ConversationId, FileDetails, FileStatus}
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
@@ -62,8 +62,8 @@ class FileDetailsRepository @Inject() (
       .map(_ => true)
   }
 
-  def findByConversationId(conversationId: String): Future[Option[FileDetails]] = {
-    val filter: Bson = equal("_id", conversationId)
+  def findByConversationId(conversationId: ConversationId): Future[Option[FileDetails]] = {
+    val filter: Bson = equal("_id", conversationId.value)
     collection
       .find(filter)
       .first()
