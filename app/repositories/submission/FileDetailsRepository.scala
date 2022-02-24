@@ -37,7 +37,7 @@ class FileDetailsRepository @Inject() (
 )(implicit ec: ExecutionContext)
     extends PlayMongoRepository[FileDetails](
       mongoComponent = mongo,
-      collectionName = "submission-details",
+      collectionName = "file-details",
       domainFormat = FileDetails.format,
       indexes = FileDetailsRepository.indexes(config),
       replaceIndexes = true
@@ -68,6 +68,15 @@ class FileDetailsRepository @Inject() (
       .find(filter)
       .first()
       .toFutureOption()
+  }
+
+  def findStatusByConversationId(conversationId: ConversationId): Future[Option[FileStatus]] = {
+    val filter: Bson = equal("_id", conversationId.value)
+    collection
+      .find(filter)
+      .first()
+      .toFutureOption()
+      .map(_.map(_.status))
   }
 
   def findBySubscriptionId(subscriptionId: String): Future[Seq[FileDetails]] = {

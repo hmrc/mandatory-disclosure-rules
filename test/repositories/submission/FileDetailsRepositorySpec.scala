@@ -110,6 +110,17 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
       }
     }
 
+    "must read FileStatus by ConversationId" in {
+      val insert = repository.insert(filedetails)
+      whenReady(insert) { result =>
+        result mustBe true
+      }
+      val res = repository.findStatusByConversationId(ConversationId("conversationId123456"))
+      whenReady(res) { result =>
+        result mustBe Some(Pending)
+      }
+    }
+
   }
 
 }

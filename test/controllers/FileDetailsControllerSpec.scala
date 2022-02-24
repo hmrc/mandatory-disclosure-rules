@@ -18,14 +18,14 @@ package controllers
 
 import base.SpecBase
 import controllers.auth.{FakeIdentifierAuthAction, IdentifierAuthAction}
-import models.submission.{Accepted, ConversationId, FileDetails, Pending}
+import models.submission._
 import org.mockito.ArgumentMatchers.any
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.http.Status.{NOT_FOUND, OK}
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{defaultAwaitTimeout, route, status, writeableOf_AnyContentAsEmpty, GET}
+import play.api.test.Helpers.{contentAsJson, defaultAwaitTimeout, route, status, writeableOf_AnyContentAsEmpty, GET}
 import repositories.submission.FileDetailsRepository
 
 import java.time.LocalDateTime
@@ -49,6 +49,17 @@ class FileDetailsControllerSpec extends SpecBase with BeforeAndAfterEach {
   val submissionTime2 = LocalDateTime.now()
   val fileDetails2    = FileDetails(ConversationId(), "subscriptionId1", "messageRefId1", Accepted, "fileName2", submissionTime2, submissionTime2)
   val files           = Seq(fileDetails1, fileDetails2)
+
+  val conversationId = ConversationId()
+  val fileDetails = FileDetails(
+    conversationId,
+    subscriptionId = "subscriptionId",
+    messageRefId = "messageRefId",
+    status = Pending,
+    name = "test.xml",
+    submitted = LocalDateTime.now(),
+    lastUpdated = LocalDateTime.now()
+  )
 
   "FileDetailsController" - {
     "must return FileDetails for the input 'conversationId'" in {
@@ -121,5 +132,41 @@ class FileDetailsControllerSpec extends SpecBase with BeforeAndAfterEach {
 
     }
 
+    "must return Pending FileStatus for the given 'conversationId'" in {
+
+      when(mockFileDetailsRepository.findStatusByConversationId(any[ConversationId]())).thenReturn(Future.successful(Some(Pending)))
+
+      val request =
+        FakeRequest(GET, routes.FileDetailsController.getStatus(conversationId).url)
+
+      val result = route(application, request).value
+      status(result) mustBe OK
+      contentAsJson(result).as[FileStatus] mustBe Pending
+    }
+
+    "must return Accepted FileStatus for the given 'conversationId'" in {
+
+      when(mockFileDetailsRepository.findStatusByConversationId(any[ConversationId]())).thenReturn(Future.successful(Some(Accepted)))
+
+      val request =
+        FakeRequest(GET, routes.FileDetailsController.getStatus(conversationId).url)
+
+      val result = route(application, request).value
+      status(result) mustBe OK
+      contentAsJson(result).as[FileStatus] mustBe Accepted
+    }
+
+    "must return Rejected FileStatus for the given 'conversationId'" in {
+
+      when(mockFileDetailsRepository.findStatusByConversationId(any[ConversationId]()))
+        .thenReturn(Future.successful(Some(Rejected(FileError("Error Processing")))))
+
+      val request =
+        FakeRequest(GET, routes.FileDetailsController.getStatus(conversationId).url)
+
+      val result = route(application, request).value
+      status(result) mustBe OK
+      contentAsJson(result).as[FileStatus] mustBe Rejected(FileError("Error Processing"))
+    }
   }
 }

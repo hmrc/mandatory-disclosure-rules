@@ -51,4 +51,12 @@ class FileDetailsController @Inject() (
     }
   }
 
+  def getStatus(conversationId: ConversationId): Action[AnyContent] = authenticate.async { implicit request =>
+    fileDetailsRepository.findStatusByConversationId(conversationId) map {
+      case Some(status) => Ok(Json.toJson(status))
+      case _ =>
+        logger.info(s"No status found for the conversationId: $conversationId")
+        NotFound
+    }
+  }
 }
