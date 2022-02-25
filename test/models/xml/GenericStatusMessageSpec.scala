@@ -18,6 +18,8 @@ package models.xml
 
 import base.SpecBase
 import com.lucidchart.open.xtract.{ParseFailure, ParseSuccess, XmlReader}
+import models.xml.FileErrorCode.MessageRefIDHasAlreadyBeenUsed
+import models.xml.RecordErrorCode.MessageTypeIndic
 
 import scala.xml.Elem
 
@@ -53,7 +55,23 @@ class GenericStatusMessageSpec extends SpecBase {
                       </gsm:ValidationResult>
                     </gsm:GenericStatusMessage>
 
-      XmlReader.of[GenericStatusMessage].read(xml) mustBe ParseSuccess(GenericStatusMessage(ValidationErrors(None, None), ValidationStatus.rejected))
+      XmlReader.of[GenericStatusMessage].read(xml) mustBe ParseSuccess(
+        GenericStatusMessage(
+          ValidationErrors(
+            Some(List(FileErrors(MessageRefIDHasAlreadyBeenUsed, Some("Duplicate message ref ID")))),
+            Some(
+              List(
+                RecordError(
+                  MessageTypeIndic,
+                  Some("A message can contain either new records (OECD1) or corrections/deletions (OECD2 and OECD3), but cannot contain a mixture of both"),
+                  Some(List("asjdhjjhjssjhdjshdAJGSJJS"))
+                )
+              )
+            )
+          ),
+          ValidationStatus.rejected
+        )
+      )
     }
 
     "must fail for an invalid xml" in {

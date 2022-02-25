@@ -24,7 +24,7 @@ case class ValidationErrors(fileError: Option[Seq[FileErrors]], recordError: Opt
 object ValidationErrors {
 
   implicit val xmlReader: XmlReader[ValidationErrors] = (
-    (__ \ "ValidationErrors").read(strictReadOptionSeq[FileErrors]),
-    (__ \ "ValidationResult").read(strictReadOptionSeq[RecordError])
+    (__ \ "FileError").read(strictReadOptionSeq[FileErrors]),
+    (__ \ "RecordError").read(strictReadOptionSeq[RecordError])
   ).mapN(apply)
 }

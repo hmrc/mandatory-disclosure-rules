@@ -20,7 +20,7 @@ import cats.implicits.catsSyntaxTuple2Semigroupal
 import com.lucidchart.open.xtract.XmlReader._
 import com.lucidchart.open.xtract.{__, XmlReader}
 
-case class GenericStatusMessage(validationErrors: ValidationErrors, validationResult: ValidationStatus.Value)
+case class GenericStatusMessage(validationErrors: ValidationErrors, status: ValidationStatus.Value)
 
 object GenericStatusMessage {
   implicit val xmlReader: XmlReader[GenericStatusMessage] = (
