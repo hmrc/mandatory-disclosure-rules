@@ -17,16 +17,15 @@
 package models.xml
 
 import cats.implicits.catsSyntaxTuple3Semigroupal
-import com.lucidchart.open.xtract.XmlReader.seq
 import com.lucidchart.open.xtract.{__, XmlReader}
 
-case class RecordError(code: String, details: String, docRefIDInError: Seq[String])
+case class RecordError(code: RecordErrorCode, details: Option[String], docRefIDInError: Option[Seq[String]])
 
 object RecordError {
 
   implicit val xmlReader: XmlReader[RecordError] = (
-    (__ \ "Code").read[String],
-    (__ \ "Details").read[String],
-    (__ \ "DocRefIDInError").read(seq[String])
+    (__ \ "Code").read[RecordErrorCode],
+    (__ \ "Details").read[String].optional,
+    (__ \ "DocRefIDInError").read(strictReadOptionSeq[String])
   ).mapN(apply)
 }

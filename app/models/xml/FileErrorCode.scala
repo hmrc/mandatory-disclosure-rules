@@ -30,17 +30,7 @@ object FileErrorCode {
   case object MessageRefIDHasAlreadyBeenUsed extends FileErrorCode("50009")
   case object FileContainsTestDataForProductionEnvironment extends FileErrorCode("50010")
   case object NotMeantToBeReceivedByTheIndicatedJurisdiction extends FileErrorCode("50012")
-
-  //TODO need to check with Jill and Andy do these message needs to be covered
-  /*
-  File Contains Test Data for Production Environment (50010)
-  File Contains Production Data for Test Environment (50011)
-  The received message is not meant to be received by the indicated
-    jurisdiction (50012)
-  An incorrect AES key size was detected by the receiving jurisdiction (50013)
-  The Message Type in the Generic Status Message does not match with the Message Type in the Metadata (50014)*/
-
-  case class UnknownErrorCode(override val code: String) extends FileErrorCode(code)
+  case class UnknownFileErrorCode(override val code: String) extends FileErrorCode(code)
 
   val values: Seq[FileErrorCode] = Seq(
     FailedSchemaValidation,
@@ -60,9 +50,9 @@ object FileErrorCode {
       values.find(x => x.code == xml.text) match {
         case Some(errorCode) => ParseSuccess(errorCode)
         case None =>
-          try ParseSuccess(UnknownErrorCode(Integer.parseInt(xml.text).toString))
+          try ParseSuccess(UnknownFileErrorCode(Integer.parseInt(xml.text).toString))
           catch {
-            case _: Exception => ParseFailure(FileErrorCodeParseError(s"Invalid or missing errorCode: ${xml.text}"))
+            case _: Exception => ParseFailure(FileErrorCodeParseError(s"Invalid or missing FileErrorCode: ${xml.text}"))
           }
       }
     }

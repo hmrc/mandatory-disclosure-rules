@@ -18,21 +18,24 @@ package models.xml
 
 import base.SpecBase
 import com.lucidchart.open.xtract.{ParseFailure, ParseSuccess, XmlReader}
-import models.xml.FileErrorCode.UnknownFileErrorCode
+import models.xml.RecordErrorCode.UnknownRecordErrorCode
 
 import scala.xml.Elem
 
-class FileErrorsSpec extends SpecBase {
+class RecordErrorSpec extends SpecBase {
 
-  "FileErrors" - {
+  "RecordError" - {
     "must read xml as FileErrors for known error code" in {
-      for (errorCode <- FileErrorCode.values) {
-        val xml: Elem = <gsm:FileError>
+      for (errorCode <- RecordErrorCode.values) {
+        val xml: Elem = <gsm:RecordError>
                           <gsm:Code>{errorCode.code}</gsm:Code>
-                          <gsm:Details Language="EN">Duplicate message ref ID</gsm:Details>
-                        </gsm:FileError>
+                          <gsm:Details Language="EN">error details</gsm:Details>
+                          <gsm:DocRefIDInError>asjdhjjhjssjhdjshdAJGSJJS</gsm:DocRefIDInError>
+                        </gsm:RecordError>
 
-        XmlReader.of[FileErrors].read(xml) mustBe ParseSuccess(FileErrors(errorCode, Some("Duplicate message ref ID")))
+        XmlReader.of[RecordError].read(xml) mustBe ParseSuccess(
+          RecordError(errorCode, Some("error details"), Some(Seq("asjdhjjhjssjhdjshdAJGSJJS")))
+        )
       }
     }
 
@@ -42,7 +45,7 @@ class FileErrorsSpec extends SpecBase {
         <gsm:Details Language="EN">error message</gsm:Details>
       </gsm:FileError>
 
-      XmlReader.of[FileErrors].read(xml) mustBe ParseSuccess(FileErrors(UnknownFileErrorCode("50011"), Some("error message")))
+      XmlReader.of[RecordError].read(xml) mustBe ParseSuccess(RecordError(UnknownRecordErrorCode("50011"), Some("error message"), None))
     }
 
     "must fail to read xml as FileErrors for invalid code" in {
@@ -51,7 +54,7 @@ class FileErrorsSpec extends SpecBase {
         <gsm:Details Language="EN">error message</gsm:Details>
       </gsm:FileError>
 
-      XmlReader.of[FileErrors].read(xml) mustBe an[ParseFailure]
+      XmlReader.of[RecordError].read(xml) mustBe an[ParseFailure]
     }
   }
 }

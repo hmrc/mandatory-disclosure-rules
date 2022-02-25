@@ -24,7 +24,7 @@ package object xml {
     XmlReader { xml =>
       strictReadSeq[A].read(xml) match {
         case ParseSuccess(x) if x.nonEmpty => ParseSuccess(x)
-        case _                        => ParseFailure()
+        case _                             => ParseFailure()
       }
     }.optional
 }
