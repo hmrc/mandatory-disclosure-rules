@@ -22,6 +22,7 @@ import play.api.mvc.PathBindable
 import java.util.UUID
 
 case class ConversationId(value: String)
+
 object ConversationId {
   def apply(): ConversationId                 = ConversationId(UUID.randomUUID().toString)
   implicit val writes: Writes[ConversationId] = conversationId => JsString(conversationId.value)
