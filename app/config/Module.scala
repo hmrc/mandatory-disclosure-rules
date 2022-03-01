@@ -18,14 +18,12 @@ package config
 
 import com.google.inject.AbstractModule
 import services.upscan.{MongoBackedUploadProgressTracker, UploadProgressTracker}
-import services.validation.{MDRSchemaValidatingParser, SaxParser}
 
 class Module() extends AbstractModule {
 
   override def configure(): Unit = {
     bind(classOf[UploadProgressTracker]).to(classOf[MongoBackedUploadProgressTracker])
-    bind(classOf[SaxParser]).to(classOf[MDRSchemaValidatingParser])
+    //  bind(classOf[SaxParser]).to(classOf[MDRSchemaValidatingParser])
     ()
   }
-
 }

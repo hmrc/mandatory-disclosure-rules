@@ -16,6 +16,7 @@
 
 package services.validation
 
+import config.AppConfig
 import helpers.XmlErrorMessageHelper
 import models.submission.MessageSpecData
 import models.validation._
@@ -30,7 +31,8 @@ import scala.xml.Elem
 
 class SubmissionValidationEngine @Inject() (xmlValidationService: XMLValidationService,
                                             xmlErrorMessageHelper: XmlErrorMessageHelper,
-                                            dataExtraction: DataExtraction
+                                            dataExtraction: DataExtraction,
+                                            appConfig: AppConfig
 ) extends Logging {
 
   def validateUploadSubmission(upScanUrl: Option[String]): Future[SubmissionValidationResult] =
@@ -53,7 +55,7 @@ class SubmissionValidationEngine @Inject() (xmlValidationService: XMLValidationS
     }
 
   def performXmlValidation(upScanUrl: Option[String]): Either[List[GenericError], Option[MessageSpecData]] = {
-    val xmlOrErrors: Either[ListBuffer[SaxParseError], Elem] = xmlValidationService.validateXML(upScanUrl)
+    val xmlOrErrors: Either[ListBuffer[SaxParseError], Elem] = xmlValidationService.validate(upScanUrl, None, appConfig.fileUploadXSDFilePath)
     xmlOrErrors match {
       case Right(xml) => Right(dataExtraction.messageSpecData(xml))
       case Left(list) => Left(xmlErrorMessageHelper.generateErrorMessages(list))

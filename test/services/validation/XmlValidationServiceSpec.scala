@@ -25,6 +25,8 @@ import scala.xml.XML
 class XmlValidationServiceSpec extends SpecBase {
   val noErrors: ListBuffer[SaxParseError] = ListBuffer()
 
+  val xsdPath = "/xsd/fileUpload/DCT06_EIS_UK_schema.xsd"
+
   "Validation Service" - {
     "must pass back errors if a file is invalid" in {
       val service = app.injector.instanceOf[XMLValidationService]
@@ -33,7 +35,7 @@ class XmlValidationServiceSpec extends SpecBase {
       <will>not validate</will>
       </this>
 
-      val result = service.validateXML(None, Some(invalid))
+      val result = service.validate(None, Some(invalid), xsdPath)
 
       result.isLeft mustBe true
     }
@@ -41,9 +43,9 @@ class XmlValidationServiceSpec extends SpecBase {
     "must correctly invalidate a submission with a data problem" in {
       val service = app.injector.instanceOf[XMLValidationService]
 
-      val validSubmission = XML.loadFile("test/resources/mdr/invalid.xml")
+      val validSubmission = XML.loadFile("test/resources/mdr/fileUpload/invalid.xml")
 
-      val result = service.validateXML(None, Some(validSubmission))
+      val result = service.validate(None, Some(validSubmission), xsdPath)
 
       result.isLeft mustBe true
     }
@@ -51,9 +53,9 @@ class XmlValidationServiceSpec extends SpecBase {
     "must correctly validate a submission" in {
       val service = app.injector.instanceOf[XMLValidationService]
 
-      val validSubmission = XML.loadFile("test/resources/mdr/validmdr.xml")
+      val validSubmission = XML.loadFile("test/resources/mdr/fileUpload/validmdr.xml")
 
-      val result = service.validateXML(None, Some(validSubmission))
+      val result = service.validate(None, Some(validSubmission), xsdPath)
 
       result.isLeft mustBe false
     }

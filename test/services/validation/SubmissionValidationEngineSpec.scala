@@ -17,6 +17,7 @@
 package services.validation
 
 import base.SpecBase
+import config.AppConfig
 import helpers.XmlErrorMessageHelper
 import models.submission.{MDR401, MessageSpecData}
 import models.validation._
@@ -117,9 +118,10 @@ class SubmissionValidationEngineSpec extends SpecBase {
 
     val mockXmlValidationService: XMLValidationService   = mock[XMLValidationService]
     val mockXmlErrorMessageHelper: XmlErrorMessageHelper = new XmlErrorMessageHelper
+    val appConfig: AppConfig                             = app.injector.instanceOf[AppConfig]
     val mockDataExtraction: DataExtraction               = mock[DataExtraction]
 
-    val validationEngine = new SubmissionValidationEngine(mockXmlValidationService, mockXmlErrorMessageHelper, mockDataExtraction)
+    val validationEngine = new SubmissionValidationEngine(mockXmlValidationService, mockXmlErrorMessageHelper, mockDataExtraction, appConfig)
 
     val source        = "src"
     val elem: Elem    = <dummyElement>Test</dummyElement>
@@ -130,7 +132,7 @@ class SubmissionValidationEngineSpec extends SpecBase {
 
     "must return UploadSubmissionValidationSuccess when xml with no errors received" in new SetUp {
 
-      when(mockXmlValidationService.validateXML(any[Option[String]](), any[Option[NodeSeq]]())).thenReturn(Right(elem))
+      when(mockXmlValidationService.validate(any[Option[String]](), any[Option[NodeSeq]](), any[String]())).thenReturn(Right(elem))
       when(mockDataExtraction.messageSpecData(any[Elem])).thenReturn(Some(messageSpecData))
 
       Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationSuccess(messageSpecData)
@@ -138,7 +140,7 @@ class SubmissionValidationEngineSpec extends SpecBase {
 
     "must return ValidationFailure for file which multiple pieces of mandatory information missing" in new SetUp {
 
-      when(mockXmlValidationService.validateXML(any[Option[String]](), any[Option[NodeSeq]]()))
+      when(mockXmlValidationService.validate(any[Option[String]](), any[Option[NodeSeq]](), any[String]()))
         .thenReturn(Left(ListBuffer(addressError1, addressError2, cityError1, cityError2)))
 
       val expectedErrors =
@@ -151,7 +153,7 @@ class SubmissionValidationEngineSpec extends SpecBase {
 
       val missingAttributeError: SaxParseError = SaxParseError(175, "cvc-complex-type.4: Attribute 'currCode' must appear on element 'Amount'.")
 
-      when(mockXmlValidationService.validateXML(any[Option[String]](), any[Option[NodeSeq]]())).thenReturn(Left(ListBuffer(missingAttributeError)))
+      when(mockXmlValidationService.validate(any[Option[String]](), any[Option[NodeSeq]](), any[String]())).thenReturn(Left(ListBuffer(missingAttributeError)))
 
       val expectedErrors = Seq(GenericError(175, Message("xml.add.an.element", List("Amount currCode"))))
 
@@ -160,7 +162,8 @@ class SubmissionValidationEngineSpec extends SpecBase {
 
     "must return ValidationFailure for file where element is too long (1-400 allowed)" in new SetUp {
 
-      when(mockXmlValidationService.validateXML(any[Option[String]](), any[Option[NodeSeq]]())).thenReturn(Left(ListBuffer(maxLengthError1, maxlengthError2)))
+      when(mockXmlValidationService.validate(any[Option[String]](), any[Option[NodeSeq]](), any[String]()))
+        .thenReturn(Left(ListBuffer(maxLengthError1, maxlengthError2)))
 
       val expectedErrors = Seq(GenericError(116, Message("xml.not.allowed.length", List("BuildingIdentifier", "400"))))
 
@@ -169,7 +172,8 @@ class SubmissionValidationEngineSpec extends SpecBase {
 
     "must return ValidationFailure for file where element is too long (1-4000 allowed) and show the number correctly formatted" in new SetUp {
 
-      when(mockXmlValidationService.validateXML(any[Option[String]](), any[Option[NodeSeq]]())).thenReturn(Left(ListBuffer(maxLengthError3, maxlengthError4)))
+      when(mockXmlValidationService.validate(any[Option[String]](), any[Option[NodeSeq]](), any[String]()))
+        .thenReturn(Left(ListBuffer(maxLengthError3, maxlengthError4)))
 
       val expectedErrors = Seq(GenericError(116, Message("xml.not.allowed.length", List("NationalProvision", "4,000"))))
 
@@ -178,7 +182,7 @@ class SubmissionValidationEngineSpec extends SpecBase {
 
     "must return ValidationFailure for file with invalid country code" in new SetUp {
 
-      when(mockXmlValidationService.validateXML(any[Option[String]](), any[Option[NodeSeq]]()))
+      when(mockXmlValidationService.validate(any[Option[String]](), any[Option[NodeSeq]](), any[String]()))
         .thenReturn(Left(ListBuffer(countryCodeError1, countryCodeError2)))
 
       val expectedErrors = Seq(GenericError(123, Message("xml.not.ISO.code", List("Country"))))
@@ -188,7 +192,7 @@ class SubmissionValidationEngineSpec extends SpecBase {
 
     "must return ValidationFailure for file with invalid countryExemption code" in new SetUp {
 
-      when(mockXmlValidationService.validateXML(any[Option[String]](), any[Option[NodeSeq]]()))
+      when(mockXmlValidationService.validate(any[Option[String]](), any[Option[NodeSeq]](), any[String]()))
         .thenReturn(Left(ListBuffer(countryExemptionError1, countryExemptionError2)))
 
       val expectedErrors = Seq(GenericError(133, Message("xml.not.ISO.code", List("CountryExemption"))))
@@ -198,7 +202,8 @@ class SubmissionValidationEngineSpec extends SpecBase {
 
     "must return ValidationFailure for file with invalid Reason entry code" in new SetUp {
 
-      when(mockXmlValidationService.validateXML(any[Option[String]](), any[Option[NodeSeq]]())).thenReturn(Left(ListBuffer(reasonError1, reasonError2)))
+      when(mockXmlValidationService.validate(any[Option[String]](), any[Option[NodeSeq]](), any[String]()))
+        .thenReturn(Left(ListBuffer(reasonError1, reasonError2)))
 
       val expectedErrors = Seq(GenericError(169, Message("xml.not.allowed.value", List("Reason"))))
 
@@ -207,7 +212,8 @@ class SubmissionValidationEngineSpec extends SpecBase {
 
     "must return ValidationFailure for file with invalid issuedBy code" in new SetUp {
 
-      when(mockXmlValidationService.validateXML(any[Option[String]](), any[Option[NodeSeq]]())).thenReturn(Left(ListBuffer(issuedByError1, issuedByError2)))
+      when(mockXmlValidationService.validate(any[Option[String]](), any[Option[NodeSeq]](), any[String]()))
+        .thenReturn(Left(ListBuffer(issuedByError1, issuedByError2)))
 
       val expectedErrors = Seq(GenericError(18, Message("xml.not.ISO.code", List("TIN issuedBy"))))
 
@@ -217,7 +223,7 @@ class SubmissionValidationEngineSpec extends SpecBase {
     "must return ValidationFailure with generic error message if parse error is not in an expected format" in new SetUp {
 
       val randomParseError: SaxParseError = SaxParseError(lineNumber, xsdError)
-      when(mockXmlValidationService.validateXML(any[Option[String]](), any[Option[NodeSeq]]())).thenReturn(Left(ListBuffer(randomParseError)))
+      when(mockXmlValidationService.validate(any[Option[String]](), any[Option[NodeSeq]](), any[String]())).thenReturn(Left(ListBuffer(randomParseError)))
 
       val expectedErrors = Seq(GenericError(lineNumber, Message("xml.defaultMessage")))
 

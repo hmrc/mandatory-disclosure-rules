@@ -16,27 +16,39 @@
 
 package services.validation
 
-import config.AppConfig
 import models.validation.SaxParseError
 import org.xml.sax.SAXParseException
 import org.xml.sax.helpers.DefaultHandler
 
 import java.io.StringReader
 import java.net.URL
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 import javax.xml.parsers.{SAXParser, SAXParserFactory}
-import javax.xml.transform.Source
-import javax.xml.transform.stream.StreamSource
-import javax.xml.validation.{Schema, SchemaFactory}
+import javax.xml.validation.Schema
 import scala.collection.mutable.ListBuffer
 import scala.xml.factory.XMLLoader
 import scala.xml.{Elem, NodeSeq}
 
-class XMLValidationService @Inject() (xmlValidatingParser: SaxParser) {
+class XMLValidationService @Inject() () {
 
-  def validateXML(upScanUrl: Option[String] = None, xml: Option[NodeSeq] = None): Either[ListBuffer[SaxParseError], Elem] = {
+  private val schemaLang: String = javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI
+
+  private def xmlValidatingParser(schema: Schema): SAXParser = {
+
+    val factory: SAXParserFactory = SAXParserFactory.newInstance()
+    factory.setNamespaceAware(true)
+    factory.setSchema(schema)
+    factory.setXIncludeAware(false)
+    factory.newSAXParser()
+  }
+
+  def validate(upScanUrl: Option[String] = None, xml: Option[NodeSeq] = None, filePath: String): Either[ListBuffer[SaxParseError], Elem] = {
 
     val list: ListBuffer[SaxParseError] = new ListBuffer[SaxParseError]
+
+    val url: URL = getClass.getResource(filePath)
+
+    val schema: Schema = javax.xml.validation.SchemaFactory.newInstance(schemaLang).newSchema(url)
 
     trait AccumulatorState extends DefaultHandler {
       override def warning(e: SAXParseException): Unit    = list += SaxParseError(e.getLineNumber, e.getMessage)
@@ -45,9 +57,8 @@ class XMLValidationService @Inject() (xmlValidatingParser: SaxParser) {
     }
 
     val loader: XMLLoader[Elem] = new scala.xml.factory.XMLLoader[scala.xml.Elem] {
-      override def parser: SAXParser = xmlValidatingParser.validatingParser
-      override def adapter =
-        new scala.xml.parsing.NoBindingFactoryAdapter with AccumulatorState
+      override def parser: SAXParser = xmlValidatingParser(schema)
+      override def adapter           = new scala.xml.parsing.NoBindingFactoryAdapter with AccumulatorState
     }
 
     val loadedXML = if (xml.isDefined) {
@@ -60,6 +71,7 @@ class XMLValidationService @Inject() (xmlValidatingParser: SaxParser) {
   }
 }
 
+/*
 trait SaxParser {
   def validatingParser: SAXParser
 }
@@ -88,3 +100,4 @@ class MDRSchemaValidatingParser @Inject() (appConfig: AppConfig) extends SaxPars
 
   override def validatingParser: SAXParser = factory.newSAXParser()
 }
+ */
