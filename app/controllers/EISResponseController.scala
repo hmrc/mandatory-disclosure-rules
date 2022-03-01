@@ -16,12 +16,12 @@
 
 package controllers
 
-import com.lucidchart.open.xtract.{ParseFailure, ParseSuccess, PartialParseSuccess, XmlReader}
-import controllers.actions.EISResponsePreConditionCheckActionFilter
-import controllers.auth.IdentifierAuthAction
-import models.xml.BREResponse
+import controllers.actions.EISResponsePreConditionCheckActionRefiner
+import controllers.auth.AuthAction
+import models.submission.{Accepted => FileStatusAccepted, FileStatus, Rejected}
+import models.xml.{BREResponse, ValidationStatus}
 import play.api.Logging
-import play.api.mvc.{Action, ControllerComponents, Result}
+import play.api.mvc.{Action, ControllerComponents}
 import repositories.submission.FileDetailsRepository
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -30,23 +30,23 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
 
 class EISResponseController @Inject() (cc: ControllerComponents,
-                                       authenticate: IdentifierAuthAction,
-                                       actionFilter: EISResponsePreConditionCheckActionFilter,
+                                       authAction: AuthAction,
+                                       actionRefiner: EISResponsePreConditionCheckActionRefiner,
                                        fileDetailsRepository: FileDetailsRepository
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
-  def processEISResponse(): Action[NodeSeq] = (authenticate(parse.xml) andThen actionFilter).async { implicit request =>
-    XmlReader.of[BREResponse].read(request.body) match {
-      case ParseSuccess(breResponse: BREResponse) =>
-        Future.successful(Ok)
-      case PartialParseSuccess(_, errors) =>
-        logger.info(s"failed to read the xml from EIS with errors: $errors")
-        Future.successful(BadRequest("Failed to read the xml from EIS to read the input xml $errors"))
-      case ParseFailure(errors) =>
-        logger.info(s"ParseFailure:failed to read the xml from EIS with errors: $errors")
-        Future.successful(BadRequest(s"failed to read the xml from EIS with errors: $errors"))
+  private def convertToFileStatus(breResponse: BREResponse): FileStatus =
+    breResponse.genericStatusMessage.status match {
+      case ValidationStatus.accepted => FileStatusAccepted
+      case ValidationStatus.rejected => Rejected(breResponse.genericStatusMessage.validationErrors)
     }
+
+  def processEISResponse(): Action[NodeSeq] = (authAction(parse.xml) andThen actionRefiner).async { implicit request =>
+    val conversationId = request.BREResponse.conversationID
+    val fileStatus     = convertToFileStatus(request.BREResponse)
+    fileDetailsRepository.updateStatus(conversationId, fileStatus)
+    Future.successful(Ok)
   }
 }

@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import controllers.auth.{FakeIdentifierAuthAction, IdentifierAuthAction}
+import controllers.auth.{AuthAction, FakeAuthAction}
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.http.Status.{BAD_REQUEST, OK}
@@ -72,7 +72,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
       val application: Application = applicationBuilder()
         .overrides(
           bind[FileDetailsRepository].toInstance(mockFileDetailsRepository),
-          bind[IdentifierAuthAction].to[FakeIdentifierAuthAction]
+          bind[AuthAction].to[FakeAuthAction]
         )
         .build()
 
@@ -92,7 +92,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
       val application: Application = applicationBuilder()
         .overrides(
           bind[FileDetailsRepository].toInstance(mockFileDetailsRepository),
-          bind[IdentifierAuthAction].to[FakeIdentifierAuthAction]
+          bind[AuthAction].to[FakeAuthAction]
         )
         .build()
 

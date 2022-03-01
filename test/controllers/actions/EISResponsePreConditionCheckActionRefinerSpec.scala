@@ -17,7 +17,7 @@
 package controllers.actions
 
 import base.SpecBase
-import controllers.auth.{IdentifierAuthAction, UserRequest}
+import controllers.auth.UserRequest
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status.{BAD_REQUEST, OK}
 import play.api.mvc.Results.Ok
@@ -31,8 +31,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.xml.NodeSeq
 
-class EISResponsePreConditionCheckActionFilterSpec extends SpecBase with BeforeAndAfterEach {
-
+class EISResponsePreConditionCheckActionRefinerSpec extends SpecBase with BeforeAndAfterEach {
   val uuid: UUID           = UUID.randomUUID()
   val headers: FakeHeaders = FakeHeaders(Seq("x-conversation-id" -> uuid.toString))
 
@@ -63,20 +62,13 @@ class EISResponsePreConditionCheckActionFilterSpec extends SpecBase with BeforeA
     </requestDetail>
   </BREResponse>
 
-  class Harness(authAction: IdentifierAuthAction, filter: EISResponsePreConditionCheckActionFilter) extends InjectedController {
-
-    def onPageLoad(): Action[AnyContent] = (authAction andThen filter) { _ =>
-      Ok
-    }
-  }
-
-  private lazy val action = new EISResponsePreConditionCheckActionFilter()
+  private lazy val action = new EISResponsePreConditionCheckActionRefiner()
 
   private val response: Request[NodeSeq] => Future[Result] = { _ =>
     Future.successful(Ok(HtmlFormat.empty))
   }
 
-  "EISResponsePreConditionCheckActionFilter" - {
+  "EISResponsePreConditionCheckActionRefiner" - {
 
     "must return Ok when 'x-conversation-id' matches with conversationId in the xml" in {
 
@@ -104,7 +96,7 @@ class EISResponsePreConditionCheckActionFilterSpec extends SpecBase with BeforeA
 
     "must return BadRequest when the request xml is invalid xml" in {
       val invalidXml             = <test>data</test>
-      val request                = UserRequest("", FakeRequest("", "").withHeaders(FakeHeaders(Seq("x-conversation-id" -> "uuid"))).withBody(invalidXml))
+      val request                = UserRequest("", FakeRequest("", "").withHeaders(FakeHeaders(Seq("x-conversation-id" -> uuid.toString))).withBody(invalidXml))
       val result: Future[Result] = action.invokeBlock(request, response)
 
       status(result) mustBe BAD_REQUEST
