@@ -17,17 +17,14 @@
 package repositories.submission
 
 import base.SpecBase
-import generators.Generators
 import models.submission._
-import models.xml.ValidationErrors
-import org.scalacheck.Arbitrary.arbitrary
-import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import models.xml.{FileErrorCode, FileErrors, ValidationErrors}
 import play.api.Configuration
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
 import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
-class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepositorySupport[FileDetails] with Generators with ScalaCheckPropertyChecks {
+class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepositorySupport[FileDetails] {
 
   lazy val config              = app.injector.instanceOf[Configuration]
   override lazy val repository = new FileDetailsRepository(mongoComponent, config)
@@ -96,12 +93,13 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
     }
 
     "must update FileDetails status to Rejected by ConversationId" in {
-      val validationErrors = arbitrary[ValidationErrors].sample.value
-      val insert           = repository.insert(fileDetails)
+      val insert = repository.insert(fileDetails)
       whenReady(insert) { result =>
         result mustBe true
       }
-      val res = repository.updateStatus("conversationId123456", Rejected(validationErrors))
+      val res = repository.updateStatus("conversationId123456",
+                                        Rejected(ValidationErrors(Some(Seq(FileErrors(FileErrorCode.FailedSchemaValidation, Some("details")))), None))
+      )
       whenReady(res) { result =>
         result mustBe true
       }
@@ -109,7 +107,14 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
       whenReady(updatedResponse) { result =>
         result must matchPattern {
           case Some(
-                FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Rejected(validationErrors), "file1.xml", _, _)
+                FileDetails(ConversationId("conversationId123456"),
+                            "subscriptionId",
+                            "messageRefId",
+                            Rejected(ValidationErrors(Some(Seq(FileErrors(FileErrorCode.FailedSchemaValidation, Some("details")))), None)),
+                            "file1.xml",
+                            _,
+                            _
+                )
               ) =>
         }
       }

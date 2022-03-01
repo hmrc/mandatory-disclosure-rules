@@ -33,8 +33,7 @@ class EISResponseController @Inject() (cc: ControllerComponents,
                                        authAction: AuthAction,
                                        actionRefiner: EISResponsePreConditionCheckActionRefiner,
                                        fileDetailsRepository: FileDetailsRepository
-)(implicit ec: ExecutionContext)
-    extends BackendController(cc)
+) extends BackendController(cc)
     with Logging {
 
   private def convertToFileStatus(breResponse: BREResponse): FileStatus =
