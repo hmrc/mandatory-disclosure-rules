@@ -18,6 +18,7 @@ package models.xml
 
 import cats.implicits.catsSyntaxTuple2Semigroupal
 import com.lucidchart.open.xtract.{__, XmlReader}
+import play.api.libs.json.{Json, OFormat}
 
 case class FileErrors(code: FileErrorCode, details: Option[String])
 
@@ -28,4 +29,5 @@ object FileErrors {
     (__ \ "Details").read[String].optional
   ).mapN(apply)
 
+  implicit val format: OFormat[FileErrors] = Json.format[FileErrors]
 }

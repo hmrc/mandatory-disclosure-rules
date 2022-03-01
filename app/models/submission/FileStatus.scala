@@ -17,6 +17,7 @@
 package models.submission
 
 import julienrf.json.derived
+import models.xml.ValidationErrors
 import play.api.libs.json.{Json, OFormat}
 
 sealed trait FileStatus

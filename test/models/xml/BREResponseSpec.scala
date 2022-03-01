@@ -55,6 +55,7 @@ class BREResponseSpec extends SpecBase {
                     </gsm:GenericStatusMessage>
                   </requestDetail>
                 </BREResponse>
+
       val fileErrors = Some(List(FileErrors(MessageRefIDHasAlreadyBeenUsed, Some("Duplicate message ref ID"))))
 
       val expectedResult = ParseSuccess(

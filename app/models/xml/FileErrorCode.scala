@@ -17,7 +17,7 @@
 package models.xml
 
 import com.lucidchart.open.xtract._
-import play.api.libs.json.{JsString, Writes}
+import play.api.libs.json.{__, JsString, Reads, Writes}
 
 import scala.xml.NodeSeq
 
@@ -42,6 +42,15 @@ object FileErrorCode {
 
   implicit val writes: Writes[FileErrorCode] = Writes[FileErrorCode] { x =>
     JsString(x.code)
+  }
+
+  implicit val reads: Reads[FileErrorCode] = __.read[String].map {
+    case "50007"   => FailedSchemaValidation
+    case "50008"   => InvalidMessageRefIDFormat
+    case "50009"   => MessageRefIDHasAlreadyBeenUsed
+    case "50010"   => FileContainsTestDataForProductionEnvironment
+    case "50012"   => NotMeantToBeReceivedByTheIndicatedJurisdiction
+    case otherCode => UnknownFileErrorCode(otherCode)
   }
 
   implicit val xmlReads: XmlReader[FileErrorCode] =

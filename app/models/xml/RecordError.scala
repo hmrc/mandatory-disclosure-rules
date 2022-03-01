@@ -18,6 +18,7 @@ package models.xml
 
 import cats.implicits.catsSyntaxTuple3Semigroupal
 import com.lucidchart.open.xtract.{__, XmlReader}
+import play.api.libs.json.{Json, OFormat}
 
 case class RecordError(code: RecordErrorCode, details: Option[String], docRefIDInError: Option[Seq[String]])
 
@@ -28,4 +29,6 @@ object RecordError {
     (__ \ "Details").read[String].optional,
     (__ \ "DocRefIDInError").read(strictReadOptionSeq[String])
   ).mapN(apply)
+
+  implicit val format: OFormat[RecordError] = Json.format[RecordError]
 }
