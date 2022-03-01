@@ -18,15 +18,19 @@ package controllers
 
 import base.SpecBase
 import controllers.auth.{AuthAction, FakeAuthAction}
+import models.submission.{Accepted, ConversationId, FileDetails, FileStatus}
+import org.mockito.ArgumentMatchers.any
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
-import play.api.http.Status.{BAD_REQUEST, OK}
+import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, OK}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{defaultAwaitTimeout, route, running, status, writeableOf_AnyContentAsXml, POST}
 import repositories.submission.FileDetailsRepository
 
+import java.time.LocalDateTime
 import java.util.UUID
+import scala.concurrent.Future
 import scala.xml.NodeSeq
 
 class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
@@ -37,6 +41,13 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
     reset(mockFileDetailsRepository)
     super.beforeEach()
   }
+
+  val application: Application = applicationBuilder()
+    .overrides(
+      bind[FileDetailsRepository].toInstance(mockFileDetailsRepository),
+      bind[AuthAction].to[FakeAuthAction]
+    )
+    .build()
 
   private val randomUUID = UUID.randomUUID()
   val xml: NodeSeq = <BREResponse>
@@ -68,13 +79,38 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
 
   "EISResponseController" - {
     "must return ok when input xml is valid" in {
+      val fileDetails =
+        FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Accepted, "file1.xml", LocalDateTime.now(), LocalDateTime.now())
 
-      val application: Application = applicationBuilder()
-        .overrides(
-          bind[FileDetailsRepository].toInstance(mockFileDetailsRepository),
-          bind[AuthAction].to[FakeAuthAction]
-        )
-        .build()
+      when(mockFileDetailsRepository.updateStatus(any[String](), any[FileStatus]())).thenReturn(Future.successful(Some(fileDetails)))
+
+      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
+        .withHeaders("x-conversation-id" -> randomUUID.toString)
+        .withXmlBody(xml)
+
+      val result = route(application, request).value
+
+      status(result) mustEqual OK
+      verify(mockFileDetailsRepository, times(1)).updateStatus(any[String](), any[FileStatus]())
+    }
+
+    "must return BadRequest when input xml is invalid" in {
+
+      val invalidXml = <test>invalid</test>
+
+      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
+        .withHeaders("x-conversation-id" -> randomUUID.toString)
+        .withXmlBody(invalidXml)
+
+      val result = route(application, request).value
+
+      status(result) mustEqual BAD_REQUEST
+      verify(mockFileDetailsRepository, never).updateStatus(any[String](), any[FileStatus]())
+    }
+
+    "must return InternalServerError on filing to update the status" in {
+
+      when(mockFileDetailsRepository.updateStatus(any[String](), any[FileStatus]())).thenReturn(Future.successful(None))
 
       running(application) {
         val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
@@ -83,29 +119,8 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
 
         val result = route(application, request).value
 
-        status(result) mustEqual OK
-      }
-    }
-
-    "must return BadRequest when input xml is invalid" in {
-
-      val application: Application = applicationBuilder()
-        .overrides(
-          bind[FileDetailsRepository].toInstance(mockFileDetailsRepository),
-          bind[AuthAction].to[FakeAuthAction]
-        )
-        .build()
-
-      val invalidXml = <test>invalid</test>
-
-      running(application) {
-        val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
-          .withHeaders("x-conversation-id" -> randomUUID.toString)
-          .withXmlBody(invalidXml)
-
-        val result = route(application, request).value
-
-        status(result) mustEqual BAD_REQUEST
+        status(result) mustEqual INTERNAL_SERVER_ERROR
+        verify(mockFileDetailsRepository, times(1)).updateStatus(any[String](), any[FileStatus]())
       }
     }
   }

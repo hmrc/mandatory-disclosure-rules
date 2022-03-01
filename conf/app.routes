@@ -17,4 +17,4 @@ GET     /files/:conversationId/details              controllers.FileDetailsContr
 GET     /files/details                              controllers.FileDetailsController.getAllFileDetails
 GET     /files/:conversationId/status               controllers.FileDetailsController.getStatus(conversationId: models.submission.ConversationId)
 
-POST   /validation-result                           controllers.EISResponseController.processEISResponse
+POST    /validation-result                          controllers.EISResponseController.processEISResponse

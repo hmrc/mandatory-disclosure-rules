@@ -26,14 +26,15 @@ import repositories.submission.FileDetailsRepository
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import scala.xml.NodeSeq
 
 class EISResponseController @Inject() (cc: ControllerComponents,
                                        authAction: AuthAction,
                                        actionRefiner: EISResponsePreConditionCheckActionRefiner,
                                        fileDetailsRepository: FileDetailsRepository
-) extends BackendController(cc)
+)(implicit ec: ExecutionContext)
+    extends BackendController(cc)
     with Logging {
 
   private def convertToFileStatus(breResponse: BREResponse): FileStatus =
@@ -45,7 +46,13 @@ class EISResponseController @Inject() (cc: ControllerComponents,
   def processEISResponse(): Action[NodeSeq] = (authAction(parse.xml) andThen actionRefiner).async { implicit request =>
     val conversationId = request.BREResponse.conversationID
     val fileStatus     = convertToFileStatus(request.BREResponse)
-    fileDetailsRepository.updateStatus(conversationId, fileStatus)
-    Future.successful(Ok)
+
+    fileDetailsRepository.updateStatus(conversationId, fileStatus) map {
+      case Some(updatedFileDetails) => //TODO email service integration use updatedFileDetails to decide slow/fast journey
+        Ok
+      case _ =>
+        logger.warn("Failed to update the status:mongo error")
+        InternalServerError
+    }
   }
 }

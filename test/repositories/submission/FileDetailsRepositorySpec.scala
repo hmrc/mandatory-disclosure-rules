@@ -34,14 +34,14 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
     FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Pending, "file1.xml", dateTimeNow, dateTimeNow)
 
   "Insert" - {
-    "must insert Filedetails" in {
+    "must insert FileDetails" in {
       val res = repository.insert(fileDetails)
       whenReady(res) { result =>
         result mustBe true
       }
     }
 
-    "must read Filedetails by SubscriptionId" in {
+    "must read FileDetails by SubscriptionId" in {
       val insert = repository.insert(fileDetails)
       whenReady(insert) { result =>
         result mustBe true
@@ -52,7 +52,7 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
       }
     }
 
-    "must read Filedetails by ConversationId" in {
+    "must read FileDetails by ConversationId" in {
       val insert = repository.insert(fileDetails)
       whenReady(insert) { result =>
         result mustBe true
@@ -63,7 +63,7 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
       }
     }
 
-    "must read Filedetails by ConversationId doesn't exists" in {
+    "must read FileDetails by ConversationId doesn't exists" in {
       val insert = repository.insert(fileDetails)
       whenReady(insert) { result =>
         result mustBe true
@@ -74,18 +74,13 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
       }
     }
 
-    "must update Filedetails status to Accepted by ConversationId" in {
+    "must update FileDetails status to Accepted by ConversationId" in {
       val insert = repository.insert(fileDetails)
       whenReady(insert) { result =>
         result mustBe true
       }
       val res = repository.updateStatus("conversationId123456", Accepted)
       whenReady(res) { result =>
-        result mustBe true
-      }
-      val updatedResponse = repository.findByConversationId(ConversationId("conversationId123456"))
-
-      whenReady(updatedResponse) { result =>
         result must matchPattern {
           case Some(FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Accepted, "file1.xml", _, _)) =>
         }
@@ -100,11 +95,8 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
       val res = repository.updateStatus("conversationId123456",
                                         Rejected(ValidationErrors(Some(Seq(FileErrors(FileErrorCode.FailedSchemaValidation, Some("details")))), None))
       )
+
       whenReady(res) { result =>
-        result mustBe true
-      }
-      val updatedResponse = repository.findByConversationId(ConversationId("conversationId123456"))
-      whenReady(updatedResponse) { result =>
         result must matchPattern {
           case Some(
                 FileDetails(ConversationId("conversationId123456"),

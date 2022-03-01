@@ -38,30 +38,30 @@ class EISResponsePreConditionCheckActionRefiner @Inject() (implicit val executio
           case Some(conversationId) =>
             Future.successful(readXmlAsBREResponse(request, xml, conversationId))
           case None =>
-            logger.info(s"x-conversation-id is missing in the request header")
+            logger.warn(s"x-conversation-id is missing in the request header")
             Future.successful(Left(BadRequest("x-conversation-id is missing in the request header")))
         }
       case invalidBody =>
-        logger.info(s"Invalid request body, Expected XML but found: ${invalidBody.getClass}")
+        logger.warn(s"Invalid request body, Expected XML but found: ${invalidBody.getClass}")
         Future.successful(Left(BadRequest("request body must be an XML")))
     }
 
   private def readXmlAsBREResponse[A](request: Request[A], xml: NodeSeq, conversationId: String): Either[Result, EISRequest[A]] =
     XmlReader.of[BREResponse].read(xml) match {
 
-      case ParseSuccess(breResponse: BREResponse) if conversationId.equalsIgnoreCase(breResponse.conversationID) =>
+      case ParseSuccess(breResponse: BREResponse) if conversationId.equalsIgnoreCase(breResponse.conversationID.trim) =>
         Right(EISRequest(request, breResponse))
 
       case ParseSuccess(breResponse: BREResponse) =>
-        logger.info(s"x-conversation-id in request header: $conversationId does not match with conversationID: ${breResponse.conversationID} in the xml")
+        logger.warn(s"x-conversation-id in request header: $conversationId does not match with conversationID: ${breResponse.conversationID} in the xml")
         Left(BadRequest(s"Request header 'x-conversation-id' does not match with xml conversationId"))
 
       case PartialParseSuccess(_, errors) =>
-        logger.info(s"failed to read the xml from EIS: $errors")
+        logger.warn(s"failed to read the xml from EIS: $errors")
         Left(BadRequest(s"Failed to read the xml from EIS: $errors"))
 
       case ParseFailure(errors) =>
-        logger.info(s"ParseFailure:failed to read the xml from EIS: $errors")
+        logger.warn(s"ParseFailure:failed to read the xml from EIS: $errors")
         Left(BadRequest(s"failed to read the xml from EIS with errors: $errors"))
     }
 

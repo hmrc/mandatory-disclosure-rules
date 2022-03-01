@@ -30,7 +30,7 @@ import play.api.test.Helpers.status
 import play.api.{Application, Configuration}
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.auth.core.retrieve.{~, Retrieval}
+import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.duration._
@@ -38,10 +38,6 @@ import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
 
 class IdentifierAuthActionSpec extends PlaySpec with GuiceOneAppPerSuite with MockitoSugar {
-
-  implicit private class HelperOps[A](a: A) {
-    def ~[B](b: B) = new ~(a, b)
-  }
 
   class Harness(authAction: IdentifierAuthAction) extends InjectedController {
 
