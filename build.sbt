@@ -1,4 +1,4 @@
-import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
+import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, integrationTestSettings}
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "mandatory-disclosure-rules"
@@ -47,4 +47,5 @@ lazy val microservice = Project(appName, file("."))
   .configs(IntegrationTest)
   .settings(ScoverageSettings.settings: _*)
   .settings(integrationTestSettings(): _*)
+  .settings(addTestReportOption(Test, "test-reports"))
   .settings(resolvers += Resolver.jcenterRepo)
