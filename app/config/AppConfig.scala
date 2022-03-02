@@ -49,4 +49,8 @@ class AppConfig @Inject() (
   val mdrschema = config.get[String]("schemafiles.mdrschema")
   val eisSchema = config.get[String]("schemafiles.eisSchema")
 
+  lazy val sendEmailUrl: String = servicesConfig.baseUrl("email")
+
+  lazy val emailSuccessfulTemplate: String   = config.get[String]("emailTemplates.fileUploadSuccessful")
+  lazy val emailUnsuccessfulTemplate: String = config.get[String]("emailTemplates.fileUploadUnsuccessful")
 }

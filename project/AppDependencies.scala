@@ -9,7 +9,8 @@ object AppDependencies {
     "uk.gov.hmrc"       %% "bootstrap-backend-play-28" % "5.14.0",
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"        % "0.55.0",
     "org.julienrf"      %% "play-json-derived-codecs"  % "7.0.0",
-    "org.typelevel"     %% "cats-core"                 % "2.7.0"
+    "org.typelevel"     %% "cats-core"                 % "2.7.0",
+    "uk.gov.hmrc"       %% "emailaddress"              % "3.5.0"
   )
 
   val test = Seq(
@@ -21,7 +22,7 @@ object AppDependencies {
     "com.vladsch.flexmark"    % "flexmark-all"             % "0.36.8"            % "test, it",
     "org.scalatest"          %% "scalatest"                % "3.1.0"             % Test,
     "org.scalatestplus.play" %% "scalatestplus-play"       % "5.1.0"             % Test,
-    "com.github.tomakehurst"  % "wiremock-standalone"      % "2.27.0"            % Test,
+    "com.github.tomakehurst"  % "wiremock-standalone"      % "2.23.2"            % Test,
     "com.typesafe.play"      %% "play-test"                % PlayVersion.current % Test
   )
 }

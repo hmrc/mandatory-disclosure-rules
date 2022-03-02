@@ -16,6 +16,7 @@
 
 package generators
 
+import models.email.EmailRequest
 import models.subscription.{
   ContactInformation,
   ContactType,
@@ -146,4 +147,12 @@ trait ModelGenerators {
       )
     }
 
+  implicit val arbitraryEmailRequest: Arbitrary[EmailRequest] = Arbitrary {
+    for {
+      to     <- arbitrary[List[String]]
+      id     <- arbitrary[String]
+      params <- arbitrary[Map[String, String]]
+
+    } yield EmailRequest(to, id, params)
+  }
 }
