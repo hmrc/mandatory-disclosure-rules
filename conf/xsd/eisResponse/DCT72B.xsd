@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2020 rel. 2 sp1 (x64) (http://www.altova.com) by  (HMRC - HM Revenue & Customs) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:cadx="http://www.hmrc.gsi.gov.uk/mdr/cadx" xmlns:gsm="urn:oecd:ties:mdr:v1" targetNamespace="http://www.hmrc.gsi.gov.uk/mdr/cadx">
+	<xs:import namespace="urn:oecd:ties:mdr:v1"/>
+	<xs:element name="MDRSubmissionRequest" type="cadx:MDRSubmissionRequest_Type"/>
+	<xs:complexType name="MDRSubmissionRequest_Type">
+		<xs:sequence>
+			<xs:element name="requestCommon" type="cadx:requestCommon_Type"/>
+			<xs:element name="requestDetail" type="cadx:requestDetail_Type">
+				<xs:annotation>
+					<xs:documentation>Wrapper tag for the MDR submission XML payload</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="requestCommon_Type">
+		<xs:sequence>
+			<xs:element name="receiptDate" type="xs:dateTime"/>
+			<xs:element name="regime">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="MDR"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="conversationID">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="36"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="schemaVersion">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="1"/>
+						<xs:maxLength value="255"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="requestDetail_Type">
+		<xs:sequence>
+			<xs:element name="GenericMessageType" type="cadx:GenericMessageStatus_Type">
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="GenericMessageStatus_Type">
+		<xs:sequence>
+			<xs:element name="ValidationErrors" type="gsm:ValidationErrors_Type"/>
+			<xs:element name="ValidationResult" type="gsm:ValidationResult_Type"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="ValidationErrors_Type">
+		<xs:sequence>
+			<xs:element name="FileError" type="gsm:FileError_Type" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="RecordError" type="gsm:RecordError_Type" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="FileError_Type">
+		<xs:sequence>
+			<xs:element name="Code" type="gsm:StringMin1Max10_Type">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Error Code</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Details" type="gsm:ErrorDetail_Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Error Details</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="RecordError_Type">
+		<xs:sequence>
+			<xs:element name="Code" type="gsm:StringMin1Max10_Type">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Error Code</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="Details" type="gsm:ErrorDetail_Type" minOccurs="0">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Error Details</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="DocRefIDInError" type="gsm:StringMin1Max200_Type" minOccurs="0" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">DocRefID of the record causing the error</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<xs:complexType name="ValidationResult_Type">
+		<xs:sequence>
+			<xs:element name="Status" type="gsm:FileAcceptanceStatus_EnumType">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Indicate if the file was accepted or rejected by the receiver</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+			<xs:element name="ValidatedBy" type="gsm:StringMin1Max400_Type" maxOccurs="unbounded">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Indicate the version of the validation tool that was used to generate this Status Message</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+</xs:schema>
