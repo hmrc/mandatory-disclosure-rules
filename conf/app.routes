@@ -13,6 +13,8 @@ POST    /subscription/read-subscription             controllers.SubscriptionCont
 
 POST    /subscription/update-subscription           controllers.SubscriptionController.updateSubscription
 
-GET     /files/:conversationId/details               controllers.FileDetailsController.getFileDetails(conversationId: models.submission.ConversationId)
-GET     /files/details                               controllers.FileDetailsController.getAllFileDetails
-GET     /files/:conversationId/status                controllers.FileDetailsController.getStatus(conversationId: models.submission.ConversationId)
+GET     /files/:conversationId/details              controllers.FileDetailsController.getFileDetails(conversationId: models.submission.ConversationId)
+GET     /files/details                              controllers.FileDetailsController.getAllFileDetails
+GET     /files/:conversationId/status               controllers.FileDetailsController.getStatus(conversationId: models.submission.ConversationId)
+
+POST    /validation-result                          controllers.EISResponseController.processEISResponse

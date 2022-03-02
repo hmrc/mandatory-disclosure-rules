@@ -16,12 +16,12 @@
 
 package generators
 
-import java.time.{Instant, LocalDate, ZoneOffset}
-
 import org.scalacheck.Arbitrary.{arbitrary, _}
 import org.scalacheck.Gen._
 import org.scalacheck.{Gen, Shrink}
 import wolfendale.scalacheck.regexp.RegexpGen
+
+import java.time.{Instant, LocalDate, ZoneOffset}
 
 trait Generators extends ModelGenerators {
 
@@ -138,4 +138,9 @@ trait Generators extends ModelGenerators {
   val apiOrgName                = "^([a-zA-Z0-9_.]{1,105})\\$"
   def validOrgName: Gen[String] = RegexpGen.from(apiOrgName)
 
+  def listWithMaxLength[T](maxSize: Int, gen: Gen[T]): Gen[Seq[T]] =
+    for {
+      size  <- Gen.choose(1, maxSize)
+      items <- Gen.listOfN(size, gen)
+    } yield items
 }

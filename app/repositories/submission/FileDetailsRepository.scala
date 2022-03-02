@@ -20,7 +20,7 @@ import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.Updates.set
-import org.mongodb.scala.model.{FindOneAndUpdateOptions, IndexModel, IndexOptions, Updates}
+import org.mongodb.scala.model.{FindOneAndUpdateOptions, IndexModel, IndexOptions, ReturnDocument, Updates}
 import play.api.Configuration
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
@@ -46,7 +46,7 @@ class FileDetailsRepository @Inject() (
   def updateStatus(
     conversationId: String,
     newStatus: FileStatus
-  ): Future[Boolean] = {
+  ): Future[Option[FileDetails]] = {
 
     val filter: Bson = equal("_id", conversationId)
     val modifier = Updates.combine(
@@ -54,12 +54,11 @@ class FileDetailsRepository @Inject() (
       set("lastUpdated", LocalDateTime.now)
     )
     val options: FindOneAndUpdateOptions =
-      FindOneAndUpdateOptions().upsert(true)
+      FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER)
 
     collection
       .findOneAndUpdate(filter, modifier, options)
-      .toFuture
-      .map(_ => true)
+      .toFutureOption()
   }
 
   def findByConversationId(conversationId: ConversationId): Future[Option[FileDetails]] = {

@@ -30,6 +30,7 @@ import models.subscription.{
   UpdateSubscriptionDetails,
   UpdateSubscriptionForMDRRequest
 }
+import models.xml.{FileErrorCode, FileErrors, RecordError, RecordErrorCode, ValidationErrors}
 import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary.arbitrary
 
@@ -144,6 +145,37 @@ trait ModelGenerators {
       } yield UpdateSubscriptionForMDRRequest(
         request
       )
+    }
+
+  implicit val arbitraryFileErrorCode: Arbitrary[FileErrorCode] = Arbitrary {
+    Gen.oneOf[FileErrorCode](FileErrorCode.values)
+  }
+
+  implicit val arbitraryRecordErrorCode: Arbitrary[RecordErrorCode] = Arbitrary {
+    Gen.oneOf[RecordErrorCode](RecordErrorCode.values)
+  }
+
+  implicit val arbitraryUpdateFileErrors: Arbitrary[FileErrors] = Arbitrary {
+    for {
+      fileErrorCode <- arbitrary[FileErrorCode]
+      details       <- Gen.option(nonEmptyString)
+    } yield FileErrors(fileErrorCode, details)
+  }
+
+  implicit val arbitraryUpdateRecordErrors: Arbitrary[RecordError] = Arbitrary {
+    for {
+      recordErrorCode <- arbitrary[RecordErrorCode]
+      details         <- Gen.option(nonEmptyString)
+      docRefIdRef     <- Gen.option(listWithMaxLength(5, nonEmptyString))
+    } yield RecordError(recordErrorCode, details, docRefIdRef)
+  }
+
+  implicit val arbitraryUpdateValidationErrors: Arbitrary[ValidationErrors] =
+    Arbitrary {
+      for {
+        fileErrors   <- Gen.option(listWithMaxLength(5, arbitrary[FileErrors]))
+        recordErrors <- Gen.option(listWithMaxLength(5, arbitrary[RecordError]))
+      } yield ValidationErrors(fileErrors, recordErrors)
     }
 
 }

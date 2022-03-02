@@ -14,21 +14,9 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.auth
 
-import play.api.Logging
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import repositories.submission.FileDetailsRepository
-import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import models.xml.BREResponse
+import play.api.mvc.{Request, WrappedRequest}
 
-import javax.inject.Inject
-import scala.concurrent.ExecutionContext
-
-class HandleEISRequestController @Inject() (cc: ControllerComponents, fileDetailsRepository: FileDetailsRepository)(implicit ec: ExecutionContext)
-    extends BackendController(cc)
-    with Logging {
-
-  def processEISRequest(): Action[AnyContent] =
-    ???
-
-}
+case class EISRequest[+A](request: Request[A], BREResponse: BREResponse) extends WrappedRequest[A](request)

@@ -18,9 +18,13 @@ package controllers
 
 import base.SpecBase
 import controllers.auth.{FakeIdentifierAuthAction, IdentifierAuthAction}
+import generators.Generators
 import models.submission._
+import models.xml.ValidationErrors
 import org.mockito.ArgumentMatchers.any
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.Application
 import play.api.http.Status.{NOT_FOUND, OK}
 import play.api.inject.bind
@@ -31,7 +35,7 @@ import repositories.submission.FileDetailsRepository
 import java.time.LocalDateTime
 import scala.concurrent.Future
 
-class FileDetailsControllerSpec extends SpecBase with BeforeAndAfterEach {
+class FileDetailsControllerSpec extends SpecBase with BeforeAndAfterEach with Generators with ScalaCheckPropertyChecks {
 
   val mockFileDetailsRepository: FileDetailsRepository = mock[FileDetailsRepository]
 
@@ -157,16 +161,16 @@ class FileDetailsControllerSpec extends SpecBase with BeforeAndAfterEach {
     }
 
     "must return Rejected FileStatus for the given 'conversationId'" in {
-
+      val validationErrors = arbitrary[ValidationErrors].sample.value
       when(mockFileDetailsRepository.findStatusByConversationId(any[ConversationId]()))
-        .thenReturn(Future.successful(Some(Rejected(FileError("Error Processing")))))
+        .thenReturn(Future.successful(Some(Rejected(validationErrors))))
 
       val request =
         FakeRequest(GET, routes.FileDetailsController.getStatus(conversationId).url)
 
       val result = route(application, request).value
       status(result) mustBe OK
-      contentAsJson(result).as[FileStatus] mustBe Rejected(FileError("Error Processing"))
+      contentAsJson(result).as[FileStatus] mustBe Rejected(validationErrors)
     }
   }
 }
