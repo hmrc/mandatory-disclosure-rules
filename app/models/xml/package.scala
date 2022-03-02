@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package models.submission
+package models
 
-import julienrf.json.derived
-import models.xml.ValidationErrors
-import play.api.libs.json.OFormat
+import com.lucidchart.open.xtract.XmlReader.strictReadSeq
+import com.lucidchart.open.xtract.{ParseFailure, ParseSuccess, XmlReader}
 
-sealed trait FileStatus
-
-case object Pending extends FileStatus
-case object Accepted extends FileStatus
-case class Rejected(error: ValidationErrors) extends FileStatus {
-  override def toString: String = "Rejected"
-}
-
-object FileStatus {
-  implicit val format: OFormat[FileStatus] = derived.oformat()
+package object xml {
+  implicit def strictReadOptionSeq[A](implicit reader: XmlReader[A]): XmlReader[Option[Seq[A]]] =
+    XmlReader { xml =>
+      strictReadSeq[A].read(xml) match {
+        case ParseSuccess(x) if x.nonEmpty => ParseSuccess(x)
+        case _                             => ParseFailure()
+      }
+    }.optional
 }

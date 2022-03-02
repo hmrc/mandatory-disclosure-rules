@@ -14,20 +14,9 @@
  * limitations under the License.
  */
 
-package models.submission
+package controllers.auth
 
-import julienrf.json.derived
-import models.xml.ValidationErrors
-import play.api.libs.json.OFormat
+import models.xml.BREResponse
+import play.api.mvc.{Request, WrappedRequest}
 
-sealed trait FileStatus
-
-case object Pending extends FileStatus
-case object Accepted extends FileStatus
-case class Rejected(error: ValidationErrors) extends FileStatus {
-  override def toString: String = "Rejected"
-}
-
-object FileStatus {
-  implicit val format: OFormat[FileStatus] = derived.oformat()
-}
+case class EISRequest[+A](request: Request[A], BREResponse: BREResponse) extends WrappedRequest[A](request)

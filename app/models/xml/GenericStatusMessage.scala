@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package models.submission
+package models.xml
 
-import julienrf.json.derived
-import models.xml.ValidationErrors
-import play.api.libs.json.OFormat
+import cats.implicits.catsSyntaxTuple2Semigroupal
+import com.lucidchart.open.xtract.XmlReader._
+import com.lucidchart.open.xtract.{__, XmlReader}
 
-sealed trait FileStatus
+case class GenericStatusMessage(validationErrors: ValidationErrors, status: ValidationStatus.Value)
 
-case object Pending extends FileStatus
-case object Accepted extends FileStatus
-case class Rejected(error: ValidationErrors) extends FileStatus {
-  override def toString: String = "Rejected"
-}
-
-object FileStatus {
-  implicit val format: OFormat[FileStatus] = derived.oformat()
+object GenericStatusMessage {
+  implicit val xmlReader: XmlReader[GenericStatusMessage] = (
+    (__ \ "ValidationErrors").read[ValidationErrors],
+    (__ \ "ValidationResult" \ "Status").read(enum(ValidationStatus))
+  ).mapN(apply)
 }

@@ -18,20 +18,24 @@ package controllers
 
 import base.SpecBase
 import controllers.auth.{FakeIdentifierAuthAction, IdentifierAuthAction}
-import models.submission.{Accepted, ConversationId, FileDetails, Pending}
+import generators.Generators
+import models.submission._
+import models.xml.ValidationErrors
 import org.mockito.ArgumentMatchers.any
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.Application
 import play.api.http.Status.{NOT_FOUND, OK}
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{defaultAwaitTimeout, route, status, writeableOf_AnyContentAsEmpty, GET}
+import play.api.test.Helpers.{contentAsJson, defaultAwaitTimeout, route, status, writeableOf_AnyContentAsEmpty, GET}
 import repositories.submission.FileDetailsRepository
 
 import java.time.LocalDateTime
 import scala.concurrent.Future
 
-class FileDetailsControllerSpec extends SpecBase with BeforeAndAfterEach {
+class FileDetailsControllerSpec extends SpecBase with BeforeAndAfterEach with Generators with ScalaCheckPropertyChecks {
 
   val mockFileDetailsRepository: FileDetailsRepository = mock[FileDetailsRepository]
 
@@ -49,6 +53,17 @@ class FileDetailsControllerSpec extends SpecBase with BeforeAndAfterEach {
   val submissionTime2 = LocalDateTime.now()
   val fileDetails2    = FileDetails(ConversationId(), "subscriptionId1", "messageRefId1", Accepted, "fileName2", submissionTime2, submissionTime2)
   val files           = Seq(fileDetails1, fileDetails2)
+
+  val conversationId = ConversationId()
+  val fileDetails = FileDetails(
+    conversationId,
+    subscriptionId = "subscriptionId",
+    messageRefId = "messageRefId",
+    status = Pending,
+    name = "test.xml",
+    submitted = LocalDateTime.now(),
+    lastUpdated = LocalDateTime.now()
+  )
 
   "FileDetailsController" - {
     "must return FileDetails for the input 'conversationId'" in {
@@ -121,5 +136,41 @@ class FileDetailsControllerSpec extends SpecBase with BeforeAndAfterEach {
 
     }
 
+    "must return Pending FileStatus for the given 'conversationId'" in {
+
+      when(mockFileDetailsRepository.findStatusByConversationId(any[ConversationId]())).thenReturn(Future.successful(Some(Pending)))
+
+      val request =
+        FakeRequest(GET, routes.FileDetailsController.getStatus(conversationId).url)
+
+      val result = route(application, request).value
+      status(result) mustBe OK
+      contentAsJson(result).as[FileStatus] mustBe Pending
+    }
+
+    "must return Accepted FileStatus for the given 'conversationId'" in {
+
+      when(mockFileDetailsRepository.findStatusByConversationId(any[ConversationId]())).thenReturn(Future.successful(Some(Accepted)))
+
+      val request =
+        FakeRequest(GET, routes.FileDetailsController.getStatus(conversationId).url)
+
+      val result = route(application, request).value
+      status(result) mustBe OK
+      contentAsJson(result).as[FileStatus] mustBe Accepted
+    }
+
+    "must return Rejected FileStatus for the given 'conversationId'" in {
+      val validationErrors = arbitrary[ValidationErrors].sample.value
+      when(mockFileDetailsRepository.findStatusByConversationId(any[ConversationId]()))
+        .thenReturn(Future.successful(Some(Rejected(validationErrors))))
+
+      val request =
+        FakeRequest(GET, routes.FileDetailsController.getStatus(conversationId).url)
+
+      val result = route(application, request).value
+      status(result) mustBe OK
+      contentAsJson(result).as[FileStatus] mustBe Rejected(validationErrors)
+    }
   }
 }

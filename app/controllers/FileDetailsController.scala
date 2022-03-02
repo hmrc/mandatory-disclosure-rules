@@ -35,7 +35,7 @@ class FileDetailsController @Inject() (
     extends BackendController(cc)
     with Logging {
 
-  def getFileDetails(conversationId: ConversationId): Action[AnyContent] = authenticate.async { implicit request =>
+  def getFileDetails(conversationId: ConversationId): Action[AnyContent] = authenticate.async { _ =>
     fileDetailsRepository.findByConversationId(conversationId) map {
       case Some(fileDetails) => Ok(Json.toJson(ResponseFileDetails.build(fileDetails)))
       case _ =>
@@ -51,4 +51,12 @@ class FileDetailsController @Inject() (
     }
   }
 
+  def getStatus(conversationId: ConversationId): Action[AnyContent] = authenticate.async { _ =>
+    fileDetailsRepository.findStatusByConversationId(conversationId) map {
+      case Some(status) => Ok(Json.toJson(status))
+      case _ =>
+        logger.info(s"No status found for the conversationId: $conversationId")
+        NotFound
+    }
+  }
 }

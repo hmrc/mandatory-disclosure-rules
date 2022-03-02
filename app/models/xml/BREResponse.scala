@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package models.submission
+package models.xml
 
-import julienrf.json.derived
-import models.xml.ValidationErrors
-import play.api.libs.json.OFormat
+import cats.implicits.catsSyntaxTuple3Semigroupal
+import com.lucidchart.open.xtract.{__, XmlReader}
 
-sealed trait FileStatus
+case class BREResponse(regime: String, conversationID: String, genericStatusMessage: GenericStatusMessage)
 
-case object Pending extends FileStatus
-case object Accepted extends FileStatus
-case class Rejected(error: ValidationErrors) extends FileStatus {
-  override def toString: String = "Rejected"
-}
+object BREResponse {
 
-object FileStatus {
-  implicit val format: OFormat[FileStatus] = derived.oformat()
+  implicit val xmlReader: XmlReader[BREResponse] = (
+    (__ \ "requestCommon" \ "regime").read[String],
+    (__ \ "requestCommon" \ "conversationID").read[String],
+    (__ \ "requestDetail" \ "GenericStatusMessage").read[GenericStatusMessage]
+  ).mapN(apply)
 }

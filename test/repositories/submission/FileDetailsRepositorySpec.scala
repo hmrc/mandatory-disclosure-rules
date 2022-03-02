@@ -18,6 +18,7 @@ package repositories.submission
 
 import base.SpecBase
 import models.submission._
+import models.xml.{FileErrorCode, FileErrors, ValidationErrors}
 import play.api.Configuration
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
@@ -29,41 +30,41 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
   override lazy val repository = new FileDetailsRepository(mongoComponent, config)
 
   val dateTimeNow: LocalDateTime = LocalDateTime.now()
-  val filedetails: FileDetails =
+  val fileDetails: FileDetails =
     FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Pending, "file1.xml", dateTimeNow, dateTimeNow)
 
   "Insert" - {
-    "must insert Filedetails" in {
-      val res = repository.insert(filedetails)
+    "must insert FileDetails" in {
+      val res = repository.insert(fileDetails)
       whenReady(res) { result =>
         result mustBe true
       }
     }
 
-    "must read Filedetails by SubscriptionId" in {
-      val insert = repository.insert(filedetails)
+    "must read FileDetails by SubscriptionId" in {
+      val insert = repository.insert(fileDetails)
       whenReady(insert) { result =>
         result mustBe true
       }
       val res = repository.findBySubscriptionId("subscriptionId")
       whenReady(res) { result =>
-        result mustBe Seq(filedetails)
+        result mustBe Seq(fileDetails)
       }
     }
 
-    "must read Filedetails by ConversationId" in {
-      val insert = repository.insert(filedetails)
+    "must read FileDetails by ConversationId" in {
+      val insert = repository.insert(fileDetails)
       whenReady(insert) { result =>
         result mustBe true
       }
       val res = repository.findByConversationId(ConversationId("conversationId123456"))
       whenReady(res) { result =>
-        result mustBe Some(filedetails)
+        result mustBe Some(fileDetails)
       }
     }
 
-    "must read Filedetails by ConversationId doesn't exists" in {
-      val insert = repository.insert(filedetails)
+    "must read FileDetails by ConversationId doesn't exists" in {
+      val insert = repository.insert(fileDetails)
       whenReady(insert) { result =>
         result mustBe true
       }
@@ -73,40 +74,52 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
       }
     }
 
-    "must update Filedetails status to Accepted by ConversationId" in {
-      val insert = repository.insert(filedetails)
+    "must update FileDetails status to Accepted by ConversationId" in {
+      val insert = repository.insert(fileDetails)
       whenReady(insert) { result =>
         result mustBe true
       }
       val res = repository.updateStatus("conversationId123456", Accepted)
       whenReady(res) { result =>
-        result mustBe true
-      }
-      val updatedResponse = repository.findByConversationId(ConversationId("conversationId123456"))
-
-      whenReady(updatedResponse) { result =>
         result must matchPattern {
           case Some(FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Accepted, "file1.xml", _, _)) =>
         }
       }
     }
 
-    "must update Filedetails status to Rejected by ConversationId" in {
-      val insert = repository.insert(filedetails)
+    "must update FileDetails status to Rejected by ConversationId" in {
+      val insert = repository.insert(fileDetails)
       whenReady(insert) { result =>
         result mustBe true
       }
-      val res = repository.updateStatus("conversationId123456", Rejected(FileError("error in file")))
+      val res = repository.updateStatus("conversationId123456",
+                                        Rejected(ValidationErrors(Some(Seq(FileErrors(FileErrorCode.FailedSchemaValidation, Some("details")))), None))
+      )
+
       whenReady(res) { result =>
-        result mustBe true
-      }
-      val updatedResponse = repository.findByConversationId(ConversationId("conversationId123456"))
-      whenReady(updatedResponse) { result =>
         result must matchPattern {
           case Some(
-                FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Rejected(FileError("error in file")), "file1.xml", _, _)
+                FileDetails(ConversationId("conversationId123456"),
+                            "subscriptionId",
+                            "messageRefId",
+                            Rejected(ValidationErrors(Some(Seq(FileErrors(FileErrorCode.FailedSchemaValidation, Some("details")))), None)),
+                            "file1.xml",
+                            _,
+                            _
+                )
               ) =>
         }
+      }
+    }
+
+    "must read FileStatus by ConversationId" in {
+      val insert = repository.insert(fileDetails)
+      whenReady(insert) { result =>
+        result mustBe true
+      }
+      val res = repository.findStatusByConversationId(ConversationId("conversationId123456"))
+      whenReady(res) { result =>
+        result mustBe Some(Pending)
       }
     }
 
