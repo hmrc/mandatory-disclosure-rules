@@ -23,7 +23,6 @@ class Module() extends AbstractModule {
 
   override def configure(): Unit = {
     bind(classOf[UploadProgressTracker]).to(classOf[MongoBackedUploadProgressTracker])
-    //  bind(classOf[SaxParser]).to(classOf[MDRSchemaValidatingParser])
     ()
   }
 }

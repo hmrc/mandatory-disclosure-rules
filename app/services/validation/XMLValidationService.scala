@@ -70,34 +70,3 @@ class XMLValidationService @Inject() () {
     if (list.isEmpty) Right(loadedXML) else Left(list)
   }
 }
-
-/*
-trait SaxParser {
-  def validatingParser: SAXParser
-}
-
-@Singleton
-class MDRSchemaValidatingParser @Inject() (appConfig: AppConfig) extends SaxParser {
-
-  val schemaLang: String                = javax.xml.XMLConstants.W3C_XML_SCHEMA_NS_URI
-  val isoXsdUrl: URL                    = getClass.getResource(appConfig.isotypes)
-  val mdrTypesUrl: URL                  = getClass.getResource(appConfig.mdrtypes)
-  val ukMDRXsdUrl: URL                  = getClass.getResource(appConfig.mdrschema)
-  val ukDCT06XsdUrl: URL                = getClass.getResource(appConfig.eisSchema)
-  val isoXsdStream: StreamSource        = new StreamSource(isoXsdUrl.openStream())
-  val ukMDRXsdStream: StreamSource      = new StreamSource(ukMDRXsdUrl.openStream())
-  val ukMDRTypesXsdStream: StreamSource = new StreamSource(mdrTypesUrl.openStream())
-  val ukDCT06XsdStream: StreamSource    = new StreamSource(ukDCT06XsdUrl.openStream())
-
-  //Order is significant as files containing parent name spaces should come last
-  val streams: Array[Source] = Array(isoXsdStream, ukMDRTypesXsdStream, ukMDRXsdStream, ukDCT06XsdStream)
-
-  val schema: Schema = SchemaFactory.newInstance(schemaLang).newSchema(streams)
-
-  val factory: SAXParserFactory = SAXParserFactory.newInstance()
-  factory.setNamespaceAware(true)
-  factory.setSchema(schema)
-
-  override def validatingParser: SAXParser = factory.newSAXParser()
-}
- */
