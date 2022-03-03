@@ -97,7 +97,7 @@
 	
 	<xs:complexType name="ValidationResult_Type">
 		<xs:sequence>
-			<xs:element name="Status" type="gsm:FileAcceptanceStatus_EnumType">
+			<xs:element name="Status" type="cadx:FileAcceptanceStatus_EnumType">
 				<xs:annotation>
 					<xs:documentation xml:lang="en">Indicate if the file was accepted or rejected by the receiver</xs:documentation>
 				</xs:annotation>

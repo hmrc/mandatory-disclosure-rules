@@ -17,6 +17,7 @@
 package controllers.actions
 
 import base.SpecBase
+import config.AppConfig
 import controllers.auth.UserRequest
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status.{BAD_REQUEST, OK}
@@ -25,6 +26,7 @@ import play.api.mvc._
 import play.api.test.Helpers.{defaultAwaitTimeout, status}
 import play.api.test.{FakeHeaders, FakeRequest}
 import play.twirl.api.HtmlFormat
+import services.validation.XMLValidationService
 
 import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -62,7 +64,10 @@ class EISResponsePreConditionCheckActionRefinerSpec extends SpecBase with Before
     </requestDetail>
   </BREResponse>
 
-  private lazy val action = new EISResponsePreConditionCheckActionRefiner()
+  val appConfig: AppConfig                    = app.injector.instanceOf[AppConfig]
+  val validationService: XMLValidationService = app.injector.instanceOf[XMLValidationService]
+
+  private lazy val action = new EISResponsePreConditionCheckActionRefiner(validationService, appConfig)
 
   private val response: Request[NodeSeq] => Future[Result] = { _ =>
     Future.successful(Ok(HtmlFormat.empty))
