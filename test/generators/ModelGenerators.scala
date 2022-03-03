@@ -17,23 +17,10 @@
 package generators
 
 import models.email.EmailRequest
-import models.subscription.{
-  ContactInformation,
-  ContactType,
-  DisplaySubscriptionDetails,
-  DisplaySubscriptionForMDRRequest,
-  IndividualDetails,
-  OrganisationDetails,
-  ReadSubscriptionRequestDetail,
-  RequestCommonForSubscription,
-  RequestCommonForUpdate,
-  RequestDetailForUpdate,
-  UpdateSubscriptionDetails,
-  UpdateSubscriptionForMDRRequest
-}
+import models.subscription._
 import models.xml.{FileErrorCode, FileErrors, RecordError, RecordErrorCode, ValidationErrors}
-import org.scalacheck.{Arbitrary, Gen}
 import org.scalacheck.Arbitrary.arbitrary
+import org.scalacheck.{Arbitrary, Gen}
 
 import java.time.LocalDate
 
