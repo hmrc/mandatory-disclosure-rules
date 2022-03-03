@@ -23,7 +23,9 @@ import models.xml.{BREResponse, ValidationStatus}
 import play.api.Logging
 import play.api.mvc.{Action, ControllerComponents}
 import repositories.submission.FileDetailsRepository
+import services.EmailService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import utils.DateTimeFormatUtil.dateFormatted
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
@@ -32,7 +34,8 @@ import scala.xml.NodeSeq
 class EISResponseController @Inject() (cc: ControllerComponents,
                                        authAction: AuthAction,
                                        actionRefiner: EISResponsePreConditionCheckActionRefiner,
-                                       fileDetailsRepository: FileDetailsRepository
+                                       fileDetailsRepository: FileDetailsRepository,
+                                       emailService: EmailService
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
@@ -48,7 +51,20 @@ class EISResponseController @Inject() (cc: ControllerComponents,
     val fileStatus     = convertToFileStatus(request.BREResponse)
 
     fileDetailsRepository.updateStatus(conversationId, fileStatus) map {
-      case Some(updatedFileDetails) => //TODO email service integration use updatedFileDetails to decide slow/fast journey
+      case Some(updatedFileDetails) =>
+        val fastJourney = updatedFileDetails.lastUpdated.isBefore(updatedFileDetails.submitted.plusSeconds(10))
+
+        (fastJourney, updatedFileDetails.status) match {
+          case (_, FileStatusAccepted) | (false, Rejected(_)) =>
+            emailService.sendAndLogEmail(
+              updatedFileDetails.subscriptionId,
+              dateFormatted(updatedFileDetails.submitted),
+              updatedFileDetails.messageRefId,
+              updatedFileDetails.status == FileStatusAccepted
+            )
+          case _ =>
+            logger.warn("Upload file status is rejected on fast journey. No email has been sent")
+        }
         Ok
       case _ =>
         logger.warn("Failed to update the status:mongo error")

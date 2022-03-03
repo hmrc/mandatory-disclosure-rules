@@ -18,29 +18,26 @@ package services
 
 import connectors.EmailConnector
 import models.email.{EmailRequest, EmailTemplate}
-import models.subscription.{ContactInformation, ContactType, IndividualDetails, OrganisationDetails}
+import models.error.ReadSubscriptionError
+import models.subscription.{ContactType, IndividualDetails, OrganisationDetails}
 import play.api.Logging
 import play.api.http.Status.{ACCEPTED, BAD_REQUEST, INTERNAL_SERVER_ERROR, NOT_FOUND}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import services.subscription.SubscriptionService
 import uk.gov.hmrc.emailaddress.EmailAddress
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class EmailService @Inject() (emailConnector: EmailConnector, emailTemplate: EmailTemplate)(implicit
+class EmailService @Inject() (emailConnector: EmailConnector, emailTemplate: EmailTemplate, subscriptionService: SubscriptionService)(implicit
   executionContext: ExecutionContext
 ) extends Logging {
 
-  def sendAndLogEmail(primaryContact: ContactInformation,
-                      secondaryContact: Option[ContactInformation],
-                      submissionTime: String,
-                      messageRefId: String,
-                      isUploadSuccessful: Boolean
-  )(implicit
+  def sendAndLogEmail(subscriptionId: String, submissionTime: String, messageRefId: String, isUploadSuccessful: Boolean)(implicit
     hc: HeaderCarrier
   ): Future[Int] =
-    sendEmail(primaryContact, secondaryContact, submissionTime, messageRefId, isUploadSuccessful) map {
+    sendEmail(subscriptionId, submissionTime, messageRefId, isUploadSuccessful) map {
       case Some(resp) =>
         resp.status match {
           case NOT_FOUND   => logger.warn("The template cannot be found within the email service")
@@ -60,42 +57,41 @@ class EmailService @Inject() (emailConnector: EmailConnector, emailTemplate: Ema
       case IndividualDetails(firstName, _, lastName) => s"$firstName $lastName"
     }
 
-  def sendEmail(primaryContact: ContactInformation,
-                secondaryContact: Option[ContactInformation],
-                submissionTime: String,
-                messageRefId: String,
-                isUploadSuccessful: Boolean
-  )(implicit
+  def sendEmail(subscriptionId: String, submissionTime: String, messageRefId: String, isUploadSuccessful: Boolean)(implicit
     hc: HeaderCarrier
-  ): Future[Option[HttpResponse]] = {
+  ): Future[Option[HttpResponse]] =
+    subscriptionService.getContactInformation(subscriptionId).flatMap {
+      case Right(responseDetail) =>
+        val emailAddress          = Some(responseDetail.primaryContact.email)
+        val contactName           = Some(getContactName(responseDetail.primaryContact.contactType))
+        val secondaryEmailAddress = responseDetail.secondaryContact.map(_.email)
+        val secondaryName         = responseDetail.secondaryContact.map(contactInfo => getContactName(contactInfo.contactType))
 
-    val emailAddress          = Some(primaryContact.email)
-    val contactName           = Some(getContactName(primaryContact.contactType))
-    val secondaryEmailAddress = secondaryContact.map(_.email)
-    val secondaryName         = secondaryContact.map(contactInfo => getContactName(contactInfo.contactType))
+        for {
 
-    for {
+          primaryResponse <- emailAddress
+            .filter(EmailAddress.isValid)
+            .fold(Future.successful(Option.empty[HttpResponse])) { email =>
+              emailConnector
+                .sendEmail(
+                  EmailRequest.fileUploadSubmission(email, contactName, emailTemplate.getTemplate(isUploadSuccessful), submissionTime, messageRefId)
+                )
+                .map(Some.apply)
+            }
 
-      primaryResponse <- emailAddress
-        .filter(EmailAddress.isValid)
-        .fold(Future.successful(Option.empty[HttpResponse])) { email =>
-          emailConnector
-            .sendEmail(
-              EmailRequest.fileUploadSubmission(email, contactName, emailTemplate.getTemplate(isUploadSuccessful), submissionTime, messageRefId)
-            )
-            .map(Some.apply)
-        }
-
-      _ <- secondaryEmailAddress
-        .filter(EmailAddress.isValid)
-        .fold(Future.successful(Option.empty[HttpResponse])) { secondaryEmailAddress =>
-          emailConnector
-            .sendEmail(
-              EmailRequest
-                .fileUploadSubmission(secondaryEmailAddress, secondaryName, emailTemplate.getTemplate(isUploadSuccessful), submissionTime, messageRefId)
-            )
-            .map(Some.apply)
-        }
-    } yield primaryResponse
-  }
+          _ <- secondaryEmailAddress
+            .filter(EmailAddress.isValid)
+            .fold(Future.successful(Option.empty[HttpResponse])) { secondaryEmailAddress =>
+              emailConnector
+                .sendEmail(
+                  EmailRequest
+                    .fileUploadSubmission(secondaryEmailAddress, secondaryName, emailTemplate.getTemplate(isUploadSuccessful), submissionTime, messageRefId)
+                )
+                .map(Some.apply)
+            }
+        } yield primaryResponse
+      case Left(ReadSubscriptionError(value)) =>
+        logger.warn(s"Failed to get contact information, received ReadSubscriptionError: $value")
+        Future.successful(None)
+    }
 }
