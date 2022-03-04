@@ -44,8 +44,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
 
   val application: Application = applicationBuilder()
     .overrides(
-      bind[FileDetailsRepository].toInstance(mockFileDetailsRepository),
-      bind[AuthAction].to[FakeAuthAction]
+      bind[FileDetailsRepository].toInstance(mockFileDetailsRepository)
     )
     .build()
 

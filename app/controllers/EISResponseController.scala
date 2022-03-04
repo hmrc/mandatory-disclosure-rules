@@ -30,7 +30,6 @@ import scala.concurrent.ExecutionContext
 import scala.xml.NodeSeq
 
 class EISResponseController @Inject() (cc: ControllerComponents,
-                                       authAction: AuthAction,
                                        actionRefiner: EISResponsePreConditionCheckActionRefiner,
                                        fileDetailsRepository: FileDetailsRepository
 )(implicit ec: ExecutionContext)
@@ -43,7 +42,7 @@ class EISResponseController @Inject() (cc: ControllerComponents,
       case ValidationStatus.rejected => Rejected(breResponse.genericStatusMessage.validationErrors)
     }
 
-  def processEISResponse(): Action[NodeSeq] = (authAction(parse.xml) andThen actionRefiner).async { implicit request =>
+  def processEISResponse(): Action[NodeSeq] = (Action(parse.xml) andThen actionRefiner).async { implicit request =>
     val conversationId = request.BREResponse.conversationID
     val fileStatus     = convertToFileStatus(request.BREResponse)
 
