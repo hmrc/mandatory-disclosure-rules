@@ -33,6 +33,12 @@ class XmlErrorMessageHelperSpec extends SpecBase {
 
     "generateErrorMessages" - {
 
+      "must return correct error for missing element declaration'" in {
+        val missingDeclaration = SaxParseError(lineNumber, "cvc-elt.1: Cannot find the declaration of element 'MDR_OECD'.")
+        val result             = helper.generateErrorMessages(ListBuffer(missingDeclaration))
+        result mustBe List(GenericError(lineNumber, Message("xml.must.have.element.declaration", List("MDR_OECD", "urn:oecd:ties:mdr:v1"))))
+      }
+
       "must return correct error for missing attribute error'" in {
         val missingAttributeError = SaxParseError(lineNumber, "cvc-complex-type.4: Attribute 'currCode' must appear on element 'Amount'.")
         val result                = helper.generateErrorMessages(ListBuffer(missingAttributeError))

@@ -34,7 +34,8 @@ class XmlErrorMessageHelper extends SaxParseErrorRegExConstants {
         val error1 = groupedErrors._2.head.errorMessage
         val error2 = groupedErrors._2.last.errorMessage
 
-        val error: Option[Message] = extractMissingElementValues(error1, error2)
+        val error: Option[Message] = extractMissingElementDeclaration(error1)
+          .orElse(extractMissingElementValues(error1, error2))
           .orElse(extractPercentageErrorTagValues(error1, error2))
           .orElse(extractEmptyTagValues(error1, error2))
           .orElse(extractTooLongFieldAttributeValues(error1, error2))
@@ -85,6 +86,16 @@ class XmlErrorMessageHelper extends SaxParseErrorRegExConstants {
         }
       case _ => None
     }
+
+  def extractMissingElementDeclaration(errorMessage1: String): Option[Message] = {
+    val declaration = "urn:oecd:ties:mdr:v1"
+
+    errorMessage1 match {
+      case missingDeclarationErrorFormat(element) =>
+        Some(Message("xml.must.have.element.declaration", Seq(element, declaration)))
+      case _ => None
+    }
+  }
 
   def extractMissingElementValues(errorMessage1: String, errorMessage2: String): Option[Message] =
     errorMessage1 match {
