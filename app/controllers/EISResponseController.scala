@@ -17,7 +17,6 @@
 package controllers
 
 import controllers.actions.EISResponsePreConditionCheckActionRefiner
-import controllers.auth.AuthAction
 import models.submission.{Accepted => FileStatusAccepted, FileStatus, Rejected}
 import models.xml.{BREResponse, ValidationStatus}
 import play.api.Logging
