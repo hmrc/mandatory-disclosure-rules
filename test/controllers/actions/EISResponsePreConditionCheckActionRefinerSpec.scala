@@ -17,7 +17,7 @@
 package controllers.actions
 
 import base.SpecBase
-import controllers.auth.UserRequest
+import config.AppConfig
 import org.scalatest.BeforeAndAfterEach
 import play.api.http.Status.{BAD_REQUEST, OK}
 import play.api.mvc.Results.Ok
@@ -25,6 +25,7 @@ import play.api.mvc._
 import play.api.test.Helpers.{defaultAwaitTimeout, status}
 import play.api.test.{FakeHeaders, FakeRequest}
 import play.twirl.api.HtmlFormat
+import services.validation.XMLValidationService
 
 import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -35,7 +36,7 @@ class EISResponsePreConditionCheckActionRefinerSpec extends SpecBase with Before
   val uuid: UUID           = UUID.randomUUID()
   val headers: FakeHeaders = FakeHeaders(Seq("x-conversation-id" -> uuid.toString))
 
-  val xml: NodeSeq = <BREResponse>
+  val acceptedXml: NodeSeq = <cadx:BREResponse xmlns:cadx="http://www.hmrc.gsi.gov.uk/mdr/cadx">
     <requestCommon>
       <receiptDate>2001-12-17T09:30:47Z</receiptDate>
       <regime>MDR</regime>
@@ -43,26 +44,38 @@ class EISResponsePreConditionCheckActionRefinerSpec extends SpecBase with Before
       <schemaVersion>1.0.0</schemaVersion>
     </requestCommon>
     <requestDetail>
-      <gsm:GenericStatusMessage>
-        <gsm:ValidationErrors>
-          <gsm:FileError>
-            <gsm:Code>50009</gsm:Code>
-            <gsm:Details Language="EN">Duplicate message ref ID</gsm:Details>
-          </gsm:FileError>
-          <gsm:RecordError>
-            <gsm:Code>80010</gsm:Code>
-            <gsm:Details Language="EN">A message can contain either new records (OECD1) or corrections/deletions (OECD2 and OECD3), but cannot contain a mixture of both</gsm:Details>
-            <gsm:DocRefIDInError>asjdhjjhjssjhdjshdAJGSJJS</gsm:DocRefIDInError>
-          </gsm:RecordError>
-        </gsm:ValidationErrors>
-        <gsm:ValidationResult>
-          <gsm:Status>Rejected</gsm:Status>
-        </gsm:ValidationResult>
-      </gsm:GenericStatusMessage>
+      <GenericStatusMessage>
+        <ValidationErrors>
+        </ValidationErrors>
+        <ValidationResult>
+          <Status>Accepted</Status>
+        </ValidationResult>
+      </GenericStatusMessage>
     </requestDetail>
-  </BREResponse>
+  </cadx:BREResponse>
 
-  private lazy val action = new EISResponsePreConditionCheckActionRefiner()
+  val rejectedXml: NodeSeq = <cadx:BREResponse xmlns:cadx="http://www.hmrc.gsi.gov.uk/mdr/cadx">
+    <requestCommon>
+      <receiptDate>2001-12-17T09:30:47Z</receiptDate>
+      <regime>MDR</regime>
+      <conversationID>{uuid}</conversationID>
+      <schemaVersion>1.0.0</schemaVersion>
+    </requestCommon>
+    <requestDetail>
+      <GenericStatusMessage>
+        <ValidationErrors>
+        </ValidationErrors>
+        <ValidationResult>
+          <Status>Accepted</Status>
+        </ValidationResult>
+      </GenericStatusMessage>
+    </requestDetail>
+  </cadx:BREResponse>
+
+  val appConfig: AppConfig                    = app.injector.instanceOf[AppConfig]
+  val validationService: XMLValidationService = app.injector.instanceOf[XMLValidationService]
+
+  private lazy val action = new EISResponsePreConditionCheckActionRefiner(validationService, appConfig)
 
   private val response: Request[NodeSeq] => Future[Result] = { _ =>
     Future.successful(Ok(HtmlFormat.empty))
@@ -70,17 +83,24 @@ class EISResponsePreConditionCheckActionRefinerSpec extends SpecBase with Before
 
   "EISResponsePreConditionCheckActionRefiner" - {
 
-    "must return Ok when 'x-conversation-id' matches with conversationId in the xml" in {
+    "must return Ok when 'x-conversation-id' matches with conversationId in the xml and validation status is 'Accepted'" in {
 
-      val request = UserRequest("", FakeRequest("", "").withHeaders(headers).withBody(xml))
+      val request = FakeRequest("", "").withHeaders(headers).withBody(acceptedXml)
 
       val testAction: Future[Result] = action.invokeBlock(request, response)
+      status(testAction) mustBe OK
+    }
 
+    "must return Ok when 'x-conversation-id' matches with conversationId in the xml and validation status is 'Rejected'" in {
+
+      val request = FakeRequest("", "").withHeaders(headers).withBody(rejectedXml)
+
+      val testAction: Future[Result] = action.invokeBlock(request, response)
       status(testAction) mustBe OK
     }
 
     "must return BadRequest when 'x-conversation-id' is missing in the request header" in {
-      val request                = UserRequest("", FakeRequest("", "").withHeaders(FakeHeaders(Seq.empty)).withBody(xml))
+      val request                = FakeRequest("", "").withHeaders(FakeHeaders(Seq.empty)).withBody(acceptedXml)
       val result: Future[Result] = action.invokeBlock(request, response)
 
       status(result) mustBe BAD_REQUEST
@@ -88,7 +108,7 @@ class EISResponsePreConditionCheckActionRefinerSpec extends SpecBase with Before
 
     "must return BadRequest when 'x-conversation-id' in the request header does not match the conversationId in the xml" in {
 
-      val request                = UserRequest("", FakeRequest("", "").withHeaders(FakeHeaders(Seq("x-conversation-id" -> "uuid"))).withBody(xml))
+      val request                = FakeRequest("", "").withHeaders(FakeHeaders(Seq("x-conversation-id" -> "uuid"))).withBody(acceptedXml)
       val result: Future[Result] = action.invokeBlock(request, response)
 
       status(result) mustBe BAD_REQUEST
@@ -96,7 +116,7 @@ class EISResponsePreConditionCheckActionRefinerSpec extends SpecBase with Before
 
     "must return BadRequest when the request xml is invalid xml" in {
       val invalidXml             = <test>data</test>
-      val request                = UserRequest("", FakeRequest("", "").withHeaders(FakeHeaders(Seq("x-conversation-id" -> uuid.toString))).withBody(invalidXml))
+      val request                = FakeRequest("", "").withHeaders(FakeHeaders(Seq("x-conversation-id" -> uuid.toString))).withBody(invalidXml)
       val result: Future[Result] = action.invokeBlock(request, response)
 
       status(result) mustBe BAD_REQUEST
@@ -107,7 +127,7 @@ class EISResponsePreConditionCheckActionRefinerSpec extends SpecBase with Before
       val response: Request[String] => Future[Result] = { _ =>
         Future.successful(Ok(HtmlFormat.empty))
       }
-      val request                = UserRequest("", FakeRequest("", "").withHeaders(headers).withBody("test"))
+      val request                = FakeRequest("", "").withHeaders(headers).withBody("test")
       val result: Future[Result] = action.invokeBlock(request, response)
       status(result) mustBe BAD_REQUEST
     }

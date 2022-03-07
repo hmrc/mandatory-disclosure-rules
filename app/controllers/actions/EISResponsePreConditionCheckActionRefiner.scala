@@ -17,18 +17,21 @@
 package controllers.actions
 
 import com.lucidchart.open.xtract.{ParseFailure, ParseSuccess, PartialParseSuccess, XmlReader}
+import config.AppConfig
 import controllers.auth.EISRequest
 import models.xml.BREResponse
 import play.api.Logging
 import play.api.mvc.Results.BadRequest
 import play.api.mvc.{ActionRefiner, Request, Result}
+import services.validation.XMLValidationService
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
 
-class EISResponsePreConditionCheckActionRefiner @Inject() (implicit val executionContext: ExecutionContext)
-    extends ActionRefiner[Request, EISRequest]
+class EISResponsePreConditionCheckActionRefiner @Inject() (validationService: XMLValidationService, appConfig: AppConfig)(implicit
+  val executionContext: ExecutionContext
+) extends ActionRefiner[Request, EISRequest]
     with Logging {
 
   override protected def refine[A](request: Request[A]): Future[Either[Result, EISRequest[A]]] =
@@ -36,7 +39,12 @@ class EISResponsePreConditionCheckActionRefiner @Inject() (implicit val executio
       case xml: NodeSeq =>
         request.headers.get("x-conversation-id") match {
           case Some(conversationId) =>
-            Future.successful(readXmlAsBREResponse(request, xml, conversationId))
+            validationService.validate(None, Some(xml), appConfig.eisResponseXSDFilePath) match {
+              case Right(xml) => Future.successful(readXmlAsBREResponse(request, xml, conversationId))
+              case Left(errors) =>
+                logger.warn(s"XML parsing failed with error: $errors")
+                Future.successful(Left(BadRequest))
+            }
           case None =>
             logger.warn(s"x-conversation-id is missing in the request header")
             Future.successful(Left(BadRequest("x-conversation-id is missing in the request header")))
