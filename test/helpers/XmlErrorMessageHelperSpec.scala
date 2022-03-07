@@ -93,13 +93,26 @@ class XmlErrorMessageHelperSpec extends SpecBase {
 
         val missingElementError1 =
           SaxParseError(lineNumber,
+                        "cvc-minLength-valid: Value '' with length = '0' is not facet-valid with respect to minLength '1' for type 'StringMin1Max200_Type'."
+          )
+
+        val missingElementError2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value '' of element 'TIN' is not valid.")
+
+        val result = helper.generateErrorMessages(ListBuffer(missingElementError1, missingElementError2))
+        result mustBe List(GenericError(lineNumber, Message("xml.add.a.element", List("TIN"))))
+      }
+
+      "must return correct error for missing optional element error when tags exist but are empty'" in {
+
+        val missingElementError1 =
+          SaxParseError(lineNumber,
                         "cvc-minLength-valid: Value '' with length = '0' is not facet-valid with respect to minLength '1' for type 'StringMin1Max400_Type'."
           )
 
         val missingElementError2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value '' of element 'Street' is not valid.")
 
         val result = helper.generateErrorMessages(ListBuffer(missingElementError1, missingElementError2))
-        result mustBe List(GenericError(lineNumber, Message("xml.add.a.element", List("Street"))))
+        result mustBe List(GenericError(lineNumber, Message("xml.optional.field.empty", List("Street"))))
       }
 
       "must return correct error for missing ConcernedMS'" in {

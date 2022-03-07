@@ -17,7 +17,6 @@
 package controllers
 
 import base.SpecBase
-import controllers.auth.{AuthAction, FakeAuthAction}
 import models.submission.{Accepted, ConversationId, FileDetails, FileStatus}
 import org.mockito.ArgumentMatchers.any
 import org.scalatest.BeforeAndAfterEach
