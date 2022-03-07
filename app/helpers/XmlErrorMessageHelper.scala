@@ -34,7 +34,8 @@ class XmlErrorMessageHelper {
         val error1 = groupedErrors._2.head.errorMessage
         val error2 = groupedErrors._2.last.errorMessage
 
-        val error: Option[Message] = extractMissingElementValues(error1, error2)
+        val error: Option[Message] = extractMissingElementDeclaration(error1)
+          .orElse(extractMissingElementValues(error1, error2))
           .orElse(extractPercentageErrorTagValues(error1, error2))
           .orElse(extractEmptyTagValues(error1, error2))
           .orElse(extractTooLongFieldAttributeValues(error1, error2))
@@ -101,6 +102,19 @@ class XmlErrorMessageHelper {
         }
       case _ => None
 
+    }
+  }
+
+  def extractMissingElementDeclaration(errorMessage1: String): Option[Message] = {
+
+    val declaration = "urn:oecd:ties:mdr:v1"
+    val formatOfFirstError =
+      """cvc-elt.1: Cannot find the declaration of element '(.*?)'.""".stripMargin.r
+
+    errorMessage1 match {
+      case formatOfFirstError(element) =>
+        Some(missingDeclarationMessage(element, declaration))
+      case _ => None
     }
   }
 
@@ -305,6 +319,9 @@ class XmlErrorMessageHelper {
       case _ => None
     }
   }
+
+  private def missingDeclarationMessage(elementName: String, declaration: String): Message =
+    Message("xml.must.have.element.declaration", Seq(elementName, declaration))
 
   private def missingInfoMessage(elementName: String): Message = {
     val vowels = "aeiouAEIOU"
