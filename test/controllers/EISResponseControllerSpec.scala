@@ -48,7 +48,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
     .build()
 
   private val randomUUID = UUID.randomUUID()
-  val xml: NodeSeq = <BREResponse>
+  val xml: NodeSeq = <cadx:BREResponse xmlns:cadx="http://www.hmrc.gsi.gov.uk/mdr/cadx">
     <requestCommon>
       <receiptDate>2001-12-17T09:30:47Z</receiptDate>
       <regime>MDR</regime>
@@ -56,24 +56,24 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
       <schemaVersion>1.0.0</schemaVersion>
     </requestCommon>
     <requestDetail>
-      <gsm:GenericStatusMessage>
-        <gsm:ValidationErrors>
-          <gsm:FileError>
-            <gsm:Code>50009</gsm:Code>
-            <gsm:Details Language="EN">Duplicate message ref ID</gsm:Details>
-          </gsm:FileError>
-          <gsm:RecordError>
-            <gsm:Code>80010</gsm:Code>
-            <gsm:Details Language="EN">A message can contain either new records (OECD1) or corrections/deletions (OECD2 and OECD3), but cannot contain a mixture of both</gsm:Details>
-            <gsm:DocRefIDInError>asjdhjjhjssjhdjshdAJGSJJS</gsm:DocRefIDInError>
-          </gsm:RecordError>
-        </gsm:ValidationErrors>
-        <gsm:ValidationResult>
-          <gsm:Status>Rejected</gsm:Status>
-        </gsm:ValidationResult>
-      </gsm:GenericStatusMessage>
+      <GenericStatusMessage>
+        <ValidationErrors>
+          <FileError>
+            <Code>50009</Code>
+            <Details Language="EN">Duplicate message ref ID</Details>
+          </FileError>
+          <RecordError>
+            <Code>80010</Code>
+            <Details Language="EN">A message can contain either new records (OECD1) or corrections/deletions (OECD2 and OECD3), but cannot contain a mixture of both</Details>
+            <DocRefIDInError>asjdhjjhjssjhdjshdAJGSJJS</DocRefIDInError>
+          </RecordError>
+        </ValidationErrors>
+        <ValidationResult>
+          <Status>Rejected</Status>
+        </ValidationResult>
+      </GenericStatusMessage>
     </requestDetail>
-  </BREResponse>
+  </cadx:BREResponse>
 
   "EISResponseController" - {
     "must return ok when input xml is valid" in {
@@ -81,7 +81,6 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
         FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Accepted, "file1.xml", LocalDateTime.now(), LocalDateTime.now())
 
       when(mockFileDetailsRepository.updateStatus(any[String](), any[FileStatus]())).thenReturn(Future.successful(Some(fileDetails)))
-
       val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
         .withHeaders("x-conversation-id" -> randomUUID.toString)
         .withXmlBody(xml)
