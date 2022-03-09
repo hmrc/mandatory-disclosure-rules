@@ -111,6 +111,18 @@ class SubmissionValidationEngineSpec extends SpecBase {
   val issuedByError2 =
     SaxParseError(18, "cvc-attribute.3: The value 'GBf' of attribute 'issuedBy' on element 'TIN' is not valid with respect to its type, 'CountryCode_Type'.")
 
+  val typeError1 = SaxParseError(
+    176,
+    "cvc-enumeration-valid: Value '' is not facet-valid with respect to enumeration '[MDR801, MDR802, MDR803, MDR804, MDR805, MDR806]'. It must be a value from the enumeration."
+  )
+
+  val typeError2 = SaxParseError(176, "cvc-type.3.1.3: The value '' of element 'Type' is not valid.")
+
+  val summaryError1 =
+    SaxParseError(258, "cvc-minLength-valid: Value '' with length = '0' is not facet-valid with respect to minLength '1' for type 'StringMin1Max4000_Type'.")
+
+  val summaryError2 = SaxParseError(258, "cvc-complex-type.2.2: Element 'Summary' must have no element [children], and the value must be valid.")
+
   val enrolmentId = "123456"
 
   trait SetUp {
@@ -141,10 +153,10 @@ class SubmissionValidationEngineSpec extends SpecBase {
     "must return ValidationFailure for file which multiple pieces of mandatory information missing" in new SetUp {
 
       when(mockXmlValidationService.validate(any[Option[String]](), any[Option[NodeSeq]](), any[String]()))
-        .thenReturn(Left(ListBuffer(addressError1, addressError2, cityError1, cityError2)))
+        .thenReturn(Left(ListBuffer(typeError1, typeError2, summaryError1, summaryError2)))
 
       val expectedErrors =
-        Seq(GenericError(20, Message("xml.add.a.element", List("Street"))), GenericError(27, Message("xml.add.a.element", List("City"))))
+        Seq(GenericError(176, Message("xml.add.a.element", List("Type"))), GenericError(258, Message("xml.add.a.element", List("Summary"))))
 
       Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
     }
