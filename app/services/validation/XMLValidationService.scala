@@ -46,8 +46,7 @@ class XMLValidationService @Inject() () {
 
     val list: ListBuffer[SaxParseError] = new ListBuffer[SaxParseError]
 
-    val url: URL = getClass.getResource(filePath)
-
+    val url: URL       = getClass.getResource(filePath)
     val schema: Schema = javax.xml.validation.SchemaFactory.newInstance(schemaLang).newSchema(url)
 
     trait AccumulatorState extends DefaultHandler {

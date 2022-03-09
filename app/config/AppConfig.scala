@@ -44,8 +44,8 @@ class AppConfig @Inject() (
   val enrolmentKey: String => String = (serviceName: String) => config.get[String](s"enrolmentKeys.$serviceName.key")
   val enrolmentId: String => String  = (serviceName: String) => config.get[String](s"enrolmentKeys.$serviceName.identifier")
 
-  val fileUploadXSDFilePath: String = config.get[String]("xsd-files.fileUpload_DCT06_XSDFile")
-  //TODO val submissionXSDFilePath = config.get[String]("")
+  val fileUploadXSDFilePath: String  = config.get[String]("xsd-files.fileUpload_MDR_XSDFile")
+  val submissionXSDFilePath: String  = config.get[String]("xsd-files.submission_DCT72a_XSDFile")
   val eisResponseXSDFilePath: String = config.get[String]("xsd-files.eisResponse_DCT72B_XSDFile")
 
 }
