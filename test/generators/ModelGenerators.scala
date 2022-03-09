@@ -16,6 +16,7 @@
 
 package generators
 
+import models.email.EmailRequest
 import models.subscription._
 import models.xml.{FileErrorCode, FileErrors, RecordError, RecordErrorCode, ValidationErrors}
 import org.scalacheck.Arbitrary.arbitrary
@@ -165,4 +166,12 @@ trait ModelGenerators {
       } yield ValidationErrors(fileErrors, recordErrors)
     }
 
+  implicit val arbitraryEmailRequest: Arbitrary[EmailRequest] = Arbitrary {
+    for {
+      to     <- arbitrary[List[String]]
+      id     <- arbitrary[String]
+      params <- arbitrary[Map[String, String]]
+
+    } yield EmailRequest(to, id, params)
+  }
 }

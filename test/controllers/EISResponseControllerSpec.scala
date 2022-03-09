@@ -17,15 +17,18 @@
 package controllers
 
 import base.SpecBase
-import models.submission.{Accepted, ConversationId, FileDetails, FileStatus}
+import models.submission._
+import models.xml.ValidationErrors
 import org.mockito.ArgumentMatchers.any
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
-import play.api.http.Status.{BAD_REQUEST, INTERNAL_SERVER_ERROR, OK}
+import play.api.http.Status.{ACCEPTED, BAD_REQUEST, INTERNAL_SERVER_ERROR, OK}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{defaultAwaitTimeout, route, running, status, writeableOf_AnyContentAsXml, POST}
 import repositories.submission.FileDetailsRepository
+import services.EmailService
+import uk.gov.hmrc.http.HeaderCarrier
 
 import java.time.LocalDateTime
 import java.util.UUID
@@ -35,15 +38,17 @@ import scala.xml.NodeSeq
 class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
 
   val mockFileDetailsRepository: FileDetailsRepository = mock[FileDetailsRepository]
+  val mockEmailService: EmailService                   = mock[EmailService]
 
   override def beforeEach(): Unit = {
-    reset(mockFileDetailsRepository)
+    reset(mockFileDetailsRepository, mockEmailService)
     super.beforeEach()
   }
 
   val application: Application = applicationBuilder()
     .overrides(
-      bind[FileDetailsRepository].toInstance(mockFileDetailsRepository)
+      bind[FileDetailsRepository].toInstance(mockFileDetailsRepository),
+      bind[EmailService].toInstance(mockEmailService)
     )
     .build()
 
@@ -80,7 +85,9 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
       val fileDetails =
         FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Accepted, "file1.xml", LocalDateTime.now(), LocalDateTime.now())
 
-      when(mockFileDetailsRepository.updateStatus(any[String](), any[FileStatus]())).thenReturn(Future.successful(Some(fileDetails)))
+      when(mockFileDetailsRepository.updateStatus(any[String], any[FileStatus])).thenReturn(Future.successful(Some(fileDetails)))
+      when(mockEmailService.sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(ACCEPTED))
 
       val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
         .withHeaders("x-conversation-id" -> randomUUID.toString)
@@ -92,6 +99,152 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
       verify(mockFileDetailsRepository, times(1)).updateStatus(any[String](), any[FileStatus]())
     }
 
+    "must send an email when on the fast journey and file upload is Accepted" in {
+      val fileDetails =
+        FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Accepted, "file1.xml", LocalDateTime.now(), LocalDateTime.now())
+
+      when(mockFileDetailsRepository.updateStatus(any[String], any[FileStatus])).thenReturn(Future.successful(Some(fileDetails)))
+      when(mockEmailService.sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(ACCEPTED))
+
+      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
+        .withHeaders("x-conversation-id" -> randomUUID.toString)
+        .withXmlBody(xml)
+
+      val result = route(application, request).value
+
+      status(result) mustEqual OK
+      verify(mockEmailService, times(1)).sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier])
+    }
+
+    "must not send an email when on the fast journey and file upload is Rejected" in {
+      val fileDetails =
+        FileDetails(
+          ConversationId("conversationId123456"),
+          "subscriptionId",
+          "messageRefId",
+          Rejected(ValidationErrors(None, None)),
+          "file1.xml",
+          LocalDateTime.now(),
+          LocalDateTime.now()
+        )
+
+      when(mockFileDetailsRepository.updateStatus(any[String], any[FileStatus])).thenReturn(Future.successful(Some(fileDetails)))
+      when(mockEmailService.sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(ACCEPTED))
+
+      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
+        .withHeaders("x-conversation-id" -> randomUUID.toString)
+        .withXmlBody(xml)
+
+      val result = route(application, request).value
+
+      status(result) mustEqual OK
+      verify(mockEmailService, times(0)).sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier])
+    }
+
+    "must not send an email when on the fast journey and file upload is Pending" in {
+      val fileDetails =
+        FileDetails(
+          ConversationId("conversationId123456"),
+          "subscriptionId",
+          "messageRefId",
+          Pending,
+          "file1.xml",
+          LocalDateTime.now(),
+          LocalDateTime.now()
+        )
+
+      when(mockFileDetailsRepository.updateStatus(any[String], any[FileStatus])).thenReturn(Future.successful(Some(fileDetails)))
+      when(mockEmailService.sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(ACCEPTED))
+
+      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
+        .withHeaders("x-conversation-id" -> randomUUID.toString)
+        .withXmlBody(xml)
+
+      val result = route(application, request).value
+
+      status(result) mustEqual OK
+      verify(mockEmailService, times(0)).sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier])
+    }
+
+    "must send an email when on the slow journey and file upload is Accepted" in {
+      val fileDetails =
+        FileDetails(ConversationId("conversationId123456"),
+                    "subscriptionId",
+                    "messageRefId",
+                    Accepted,
+                    "file1.xml",
+                    LocalDateTime.now().minusSeconds(20),
+                    LocalDateTime.now()
+        )
+
+      when(mockFileDetailsRepository.updateStatus(any[String], any[FileStatus])).thenReturn(Future.successful(Some(fileDetails)))
+      when(mockEmailService.sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(ACCEPTED))
+
+      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
+        .withHeaders("x-conversation-id" -> randomUUID.toString)
+        .withXmlBody(xml)
+
+      val result = route(application, request).value
+
+      status(result) mustEqual OK
+      verify(mockEmailService, times(1)).sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier])
+    }
+
+    "must send an email when on the slow journey and file upload is Rejected" in {
+      val fileDetails =
+        FileDetails(
+          ConversationId("conversationId123456"),
+          "subscriptionId",
+          "messageRefId",
+          Rejected(ValidationErrors(None, None)),
+          "file1.xml",
+          LocalDateTime.now().minusSeconds(20),
+          LocalDateTime.now()
+        )
+
+      when(mockFileDetailsRepository.updateStatus(any[String], any[FileStatus])).thenReturn(Future.successful(Some(fileDetails)))
+      when(mockEmailService.sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(ACCEPTED))
+
+      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
+        .withHeaders("x-conversation-id" -> randomUUID.toString)
+        .withXmlBody(xml)
+
+      val result = route(application, request).value
+
+      status(result) mustEqual OK
+      verify(mockEmailService, times(1)).sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier])
+    }
+
+    "must not send an email when on the slow journey and file upload is Pending" in {
+      val fileDetails =
+        FileDetails(
+          ConversationId("conversationId123456"),
+          "subscriptionId",
+          "messageRefId",
+          Pending,
+          "file1.xml",
+          LocalDateTime.now().minusSeconds(20),
+          LocalDateTime.now()
+        )
+
+      when(mockFileDetailsRepository.updateStatus(any[String], any[FileStatus])).thenReturn(Future.successful(Some(fileDetails)))
+      when(mockEmailService.sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(ACCEPTED))
+
+      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
+        .withHeaders("x-conversation-id" -> randomUUID.toString)
+        .withXmlBody(xml)
+
+      val result = route(application, request).value
+
+      status(result) mustEqual OK
+      verify(mockEmailService, times(0)).sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier])
+    }
     "must return BadRequest when input xml is invalid" in {
 
       val invalidXml = <test>invalid</test>
@@ -106,7 +259,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
       verify(mockFileDetailsRepository, never).updateStatus(any[String](), any[FileStatus]())
     }
 
-    "must return InternalServerError on filing to update the status" in {
+    "must return InternalServerError on failing to update the status" in {
 
       when(mockFileDetailsRepository.updateStatus(any[String](), any[FileStatus]())).thenReturn(Future.successful(None))
 

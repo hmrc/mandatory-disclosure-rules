@@ -33,7 +33,7 @@ trait WireMockServerHandler extends BeforeAndAfterAll with BeforeAndAfterEach {
   }
 
   override def beforeEach(): Unit = {
-    server.resetAll()
+    server.resetToDefaultMappings()
     super.beforeEach()
   }
 

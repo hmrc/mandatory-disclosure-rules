@@ -44,7 +44,8 @@ trait SaxParseErrorRegExConstants {
 
   final val genericInvalidErrorFormat = """cvc-datatype-valid.1.2.1: '((?s).*)' is not a valid value for '(.*?)'.""".stripMargin.r
 
-  final val genericInvalidSecondErrorFormat = """cvc-complex-type.2.2: Element '(.*?)' must have no element children, and the value must be valid.""".stripMargin.r
+  final val genericInvalidSecondErrorFormat =
+    """cvc-complex-type.2.2: Element '(.*?)' must have no element children, and the value must be valid.""".stripMargin.r
 
   final val outOfRangeErrorFormat =
     """cvc-maxInclusive-valid: Value '((?s).*)' is not facet-valid with respect to maxInclusive '(.*?)' for type '(.*?)'.""".stripMargin.r
