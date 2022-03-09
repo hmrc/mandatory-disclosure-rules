@@ -22,7 +22,7 @@ import java.time.format.{DateTimeFormatter, DateTimeParseException}
 import scala.collection.mutable.ListBuffer
 import scala.util.{Failure, Try}
 
-class XmlErrorMessageHelper {
+class XmlErrorMessageHelper extends SaxParseErrorRegExConstants {
 
   val defaultMessage = "xml.defaultMessage"
 
@@ -34,7 +34,8 @@ class XmlErrorMessageHelper {
         val error1 = groupedErrors._2.head.errorMessage
         val error2 = groupedErrors._2.last.errorMessage
 
-        val error: Option[Message] = extractMissingElementValues(error1, error2)
+        val error: Option[Message] = extractMissingElementDeclaration(error1)
+          .orElse(extractMissingElementValues(error1, error2))
           .orElse(extractPercentageErrorTagValues(error1, error2))
           .orElse(extractEmptyTagValues(error1, error2))
           .orElse(extractTooLongFieldAttributeValues(error1, error2))
@@ -51,138 +52,101 @@ class XmlErrorMessageHelper {
         GenericError(groupedErrors._1, error.getOrElse(Message(defaultMessage)))
       } else GenericError(groupedErrors._1, Message(defaultMessage))
     }.toList
-
   }
 
-  def extractMissingAttributeValues(errorMessage: String): Option[Message] = {
-    val format = """cvc-complex-type.4: Attribute '(.*?)' must appear on element '(.*?)'.""".stripMargin.r
-
+  def extractMissingAttributeValues(errorMessage: String): Option[Message] =
     errorMessage match {
-      case format(attribute, element) =>
+      case missingAttributeErrorFormat(attribute, element) =>
         Some(missingInfoMessage(element + " " + attribute))
       case _ => None
     }
-  }
 
-  def extractTooLongFieldAttributeValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
-    val formatOfFirstError =
-      """cvc-maxLength-valid: Value '((?s).*)' with length = '(.*?)' is not facet-valid with respect to maxLength '(.*?)' for type '(.*?)'.""".stripMargin.r
-    val formatOfSecondError =
-      """cvc-attribute.3: The value '((?s).*)' of attribute '(.*?)' on element '(.*?)' is not valid with respect to its type, '(.*?)'.""".stripMargin.r
-
+  def extractTooLongFieldAttributeValues(errorMessage1: String, errorMessage2: String): Option[Message] =
     errorMessage1 match {
-      case formatOfFirstError(_, _, maxLength, _) =>
+      case fieldTooLongErrorFormat(_, _, maxLength, _) =>
         errorMessage2 match {
-          case formatOfSecondError(_, "INType", _, _) =>
+          case invalidTypeErrorFormat(_, "INType", _, _) =>
             Some(Message("xml.not.allowed.length", Seq("INType", maxLength)))
-          case formatOfSecondError(_, attribute, element, _) =>
+          case invalidTypeErrorFormat(_, attribute, element, _) =>
             Some(Message("xml.not.allowed.length", Seq(element + " " + attribute, maxLength)))
           case _ => None
         }
       case _ => None
-
     }
-  }
 
-  def extractInvalidEnumAttributeValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
-    val formatOfFirstError =
-      """cvc-enumeration-valid: Value '((?s).*)' is not facet-valid with respect to enumeration '(.*?)'. It must be a value from the enumeration.""".stripMargin.r
-    val formatOfSecondError =
-      """cvc-attribute.3: The value '((?s).*)' of attribute '(.*?)' on element '(.*?)' is not valid with respect to its type, '(.*?)'.""".stripMargin.r
-
+  def extractInvalidEnumAttributeValues(errorMessage1: String, errorMessage2: String): Option[Message] =
     errorMessage1 match {
-      case formatOfFirstError(_, _) =>
+      case invalidEnumErrorFormat(_, _) =>
         errorMessage2 match {
-          case formatOfSecondError("", attribute, _, _) =>
+          case invalidTypeErrorFormat("", attribute, _, _) =>
             Some(Message("xml.optional.field.empty", Seq(attribute)))
-          case formatOfSecondError(_, attribute, element, _) =>
+          case invalidTypeErrorFormat(_, attribute, element, _) =>
             invalidCodeMessage(element + " " + attribute)
           case _ => None
         }
       case _ => None
+    }
 
+  def extractMissingElementDeclaration(errorMessage1: String): Option[Message] = {
+    val declaration = "urn:oecd:ties:mdr:v1"
+
+    errorMessage1 match {
+      case missingDeclarationErrorFormat(element) =>
+        Some(Message("xml.must.have.element.declaration", Seq(element, declaration)))
+      case _ => None
     }
   }
 
-  def extractMissingElementValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
-
-    val formattedError = errorMessage2.replaceAll("\\[", "").replaceAll("\\]", "")
-    val formatOfFirstError =
-      """cvc-minLength-valid: Value '' with length = '0' is not facet-valid with respect to minLength '1' for type '(.*?)'.""".stripMargin.r
-    val formatOfSecondError            = """cvc-type.3.1.3: The value '' of element '(.*?)' is not valid.""".stripMargin.r
-    val formatOfAlternativeSecondError = """cvc-complex-type.2.2: Element '(.*?)' must have no element children, and the value must be valid.""".stripMargin.r
-
+  def extractMissingElementValues(errorMessage1: String, errorMessage2: String): Option[Message] =
     errorMessage1 match {
-      case formatOfFirstError(_) =>
-        formattedError match {
-          case formatOfSecondError(element) =>
+      case emptyTagErrorFormat(_, _) =>
+        formattedError(errorMessage2) match {
+          case missingOrInvalidErrorFormat("", element) =>
             Some(missingInfoMessage(element))
-          case formatOfAlternativeSecondError(element) =>
+          case genericInvalidSecondErrorFormat(element) =>
             Some(missingInfoMessage(element))
           case _ => None
         }
       case _ => None
     }
-  }
 
-  def extractPercentageErrorTagValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
-
-    val formattedError = errorMessage2.replaceAll("\\[", "").replaceAll("\\]", "")
-    val formatOfFirstError =
-      """cvc-maxInclusive-valid: Value '((?s).*)' is not facet-valid with respect to maxInclusive '(.*?)' for type '(.*?)'.""".stripMargin.r
-    val formatOfAlternativeFirstError = """cvc-datatype-valid.1.2.1: '((?s).*)' is not a valid value for 'integer'.""".stripMargin.r
-
-    val formatOfSecondError = """cvc-type.3.1.3: The value '((?s).*)' of element '(.*?)' is not valid.""".stripMargin.r
-
+  def extractPercentageErrorTagValues(errorMessage1: String, errorMessage2: String): Option[Message] =
     errorMessage1 match {
-      case formatOfFirstError(_, _, _) | formatOfAlternativeFirstError(_) =>
-        formattedError match {
-          case formatOfSecondError(_, element) =>
+      case outOfRangeErrorFormat(_, _, _) | genericInvalidErrorFormat(_, "integer") =>
+        formattedError(errorMessage2) match {
+          case missingOrInvalidErrorFormat("", "Ownership") =>
+            Some(Message("xml.optional.field.empty", Seq("Ownership")))
+          case missingOrInvalidErrorFormat(_, element) =>
             Some(Message("xml.not.valid.percentage", Seq(element)))
           case _ => None
         }
       case _ => None
     }
-  }
 
-  def extractEmptyTagValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
-
-    val formattedError = errorMessage2.replaceAll("\\[", "").replaceAll("\\]", "")
-    val formatOfFirstError =
-      """cvc-minLength-valid: Value '' with length = '0' is not facet-valid with respect to minLength '(.*?)' for type '(.*?)'.""".stripMargin.r
-    val formatOfSecondError = """cvc-type.3.1.3: The value '' of element '(.*?)' is not valid.""".stripMargin.r
-
+  def extractEmptyTagValues(errorMessage1: String, errorMessage2: String): Option[Message] =
     errorMessage1 match {
-      case formatOfFirstError(_, _) =>
-        formattedError match {
-          case formatOfSecondError(element) =>
+      case emptyTagErrorFormat(_, _) =>
+        formattedError(errorMessage2) match {
+          case missingOrInvalidErrorFormat("", element) =>
             Some(missingInfoMessage(element))
           case _ => None
         }
       case _ => None
     }
-  }
 
   def extractMaxLengthErrorValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
-    val formattedError = errorMessage2.replaceAll("\\[", "").replaceAll("\\]", "")
-    val formatOfFirstError =
-      """cvc-maxLength-valid: Value '((?s).*)' with length = '(.*?)' is not facet-valid with respect to maxLength '(.*?)' for type '(.*?)'.""".stripMargin.r
-    val formatOfSecondError = """cvc-type.3.1.3: The value '((?s).*)' of element '(.*?)' is not valid.""".stripMargin.r
-
-    val formatOfAlternativeSecondError = """cvc-complex-type.2.2: Element '(.*?)' must have no element children, and the value must be valid.""".stripMargin.r
-
     val numberFormatter = java.text.NumberFormat.getIntegerInstance
 
     errorMessage1 match {
-      case formatOfFirstError(_, _, allowedLength, _) =>
-        formattedError match {
-          case formatOfSecondError(_, "MessageRefId") =>
+      case fieldTooLongErrorFormat(_, _, allowedLength, _) =>
+        formattedError(errorMessage2) match {
+          case missingOrInvalidErrorFormat(_, "MessageRefId") =>
             Some(Message("xml.not.allowed.length", Seq("MessageRefId", "85")))
-          case formatOfSecondError(_, "DocRefId") =>
+          case missingOrInvalidErrorFormat(_, "DocRefId") =>
             Some(Message("xml.not.allowed.length", Seq("DocRefId", "100")))
-          case formatOfSecondError(_, element) =>
+          case missingOrInvalidErrorFormat(_, element) =>
             Some(Message("xml.not.allowed.length", Seq(element, numberFormatter.format(allowedLength.toInt))))
-          case formatOfAlternativeSecondError(element) =>
+          case genericInvalidSecondErrorFormat(element) =>
             if (List("Narrative", "Summary", "OtherInfo").contains(element)) {
               Some(Message("xml.not.allowed.length.repeatable", Seq(element, numberFormatter.format(allowedLength.toInt))))
             } else {
@@ -194,26 +158,20 @@ class XmlErrorMessageHelper {
     }
   }
 
-  def extractEnumErrorValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
-    val formattedError = errorMessage1.replaceAll("\\[", "(").replaceAll("\\]", ")")
-
-    val formatOfFirstError =
-      """cvc-enumeration-valid: Value '((?s).*)' is not facet-valid with respect to enumeration '(.*?)'. It must be a value from the enumeration.""".stripMargin.r
-    val formatOfSecondError = """cvc-type.3.1.3: The value '((?s).*)' of element '(.*?)' is not valid.""".stripMargin.r
-
-    formattedError match {
-      case formatOfFirstError(suppliedValue, "(MDR)") =>
+  def extractEnumErrorValues(errorMessage1: String, errorMessage2: String): Option[Message] =
+    formattedError(errorMessage1) match {
+      case invalidEnumErrorFormat(suppliedValue, "MDR") =>
         errorMessage2 match {
-          case formatOfSecondError(_, element) =>
+          case missingOrInvalidErrorFormat(_, element) =>
             if (suppliedValue == "") {
               Some(Message("xml.add.line.messageType", Seq(element)))
             } else {
               Some(Message("xml.add.mdr"))
             }
         }
-      case formatOfFirstError(suppliedValue, allowedValues) =>
+      case invalidEnumErrorFormat(suppliedValue, allowedValues) =>
         errorMessage2 match {
-          case formatOfSecondError(_, element) =>
+          case missingOrInvalidErrorFormat(_, element) =>
             if (suppliedValue.isEmpty) {
               Some(missingInfoMessage(element))
             } else invalidCodeMessage(element, Some(allowedValues))
@@ -221,31 +179,26 @@ class XmlErrorMessageHelper {
         }
       case _ => None
     }
-  }
 
-  def extractInvalidIntegerErrorValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
-    val formatOfFirstError  = """cvc-datatype-valid.1.2.1: '((?s).*)' is not a valid value for 'integer'.""".stripMargin.r
-    val formatOfSecondError = """cvc-complex-type.2.2: Element '(.*?)' must have no element (.*?), and the value must be valid.""".stripMargin.r
-
+  def extractInvalidIntegerErrorValues(errorMessage1: String, errorMessage2: String): Option[Message] =
     errorMessage1 match {
-      case formatOfFirstError(_) =>
-        errorMessage2 match {
-          case formatOfSecondError(element, _) =>
+      case genericInvalidErrorFormat(value, "integer") =>
+        formattedError(errorMessage2) match {
+          case genericInvalidSecondErrorFormat("InvestAmount") if value == "" =>
+            Some(Message("xml.optional.field.empty", Seq("InvestAmount")))
+          case genericInvalidSecondErrorFormat(element) =>
             Some(Message("xml.must.be.whole.number", Seq(element)))
           case _ => None
         }
       case _ => None
     }
-  }
 
-  def extractInvalidDateErrorValues(errorMessage1: String, errorMessage2: String): Option[Message] = {
-    val formatOfFirstError  = """cvc-datatype-valid.1.2.1: '((?s).*)' is not a valid value for '(.*?)'.""".stripMargin.r
-    val formatOfSecondError = """cvc-type.3.1.3: The value '((?s).*)' of element '(.*?)' is not valid.""".stripMargin.r
-
+  def extractInvalidDateErrorValues(errorMessage1: String, errorMessage2: String): Option[Message] =
     errorMessage1 match {
-      case formatOfFirstError(dateStr, attribute) if attribute == "date" || attribute == "dateTime" =>
+      case genericInvalidErrorFormat(dateStr, attribute) if attribute == "date" || attribute == "dateTime" =>
         errorMessage2 match {
-          case formatOfSecondError(_, element) =>
+          case missingOrInvalidErrorFormat("", "BirthDate") => Some(Message("xml.optional.field.empty", Seq("BirthDate")))
+          case missingOrInvalidErrorFormat(_, element) =>
             Try {
               DateTimeFormatter.ISO_DATE.parse(dateStr)
             } match {
@@ -260,60 +213,51 @@ class XmlErrorMessageHelper {
         }
       case _ => None
     }
-  }
 
   def extractMissingTagValues(errorMessage: String): Option[Message] = {
-
     val formattedError = errorMessage.replaceAll("[{}]", "")
-    val format =
-      """cvc-complex-type.2.4.a: Invalid content was found starting with element '(.*?)'. One of '"urn:oecd:ties:mdr:v1":(.*?)' is expected.""".stripMargin.r
 
     formattedError match {
-      case format(_, element) if element.contains(":") =>
+      case missingTagErrorFormat(_, element) if element.contains(":") =>
         val formattedElement = element.replaceAll("""(.*?), "urn:oecd:ties:mdr:v1":""", "")
         getErrorMessageForMissingTags(formattedElement)
-      case format(_, element) =>
+      case missingTagErrorFormat(_, element) =>
         getErrorMessageForMissingTags(element)
       case _ => None
     }
   }
 
   def extractEmptyTagValues(errorMessage: String): Option[Message] = {
-
     val formattedError = errorMessage.replaceAll("[{}]", "")
-    val format =
-      """cvc-complex-type.2.4.b: The content of element '(.*?)' is not complete. One of '"urn:oecd:ties:mdr:v1":(.*?)' is expected.""".stripMargin.r
 
     formattedError match {
-      case format(parent, element) if parent == "Arrangement" | parent == "ID" =>
+      case emptySubTagErrorFormat(parent, element) if parent == "Arrangement" | parent == "ID" =>
         val formattedElement = element.replaceAll(", \"urn:oecd:ties:mdr:v1\":", " or ")
         Some(Message("xml.empty.tag", Seq(parent, formattedElement)))
-      case format(parent, element) =>
+      case emptySubTagErrorFormat(parent, element) =>
         val formattedElement = element.replaceAll("(.*?):", "")
         Some(Message("xml.empty.tag", Seq(parent, formattedElement)))
       case _ => None
     }
   }
 
-  def extractUnorderedTagValues(errorMessage: String): Option[Message] = {
-    val format =
-      """cvc-complex-type.2.4.d: Invalid content was found starting with element '(.*?)'. No child element is expected at this point.""".stripMargin.r
-
+  def extractUnorderedTagValues(errorMessage: String): Option[Message] =
     errorMessage match {
-      case format("AddressFix") =>
+      case unorderedTagErrorFormat("AddressFix") =>
         Some(Message("xml.addressFix.error"))
       case _ => None
     }
-  }
 
   private def missingInfoMessage(elementName: String): Message = {
     val vowels = "aeiouAEIOU"
-    if (vowels.contains(elementName.head) || elementName.toLowerCase.startsWith("mdr")) {
-      Message("xml.add.an.element", Seq(elementName))
-    } else if (elementName.contains("Jurisdictions")) {
-      Message("xml.add.one.or.more.elements", Seq(elementName))
-    } else {
-      Message("xml.add.a.element", Seq(elementName))
+    elementName match {
+      case "Jurisdictions" => Message("xml.add.one.or.more.elements", Seq(elementName))
+      case "CorrDocRefId" | "Reason" | "OtherInfo" | "PrecedingTitle" | "Title" | "MiddleName" | "NamePrefix" | "GenerationIdentifier" | "Suffix" |
+          "GeneralSuffix" | "AddressFree" | "Street" | "BuildingIdentifier" | "SuiteIdentifier" | "FloorIdentifier" | "DistrictName" | "POB" | "PostCode" |
+          "CountrySubentity" =>
+        Message("xml.optional.field.empty", Seq(elementName))
+      case _ if vowels.contains(elementName.head) || elementName.toLowerCase.startsWith("mdr") => Message("xml.add.an.element", Seq(elementName))
+      case _                                                                                   => Message("xml.add.a.element", Seq(elementName))
     }
   }
 
@@ -341,6 +285,8 @@ class XmlErrorMessageHelper {
         Some(missingInfoMessage(element))
       case "Disclosing" => Some(Message("xml.add.element", Seq(element)))
       case _            => Some(Message("xml.add.line", Seq(element)))
-
     }
+
+  private def formattedError(errorMessage: String): String =
+    errorMessage.replaceAll("\\[", "").replaceAll("\\]", "")
 }

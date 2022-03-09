@@ -17,8 +17,7 @@
 package controllers
 
 import base.SpecBase
-import controllers.auth.{AuthAction, FakeAuthAction}
-import models.submission.{Accepted, ConversationId, FileDetails, FileStatus, Pending, Rejected}
+import models.submission._
 import models.xml.ValidationErrors
 import org.mockito.ArgumentMatchers.any
 import org.scalatest.BeforeAndAfterEach
@@ -49,8 +48,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
   val application: Application = applicationBuilder()
     .overrides(
       bind[FileDetailsRepository].toInstance(mockFileDetailsRepository),
-      bind[EmailService].toInstance(mockEmailService),
-      bind[AuthAction].to[FakeAuthAction]
+      bind[EmailService].toInstance(mockEmailService)
     )
     .build()
 
