@@ -42,7 +42,7 @@ class XMLValidationService @Inject() () {
     factory.newSAXParser()
   }
 
-  def validate(upScanUrl: Option[String] = None, xml: Option[NodeSeq] = None, filePath: String): Either[ListBuffer[SaxParseError], Elem] = {
+  def validate(upScanUrl: String, xml: Option[NodeSeq] = None, filePath: String): Either[ListBuffer[SaxParseError], Elem] = {
 
     val list: ListBuffer[SaxParseError] = new ListBuffer[SaxParseError]
 
@@ -63,7 +63,7 @@ class XMLValidationService @Inject() () {
     val loadedXML = if (xml.isDefined) {
       loader.load(new StringReader(xml.mkString))
     } else {
-      loader.load(new URL(upScanUrl.get))
+      loader.load(new URL(upScanUrl))
     }
 
     if (list.isEmpty) Right(loadedXML) else Left(list)

@@ -35,7 +35,7 @@ class SubmissionValidationEngine @Inject() (xmlValidationService: XMLValidationS
                                             appConfig: AppConfig
 ) extends Logging {
 
-  def validateUploadSubmission(upScanUrl: Option[String]): Future[SubmissionValidationResult] =
+  def validateUploadSubmission(upScanUrl: String): Future[SubmissionValidationResult] =
     try performXmlValidation(upScanUrl) match {
       case Right(messageSpecData) =>
         messageSpecData match {
@@ -54,7 +54,7 @@ class SubmissionValidationEngine @Inject() (xmlValidationService: XMLValidationS
         Future.successful(InvalidXmlError(e.getMessage))
     }
 
-  def performXmlValidation(upScanUrl: Option[String]): Either[List[GenericError], Option[MessageSpecData]] = {
+  def performXmlValidation(upScanUrl: String): Either[List[GenericError], Option[MessageSpecData]] = {
     val xmlOrErrors: Either[ListBuffer[SaxParseError], Elem] = xmlValidationService.validate(upScanUrl, None, appConfig.fileUploadXSDFilePath)
     xmlOrErrors match {
       case Right(xml) => Right(dataExtraction.messageSpecData(xml))

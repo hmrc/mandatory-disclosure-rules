@@ -144,102 +144,102 @@ class SubmissionValidationEngineSpec extends SpecBase {
 
     "must return UploadSubmissionValidationSuccess when xml with no errors received" in new SetUp {
 
-      when(mockXmlValidationService.validate(any[Option[String]](), any[Option[NodeSeq]](), any[String]())).thenReturn(Right(elem))
+      when(mockXmlValidationService.validate(any[String](), any[Option[NodeSeq]](), any[String]())).thenReturn(Right(elem))
       when(mockDataExtraction.messageSpecData(any[Elem])).thenReturn(Some(messageSpecData))
 
-      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationSuccess(messageSpecData)
+      Await.result(validationEngine.validateUploadSubmission(source), 10.seconds) mustBe SubmissionValidationSuccess(messageSpecData)
     }
 
     "must return ValidationFailure for file which multiple pieces of mandatory information missing" in new SetUp {
 
-      when(mockXmlValidationService.validate(any[Option[String]](), any[Option[NodeSeq]](), any[String]()))
+      when(mockXmlValidationService.validate(any[String](), any[Option[NodeSeq]](), any[String]()))
         .thenReturn(Left(ListBuffer(typeError1, typeError2, summaryError1, summaryError2)))
 
       val expectedErrors =
         Seq(GenericError(176, Message("xml.add.a.element", List("Type"))), GenericError(258, Message("xml.add.a.element", List("Summary"))))
 
-      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
+      Await.result(validationEngine.validateUploadSubmission(source), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
     }
 
     "must return ValidationFailure for file missing mandatory attributes" in new SetUp {
 
       val missingAttributeError: SaxParseError = SaxParseError(175, "cvc-complex-type.4: Attribute 'currCode' must appear on element 'Amount'.")
 
-      when(mockXmlValidationService.validate(any[Option[String]](), any[Option[NodeSeq]](), any[String]())).thenReturn(Left(ListBuffer(missingAttributeError)))
+      when(mockXmlValidationService.validate(any[String](), any[Option[NodeSeq]](), any[String]())).thenReturn(Left(ListBuffer(missingAttributeError)))
 
       val expectedErrors = Seq(GenericError(175, Message("xml.add.an.element", List("Amount currCode"))))
 
-      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
+      Await.result(validationEngine.validateUploadSubmission(source), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
     }
 
     "must return ValidationFailure for file where element is too long (1-400 allowed)" in new SetUp {
 
-      when(mockXmlValidationService.validate(any[Option[String]](), any[Option[NodeSeq]](), any[String]()))
+      when(mockXmlValidationService.validate(any[String](), any[Option[NodeSeq]](), any[String]()))
         .thenReturn(Left(ListBuffer(maxLengthError1, maxlengthError2)))
 
       val expectedErrors = Seq(GenericError(116, Message("xml.not.allowed.length", List("BuildingIdentifier", "400"))))
 
-      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
+      Await.result(validationEngine.validateUploadSubmission(source), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
     }
 
     "must return ValidationFailure for file where element is too long (1-4000 allowed) and show the number correctly formatted" in new SetUp {
 
-      when(mockXmlValidationService.validate(any[Option[String]](), any[Option[NodeSeq]](), any[String]()))
+      when(mockXmlValidationService.validate(any[String](), any[Option[NodeSeq]](), any[String]()))
         .thenReturn(Left(ListBuffer(maxLengthError3, maxlengthError4)))
 
       val expectedErrors = Seq(GenericError(116, Message("xml.not.allowed.length", List("NationalProvision", "4,000"))))
 
-      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
+      Await.result(validationEngine.validateUploadSubmission(source), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
     }
 
     "must return ValidationFailure for file with invalid country code" in new SetUp {
 
-      when(mockXmlValidationService.validate(any[Option[String]](), any[Option[NodeSeq]](), any[String]()))
+      when(mockXmlValidationService.validate(any[String](), any[Option[NodeSeq]](), any[String]()))
         .thenReturn(Left(ListBuffer(countryCodeError1, countryCodeError2)))
 
       val expectedErrors = Seq(GenericError(123, Message("xml.not.ISO.code", List("Country"))))
 
-      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
+      Await.result(validationEngine.validateUploadSubmission(source), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
     }
 
     "must return ValidationFailure for file with invalid countryExemption code" in new SetUp {
 
-      when(mockXmlValidationService.validate(any[Option[String]](), any[Option[NodeSeq]](), any[String]()))
+      when(mockXmlValidationService.validate(any[String](), any[Option[NodeSeq]](), any[String]()))
         .thenReturn(Left(ListBuffer(countryExemptionError1, countryExemptionError2)))
 
       val expectedErrors = Seq(GenericError(133, Message("xml.not.ISO.code", List("CountryExemption"))))
 
-      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
+      Await.result(validationEngine.validateUploadSubmission(source), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
     }
 
     "must return ValidationFailure for file with invalid Reason entry code" in new SetUp {
 
-      when(mockXmlValidationService.validate(any[Option[String]](), any[Option[NodeSeq]](), any[String]()))
+      when(mockXmlValidationService.validate(any[String](), any[Option[NodeSeq]](), any[String]()))
         .thenReturn(Left(ListBuffer(reasonError1, reasonError2)))
 
       val expectedErrors = Seq(GenericError(169, Message("xml.not.allowed.value", List("Reason"))))
 
-      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
+      Await.result(validationEngine.validateUploadSubmission(source), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
     }
 
     "must return ValidationFailure for file with invalid issuedBy code" in new SetUp {
 
-      when(mockXmlValidationService.validate(any[Option[String]](), any[Option[NodeSeq]](), any[String]()))
+      when(mockXmlValidationService.validate(any[String](), any[Option[NodeSeq]](), any[String]()))
         .thenReturn(Left(ListBuffer(issuedByError1, issuedByError2)))
 
       val expectedErrors = Seq(GenericError(18, Message("xml.not.ISO.code", List("TIN issuedBy"))))
 
-      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
+      Await.result(validationEngine.validateUploadSubmission(source), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
     }
 
     "must return ValidationFailure with generic error message if parse error is not in an expected format" in new SetUp {
 
       val randomParseError: SaxParseError = SaxParseError(lineNumber, xsdError)
-      when(mockXmlValidationService.validate(any[Option[String]](), any[Option[NodeSeq]](), any[String]())).thenReturn(Left(ListBuffer(randomParseError)))
+      when(mockXmlValidationService.validate(any[String](), any[Option[NodeSeq]](), any[String]())).thenReturn(Left(ListBuffer(randomParseError)))
 
       val expectedErrors = Seq(GenericError(lineNumber, Message("xml.defaultMessage")))
 
-      Await.result(validationEngine.validateUploadSubmission(Some(source)), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
+      Await.result(validationEngine.validateUploadSubmission(source), 10.seconds) mustBe SubmissionValidationFailure(ValidationErrors(expectedErrors))
     }
   }
 }

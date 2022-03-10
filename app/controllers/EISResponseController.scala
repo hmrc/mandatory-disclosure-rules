@@ -17,7 +17,7 @@
 package controllers
 
 import controllers.actions.EISResponsePreConditionCheckActionRefiner
-import models.submission.{FileStatus, Rejected, Accepted => FileStatusAccepted}
+import models.submission.{Accepted => FileStatusAccepted, FileStatus, Rejected}
 import models.xml.{BREResponse, ValidationStatus}
 import play.api.Logging
 import play.api.mvc.{Action, ControllerComponents}

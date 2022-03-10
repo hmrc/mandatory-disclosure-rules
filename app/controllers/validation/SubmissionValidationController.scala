@@ -16,17 +16,20 @@
 
 package controllers.validation
 
+import controllers.auth.IdentifierAuthAction
+import models.upscan.UpscanURL
 import models.validation.{InvalidXmlError, SubmissionValidationFailure, SubmissionValidationSuccess}
 import play.api.Logging
-import play.api.libs.json.Json
+import play.api.libs.json.{JsError, JsResult, JsSuccess, JsValue, Json}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import services.validation.SubmissionValidationEngine
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class SubmissionValidationController @Inject() (
+  authenticate: IdentifierAuthAction,
   cc: ControllerComponents,
   validationEngine: SubmissionValidationEngine
 )(implicit ec: ExecutionContext)
@@ -34,22 +37,27 @@ class SubmissionValidationController @Inject() (
     with Logging {
 
   //TODO replace Action.async with IdentifierAuthAction and instead of request.body.asText read it as a json
-  def validateSubmission: Action[AnyContent] = Action.async { implicit request =>
-    validationEngine.validateUploadSubmission(request.body.asText) map {
-      case SubmissionValidationSuccess(msd) =>
-        Ok(Json.toJsObject(SubmissionValidationSuccess(msd)))
+  def validateSubmission: Action[JsValue] = authenticate(parse.json).async { implicit request =>
+    request.body.validate[UpscanURL] match {
+      case JsSuccess(upscanURL, _) =>
+        validationEngine.validateUploadSubmission(upscanURL.url) map {
+          case SubmissionValidationSuccess(msd) =>
+            Ok(Json.toJsObject(SubmissionValidationSuccess(msd)))
 
-      case SubmissionValidationFailure(errors) =>
-        Ok(Json.toJson(SubmissionValidationFailure(errors)))
+          case SubmissionValidationFailure(errors) =>
+            Ok(Json.toJson(SubmissionValidationFailure(errors)))
 
-      case InvalidXmlError(saxException) =>
-        logger.info("InvalidXmlError: Failed to validate xml submission")
-        BadRequest(InvalidXmlError(saxException).toString)
+          case InvalidXmlError(saxException) =>
+            logger.info("InvalidXmlError: Failed to validate xml submission")
+            BadRequest(InvalidXmlError(saxException).toString)
 
-      case _ =>
-        logger.info("Failed to validate xml submission")
-        InternalServerError("failed to validateSubmission")
-
+          case _ =>
+            logger.info("Failed to validate xml submission")
+            InternalServerError("failed to validateSubmission")
+        }
+      case JsError(errors) =>
+        logger.info(s"Missing upscan URL: $errors")
+        Future.successful(InternalServerError("Missing upscan URL"))
     }
   }
 }

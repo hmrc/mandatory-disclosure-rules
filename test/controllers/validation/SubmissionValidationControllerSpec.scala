@@ -45,7 +45,7 @@ class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEac
 
     "must return 200 and a sequence of errors when a validation error occurs" in {
 
-      when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[Option[String]]()))
+      when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[String]()))
         .thenReturn(Future.successful(SubmissionValidationFailure(ValidationErrors(Seq(GenericError(1, Message("xml.enter.an.element")))))))
 
       val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url)
@@ -56,7 +56,7 @@ class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEac
     }
 
     "must return 200 and Validation success object " in {
-      when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[Option[String]]()))
+      when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[String]()))
         .thenReturn(Future.successful(SubmissionValidationSuccess(messageSpecData)))
 
       val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url)
@@ -66,7 +66,7 @@ class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEac
     }
 
     "must return 400 and a bad request when validation fails" in {
-      when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[Option[String]]()))
+      when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[String]()))
         .thenReturn(Future.successful(InvalidXmlError("")))
 
       val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url)

@@ -61,7 +61,6 @@ class SubscriptionConnector @Inject() (
   def updateSubscription(
     updateSubscription: UpdateSubscriptionForMDRRequest
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
-    //TODO Not sure why above conversationId is not applicable here as per DAC6 comment
 
     val serviceName = "update-subscription"
     val extraHeaders = Seq()

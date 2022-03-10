@@ -35,7 +35,7 @@ class XmlValidationServiceSpec extends SpecBase {
       <will>not validate</will>
       </this>
 
-      val result = service.validate(None, Some(invalid), xsdPath)
+      val result = service.validate("", Some(invalid), xsdPath)
 
       result.isLeft mustBe true
     }
@@ -45,7 +45,7 @@ class XmlValidationServiceSpec extends SpecBase {
 
       val validSubmission = XML.loadFile("test/resources/mdr/fileUpload/invalid.xml")
 
-      val result = service.validate(None, Some(validSubmission), xsdPath)
+      val result = service.validate("None", Some(validSubmission), xsdPath)
 
       result.isLeft mustBe true
     }
@@ -55,7 +55,7 @@ class XmlValidationServiceSpec extends SpecBase {
 
       val validSubmission = XML.loadFile("test/resources/mdr/fileUpload/validmdr.xml")
 
-      val result = service.validate(None, Some(validSubmission), xsdPath)
+      val result = service.validate("None", Some(validSubmission), xsdPath)
 
       result.isLeft mustBe false
     }
