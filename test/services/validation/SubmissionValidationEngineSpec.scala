@@ -27,7 +27,7 @@ import services.DataExtraction
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
-import scala.xml.{Elem, NodeSeq}
+import scala.xml.Elem
 
 class SubmissionValidationEngineSpec extends SpecBase {
 

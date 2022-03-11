@@ -78,7 +78,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
         .thenReturn(Future.successful(Right(responseDetail)))
       when(mockSubmissionConnector.submitDisclosure(any[NodeSeq](), any[ConversationId])(any[HeaderCarrier]()))
         .thenReturn(Future.successful(HttpResponse(OK, "")))
-      when(mockXMLValidationService.validate(any[Option[NodeSeq]], any[String]))
+      when(mockXMLValidationService.validate(any[NodeSeq], any[String]))
         .thenReturn(Right(basicXml))
       val submission = basicXml
 
@@ -126,7 +126,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
         .thenReturn(Future.successful(HttpResponse(INTERNAL_SERVER_ERROR, "")))
 
       val submission = basicXml
-      when(mockXMLValidationService.validate(any[Option[NodeSeq]], any[String]))
+      when(mockXMLValidationService.validate(any[NodeSeq], any[String]))
         .thenReturn(Left(ListBuffer(SaxParseError(1, "Invalid Node at line 1"))))
 
       val request                = FakeRequest(POST, SubmissionController.submitDisclosure().url).withXmlBody(submission)

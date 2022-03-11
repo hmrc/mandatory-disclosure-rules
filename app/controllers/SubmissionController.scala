@@ -63,16 +63,16 @@ class SubmissionController @Inject() (
     readSubscriptionService.getContactInformation(subscriptionId).flatMap {
       case Right(value) =>
         // Add metadata
-        val submission: NodeSeq = transformService.addSubscriptionDetailsToSubmission(uploadedXmlNode, value, submissionMetaData)
+        val submissionXml: NodeSeq = transformService.addSubscriptionDetailsToSubmission(uploadedXmlNode, value, submissionMetaData)
 
-        val validatedResponse = xmlValidationService.validate(xml = Some(submission), filePath = appConfig.submissionXSDFilePath)
+        val validatedResponse = xmlValidationService.validate(xml = submissionXml, filePath = appConfig.submissionXSDFilePath)
 
         validatedResponse match {
           case Left(value) =>
             logger.warn(s"Xml Validation Error $value")
             Future.successful(InternalServerError)
           case Right(_) =>
-            submissionConnector.submitDisclosure(submission, conversationId).flatMap { httpResponse =>
+            submissionConnector.submitDisclosure(submissionXml, conversationId).flatMap { httpResponse =>
               httpResponse.status match {
                 case OK => fileDetailsRepository.insert(submissionDetails).map(_ => Ok(Json.toJson(conversationId)))
                 case _  => Future.successful(httpResponse.handleResponse)
