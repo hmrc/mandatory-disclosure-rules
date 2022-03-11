@@ -17,12 +17,15 @@
 package controllers.validation
 
 import base.SpecBase
+import controllers.auth.{FakeIdentifierAuthAction, IdentifierAuthAction}
 import models.submission.{MDR401, MessageSpecData}
+import models.upscan.UpscanURL
 import models.validation._
 import org.mockito.ArgumentMatchers.any
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.inject.bind
+import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{status, POST, _}
 import services.validation.SubmissionValidationEngine
@@ -37,7 +40,8 @@ class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEac
   val application: Application =
     applicationBuilder()
       .overrides(
-        bind[SubmissionValidationEngine].toInstance(mockUploadSubmissionValidationEngine)
+        bind[SubmissionValidationEngine].toInstance(mockUploadSubmissionValidationEngine),
+        bind[IdentifierAuthAction].to[FakeIdentifierAuthAction]
       )
       .build()
 
@@ -45,10 +49,10 @@ class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEac
 
     "must return 200 and a sequence of errors when a validation error occurs" in {
 
-      when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[Option[String]]()))
+      when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[String]()))
         .thenReturn(Future.successful(SubmissionValidationFailure(ValidationErrors(Seq(GenericError(1, Message("xml.enter.an.element")))))))
 
-      val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url)
+      val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url).withJsonBody(Json.toJson(UpscanURL("someUrl")))
       val result  = route(application, request).value
 
       status(result) mustBe OK
@@ -56,20 +60,20 @@ class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEac
     }
 
     "must return 200 and Validation success object " in {
-      when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[Option[String]]()))
+      when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[String]()))
         .thenReturn(Future.successful(SubmissionValidationSuccess(messageSpecData)))
 
-      val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url)
+      val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url).withJsonBody(Json.toJson(UpscanURL("someUrl")))
       val result  = route(application, request).value
 
       status(result) mustBe OK
     }
 
     "must return 400 and a bad request when validation fails" in {
-      when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[Option[String]]()))
+      when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[String]()))
         .thenReturn(Future.successful(InvalidXmlError("")))
 
-      val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url)
+      val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url).withJsonBody(Json.toJson(UpscanURL("someUrl")))
       val result  = route(application, request).value
 
       status(result) mustBe BAD_REQUEST
