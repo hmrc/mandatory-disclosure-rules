@@ -55,7 +55,7 @@ class SubmissionValidationEngine @Inject() (xmlValidationService: XMLValidationS
     }
 
   def performXmlValidation(upScanUrl: String): Either[List[GenericError], Option[MessageSpecData]] = {
-    val xmlOrErrors: Either[ListBuffer[SaxParseError], Elem] = xmlValidationService.validate(upScanUrl, None, appConfig.fileUploadXSDFilePath)
+    val xmlOrErrors: Either[ListBuffer[SaxParseError], Elem] = xmlValidationService.validate(upScanUrl, appConfig.fileUploadXSDFilePath)
     xmlOrErrors match {
       case Right(xml) => Right(dataExtraction.messageSpecData(xml))
       case Left(list) => Left(xmlErrorMessageHelper.generateErrorMessages(list))

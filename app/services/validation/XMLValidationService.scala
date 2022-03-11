@@ -46,30 +46,32 @@ class XMLValidationService @Inject() () {
     factory.newSAXParser()
   }
 
-  def validate(upScanUrl: String, xml: Option[NodeSeq] = None, filePath: String): Either[ListBuffer[SaxParseError], Elem] = {
-
-    val list: ListBuffer[SaxParseError] = new ListBuffer[SaxParseError]
+  private def xmlLoader(filePath: String, errorList: ListBuffer[SaxParseError]): XMLLoader[Elem] = {
 
     val url: URL       = getClass.getResource(filePath)
     val schema: Schema = javax.xml.validation.SchemaFactory.newInstance(schemaLang).newSchema(url)
-
     trait AccumulatorState extends DefaultHandler {
-      override def warning(e: SAXParseException): Unit    = list += SaxParseError(e.getLineNumber, e.getMessage)
-      override def error(e: SAXParseException): Unit      = list += SaxParseError(e.getLineNumber, e.getMessage)
-      override def fatalError(e: SAXParseException): Unit = list += SaxParseError(e.getLineNumber, e.getMessage)
+      override def warning(e: SAXParseException): Unit    = errorList += SaxParseError(e.getLineNumber, e.getMessage)
+      override def error(e: SAXParseException): Unit      = errorList += SaxParseError(e.getLineNumber, e.getMessage)
+      override def fatalError(e: SAXParseException): Unit = errorList += SaxParseError(e.getLineNumber, e.getMessage)
     }
 
-    val loader: XMLLoader[Elem] = new scala.xml.factory.XMLLoader[scala.xml.Elem] {
+    new scala.xml.factory.XMLLoader[scala.xml.Elem] {
       override def parser: SAXParser = xmlValidatingParser(schema)
       override def adapter           = new scala.xml.parsing.NoBindingFactoryAdapter with AccumulatorState
     }
+  }
 
-    val loadedXML = if (xml.isDefined) {
-      loader.load(new StringReader(xml.mkString))
-    } else {
-      loader.load(new URL(upScanUrl))
-    }
-
+  def validate(upScanUrl: String, filePath: String): Either[ListBuffer[SaxParseError], Elem] = {
+    val list: ListBuffer[SaxParseError] = new ListBuffer[SaxParseError]
+    val loadedXML                       = xmlLoader(filePath, list).load(new URL(upScanUrl))
     if (list.isEmpty) Right(loadedXML) else Left(list)
   }
+
+  def validate(xml: Option[NodeSeq] = None, filePath: String): Either[ListBuffer[SaxParseError], Elem] = {
+    val list: ListBuffer[SaxParseError] = new ListBuffer[SaxParseError]
+    val loadedXML                       = xmlLoader(filePath, list).load(new StringReader(xml.mkString))
+    if (list.isEmpty) Right(loadedXML) else Left(list)
+  }
+
 }
