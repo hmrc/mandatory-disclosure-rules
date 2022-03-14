@@ -73,5 +73,4 @@ class XMLValidationService @Inject() () {
     val loadedXML                       = xmlLoader(filePath, list).load(new StringReader(xml.mkString))
     if (list.isEmpty) Right(loadedXML) else Left(list)
   }
-
 }

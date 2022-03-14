@@ -41,7 +41,7 @@ class SubmissionConnectorSpec extends SpecBase with GuiceOneAppPerSuite with Wir
     "should return OK" - {
       "when the backend returns a valid successful response" in {
         server.stubFor(
-          post(urlEqualTo("/mdr/dct06/v1"))
+          post(urlEqualTo("/mdr/dct72a/v1"))
             .willReturn(
               aResponse()
                 .withStatus(OK)
@@ -60,10 +60,7 @@ class SubmissionConnectorSpec extends SpecBase with GuiceOneAppPerSuite with Wir
       "when upscan returns a 4xx response" in {
         server.stubFor(
           post(
-            urlEqualTo(
-              "" +
-                "/mdr/dct06/v1"
-            )
+            urlEqualTo("/mdr/dct72a/v1")
           )
             .willReturn(
               aResponse()
@@ -79,7 +76,7 @@ class SubmissionConnectorSpec extends SpecBase with GuiceOneAppPerSuite with Wir
 
       "when upscan returns 5xx response" in {
         server.stubFor(
-          post(urlEqualTo("/mdr/dct06/v1"))
+          post(urlEqualTo("/mdr/dct72a/v1"))
             .willReturn(
               aResponse()
                 .withStatus(SERVICE_UNAVAILABLE)
