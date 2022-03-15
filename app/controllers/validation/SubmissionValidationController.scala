@@ -20,8 +20,8 @@ import controllers.auth.IdentifierAuthAction
 import models.upscan.UpscanURL
 import models.validation.{InvalidXmlError, SubmissionValidationFailure, SubmissionValidationSuccess}
 import play.api.Logging
-import play.api.libs.json.{JsError, JsResult, JsSuccess, JsValue, Json}
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
+import play.api.mvc.{Action, ControllerComponents}
 import services.validation.SubmissionValidationEngine
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 

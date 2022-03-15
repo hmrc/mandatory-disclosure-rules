@@ -65,11 +65,11 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
         <ValidationErrors>
           <FileError>
             <Code>50009</Code>
-            <Details Language="EN">Duplicate message ref ID</Details>
+            <Details>Duplicate message ref ID</Details>
           </FileError>
           <RecordError>
             <Code>80010</Code>
-            <Details Language="EN">A message can contain either new records (OECD1) or corrections/deletions (OECD2 and OECD3), but cannot contain a mixture of both</Details>
+            <Details>A message can contain either new records (OECD1) or corrections/deletions (OECD2 and OECD3), but cannot contain a mixture of both</Details>
             <DocRefIDInError>asjdhjjhjssjhdjshdAJGSJJS</DocRefIDInError>
           </RecordError>
         </ValidationErrors>
