@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSpy v2020 rel. 2 sp1 (x64) (http://www.altova.com) by  (HMRC - HM Revenue & Customs) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:cadx="http://www.hmrc.gsi.gov.uk/mdr/cadx" xmlns:iso="urn:oecd:ties:isomdrtypes:v1" targetNamespace="http://www.hmrc.gsi.gov.uk/mdr/cadx">
-	<xs:import namespace="urn:oecd:ties:isomdrtypes:v1" schemaLocation="IsoMdrTypes_v1.0.xsd"/>
+	<xs:import namespace="urn:oecd:ties:isomdrtypes:v1"/>
 	<xs:element name="BREResponse" type="cadx:BREResponse_Type"/>
 	<xs:complexType name="BREResponse_Type">
 		<xs:sequence>
@@ -131,7 +131,6 @@
 		</xs:annotation>
 		<xs:simpleContent>
 			<xs:extension base="cadx:StringMin1Max4000_Type">
-				<xs:attribute name="Language" type="iso:LanguageCode_Type"/>
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
