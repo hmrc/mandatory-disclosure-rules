@@ -301,8 +301,8 @@ object SubmissionFixture {
       tradingName = Some("tradingName"),
       isGBUser = true,
       primaryContact = ContactInformation(
-        email = "aaa",
-        phone = Some("bbb"),
+        email = "aaa@test.com",
+        phone = Some("1234567"),
         mobile = None,
         contactType = OrganisationDetails(
           organisationName = "Example"
@@ -311,8 +311,8 @@ object SubmissionFixture {
       secondaryContact = Some(
         ContactInformation(
           email = "ddd",
-          phone = Some("eee"),
-          mobile = Some("fff"),
+          phone = Some("12345678"),
+          mobile = Some("1222222"),
           contactType = OrganisationDetails(
             organisationName = "AnotherExample"
           )

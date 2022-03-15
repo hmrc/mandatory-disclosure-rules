@@ -19,12 +19,12 @@ package models.submission
 import java.time.format.DateTimeFormatter
 import java.time.{LocalDateTime, OffsetDateTime}
 
-case class SubmissionMetaData(submissionTime: String, conversationID: String, fileName: Option[String])
+case class SubmissionMetaData(submissionTime: String, conversationId: ConversationId, fileName: Option[String])
 
 object SubmissionMetaData {
   val dateTimeFormat: DateTimeFormatter = DateTimeFormatter.ISO_INSTANT
 
-  def build(submissionTime: LocalDateTime, conversationID: String, fileName: String): SubmissionMetaData =
+  def build(submissionTime: LocalDateTime, conversationID: ConversationId, fileName: String): SubmissionMetaData =
     SubmissionMetaData(
       dateTimeFormat.format(submissionTime.toInstant(OffsetDateTime.now().getOffset)),
       conversationID,

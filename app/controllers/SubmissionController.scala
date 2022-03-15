@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.AppConfig
 import connectors.SubmissionConnector
 import controllers.auth.IdentifierAuthAction
 import models.error.ReadSubscriptionError
@@ -26,6 +27,7 @@ import play.api.{Logger, Logging}
 import repositories.submission.FileDetailsRepository
 import services.submission.TransformService
 import services.subscription.SubscriptionService
+import services.validation.XMLValidationService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import java.time.LocalDateTime
@@ -39,36 +41,45 @@ class SubmissionController @Inject() (
   transformService: TransformService,
   readSubscriptionService: SubscriptionService,
   submissionConnector: SubmissionConnector,
-  fileDetailsRepository: FileDetailsRepository
+  fileDetailsRepository: FileDetailsRepository,
+  xmlValidationService: XMLValidationService,
+  appConfig: AppConfig
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
   def submitDisclosure: Action[NodeSeq] = authenticate.async(parse.xml) { implicit request =>
-    //TODO receive xml and read details not sure what I need
-    val xml                  = request.body
-    val fileName             = (xml \ "fileName").text
-    val messageRefId         = (xml \\ "MessageRefId").text
-    val subscriptionId       = request.subscriptionId
-    val submissionTime       = LocalDateTime.now()
-    val conversationId       = ConversationId()
-    val submissionDetails    = FileDetails(conversationId, subscriptionId, messageRefId, Pending, fileName, submissionTime, submissionTime)
-    implicit val log: Logger = logger
+    val xml                      = request.body
+    val fileName                 = (xml \ "fileName").text
+    val messageRefId             = (xml \\ "MessageRefId").text
+    val subscriptionId           = request.subscriptionId
+    val submissionTime           = LocalDateTime.now()
+    val conversationId           = ConversationId()
+    val uploadedXmlNode: NodeSeq = xml \ "file" \ "MDR_OECD"
+    val submissionDetails        = FileDetails(conversationId, subscriptionId, messageRefId, Pending, fileName, submissionTime, submissionTime)
+    implicit val log: Logger     = logger
 
-    //TODO verify submissionTime and conversationId if this is needed
-    val submissionMetaData = SubmissionMetaData.build(submissionTime, conversationId.value, fileName)
+    val submissionMetaData = SubmissionMetaData.build(submissionTime, conversationId, fileName)
     readSubscriptionService.getContactInformation(subscriptionId).flatMap {
       case Right(value) =>
         // Add metadata
-        val submission: NodeSeq = transformService.addSubscriptionDetailsToSubmission(xml, value, submissionMetaData)
-        //TODO validate XML
-        //Submit disclosure
-        submissionConnector.submitDisclosure(submission, conversationId).flatMap { httpResponse =>
-          httpResponse.status match {
-            case OK => fileDetailsRepository.insert(submissionDetails).map(_ => Ok(Json.toJson(conversationId)))
-            case _  => Future.successful(httpResponse.handleResponse)
-          }
+        val submissionXml: NodeSeq = transformService.addSubscriptionDetailsToSubmission(uploadedXmlNode, value, submissionMetaData)
+
+        val validatedResponse = xmlValidationService.validate(xml = submissionXml, filePath = appConfig.submissionXSDFilePath)
+
+        validatedResponse match {
+          case Left(value) =>
+            logger.warn(s"Xml Validation Error $value")
+            Future.successful(InternalServerError)
+          case Right(_) =>
+            submissionConnector.submitDisclosure(submissionXml, conversationId).flatMap { httpResponse =>
+              httpResponse.status match {
+                case OK => fileDetailsRepository.insert(submissionDetails).map(_ => Ok(Json.toJson(conversationId)))
+                case _  => Future.successful(httpResponse.handleResponse)
+              }
+            }
         }
+
       case Left(ReadSubscriptionError(value)) =>
         logger.warn(s"ReadSubscriptionError $value")
         Future.successful(InternalServerError)

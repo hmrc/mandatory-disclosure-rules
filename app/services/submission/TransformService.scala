@@ -16,41 +16,44 @@
 
 package services.submission
 
-import models.submission.SubmissionMetaData
+import models.submission.{NamespaceForNode, SubmissionMetaData}
 import models.subscription._
+
 import javax.inject.Inject
 import scala.xml._
 
 class TransformService @Inject() () {
 
-//TODO DAC6 need to update to MDR
   def addSubscriptionDetailsToSubmission(
-    submissionFile: NodeSeq,
+    uploadedFile: NodeSeq,
     subscriptionDetails: ResponseDetail,
     metaData: SubmissionMetaData
   ): NodeSeq =
-    <DAC6UKSubmissionInboundRequest xmlns:dac6="urn:eu:taxud:dac6:v1"
-                                    xmlns:eis="http://www.hmrc.gov.uk/dac6/eis"
-                                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                                    xsi:schemaLocation="http://www.hmrc.gov.uk/dac6/eis DCT06_EIS_UK_schema.xsd">
+    <cadx:MDRSubmissionRequest xmlns:mdr="urn:oecd:ties:mdr:v1"
+                          xmlns:cadx="http://www.hmrc.gsi.gov.uk/mdr/cadx"
+                          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                          xsi:schemaLocation="http://www.hmrc.gsi.gov.uk/mdr/cadx DCT72a_MDRSubmissionRequest_v0.1.xsd">
+
       <requestCommon>
-        <receiptDate>{metaData.submissionTime}</receiptDate>
-        <regime>DAC</regime>
-        <conversationID>{metaData.conversationID.replace("govuk-tax-", "")}</conversationID>
+        <receiptDate>
+          {metaData.submissionTime}
+        </receiptDate>
+        <regime>MDR</regime>
+        <conversationID>{metaData.conversationId.value}</conversationID>
         <schemaVersion>1.0.0</schemaVersion>
       </requestCommon>
       <requestDetail>
-        {addNameSpaceDefinitions(submissionFile)}
+        {addNameSpaces(addNameSpaceDefinitions(uploadedFile), Seq(NamespaceForNode("MDR_OECD", "mdr")))}
       </requestDetail>
       <requestAdditionalDetail>
         {transformSubscriptionDetails(subscriptionDetails, metaData.fileName)}
       </requestAdditionalDetail>
-    </DAC6UKSubmissionInboundRequest>
+    </cadx:MDRSubmissionRequest>
 
   def addNameSpaceDefinitions(submissionFile: NodeSeq): NodeSeq =
     for (node <- submissionFile) yield node match {
-      case elem: Elem => //TODO Namespace binding
-        elem.copy(scope = NamespaceBinding("xsi", "http://www.w3.org/2001/XMLSchema-instance", NamespaceBinding("dac6", "urn:ukdac6:v0.1", TopScope)))
+      case elem: Elem =>
+        elem.copy(scope = NamespaceBinding("xsi", "http://www.w3.org/2001/XMLSchema-instance", NamespaceBinding("mdr", "urn:oecd:ties:mdr:v1", TopScope)))
     }
 
   def transformSubscriptionDetails(
@@ -58,16 +61,22 @@ class TransformService @Inject() () {
     fileName: Option[String]
   ): NodeSeq =
     Seq(
-      fileName.map(name => <fileName>{name}</fileName>),
+      fileName.map(name => <fileName>
+        {name}
+      </fileName>),
       Some(<subscriptionID>{subscriptionDetails.subscriptionID}</subscriptionID>),
-      subscriptionDetails.tradingName.map(tradingName => <tradingName>{tradingName}</tradingName>),
-      Some(<isGBUser>{subscriptionDetails.isGBUser}</isGBUser>),
+      subscriptionDetails.tradingName.map(tradingName => <tradingName>
+        {tradingName}
+      </tradingName>),
+      Some(<isGBUser>
+        {subscriptionDetails.isGBUser}
+      </isGBUser>),
       Some(<primaryContact>
-          {transformContactInformation(subscriptionDetails.primaryContact)}
-        </primaryContact>),
+        {transformContactInformation(subscriptionDetails.primaryContact)}
+      </primaryContact>),
       subscriptionDetails.secondaryContact.map(sc => <secondaryContact>
-          {transformContactInformation(sc)}
-        </secondaryContact>)
+        {transformContactInformation(sc)}
+      </secondaryContact>)
     ).filter(_.isDefined).map(_.get)
 
   def transformContactInformation(
@@ -75,9 +84,7 @@ class TransformService @Inject() () {
   ): NodeSeq = {
 
     val contactType = contactInformation.contactType match {
-      case individual: IndividualDetails => Some(<individualDetails>
-        {transformIndividual(individual)}
-      </individualDetails>)
+      case individual: IndividualDetails => Some(<individualDetails>{transformIndividual(individual)}</individualDetails>)
       case organisation: OrganisationDetails => Some(<organisationDetails>
         <organisationName>{organisation.organisationName}</organisationName>
       </organisationDetails>)
@@ -95,8 +102,43 @@ class TransformService @Inject() () {
 
   def transformIndividual(individual: IndividualDetails): NodeSeq =
     Seq(
-      Some(<firstName>{individual.firstName}</firstName>),
-      individual.middleName.map(middle => <middleName>{middle}</middleName>),
-      Some(<lastName>{individual.lastName}</lastName>)
+      Some(<firstName>
+        {individual.firstName}
+      </firstName>),
+      individual.middleName.map(middle => <middleName>
+        {middle}
+      </middleName>),
+      Some(<lastName>
+        {individual.lastName}
+      </lastName>)
     ).filter(_.isDefined).map(_.get)
+
+  def addNameSpaces(file: NodeSeq, namespaces: Seq[NamespaceForNode]): NodeSeq = {
+
+    def changeNS(el: NodeSeq): NodeSeq = {
+      def fixSeq(ns: Seq[Node], currentPrefix: Option[String]): Seq[Node] = for (node <- ns) yield node match {
+        case elem: Elem =>
+          namespaces
+            .find(n => n.nodeName == elem.label)
+            .map { n =>
+              elem.copy(
+                prefix = n.prefix,
+                child = fixSeq(elem.child, Some(n.prefix))
+              )
+            }
+            .getOrElse(
+              elem.copy(
+                prefix = currentPrefix.orNull,
+                child = fixSeq(elem.child, currentPrefix)
+              )
+            )
+        case other => other
+      }
+
+      fixSeq(el, None).head
+    }
+
+    changeNS(file)
+  }
+
 }

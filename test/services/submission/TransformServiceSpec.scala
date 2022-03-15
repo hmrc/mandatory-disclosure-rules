@@ -182,17 +182,17 @@ class TransformServiceSpec extends SpecBase with StreamlinedXmlEquality {
     expected == result
   }
 
-  "add namespace definitions for dac6 arrangement" in {
+  "add namespace definitions for MDR-oecd" in {
     val service = app.injector.instanceOf[TransformService]
-    val file = <DAC6_Arrangement version="2020-04-16T09:30:47Z">
+    val file = <MDR_OECD version="1.0.0">
       <submission>Submitted Data</submission>
-    </DAC6_Arrangement>
+    </MDR_OECD>
 
-    val expected = <DAC6_Arrangement version="2020-04-16T09:30:47Z"
-                                     xmlns:dac6="urn:ukdac6:v0.1"
+    val expected = <MDR_OECD version="1.0.0"
+                                     xmlns:mdr="urn:oecd:ties:mdr:v1"
                                      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <submission>Submitted Data</submission>
-    </DAC6_Arrangement>
+    </MDR_OECD>
 
     val result = service.addNameSpaceDefinitions(file)
 
