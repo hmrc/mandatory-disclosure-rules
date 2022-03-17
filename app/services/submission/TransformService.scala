@@ -35,9 +35,7 @@ class TransformService @Inject() () {
                           xsi:schemaLocation="http://www.hmrc.gsi.gov.uk/mdr/cadx DCT72a_MDRSubmissionRequest_v0.1.xsd">
 
       <requestCommon>
-        <receiptDate>
-          {metaData.submissionTime}
-        </receiptDate>
+        <receiptDate>{metaData.submissionTime}</receiptDate>
         <regime>MDR</regime>
         <conversationID>{metaData.conversationId.value}</conversationID>
         <schemaVersion>1.0.0</schemaVersion>
@@ -61,22 +59,12 @@ class TransformService @Inject() () {
     fileName: Option[String]
   ): NodeSeq =
     Seq(
-      fileName.map(name => <fileName>
-        {name}
-      </fileName>),
+      fileName.map(name => <fileName>{name}</fileName>),
       Some(<subscriptionID>{subscriptionDetails.subscriptionID}</subscriptionID>),
-      subscriptionDetails.tradingName.map(tradingName => <tradingName>
-        {tradingName}
-      </tradingName>),
-      Some(<isGBUser>
-        {subscriptionDetails.isGBUser}
-      </isGBUser>),
-      Some(<primaryContact>
-        {transformContactInformation(subscriptionDetails.primaryContact)}
-      </primaryContact>),
-      subscriptionDetails.secondaryContact.map(sc => <secondaryContact>
-        {transformContactInformation(sc)}
-      </secondaryContact>)
+      subscriptionDetails.tradingName.map(tradingName => <tradingName>{tradingName}</tradingName>),
+      Some(<isGBUser>{subscriptionDetails.isGBUser}</isGBUser>),
+      Some(<primaryContact>{transformContactInformation(subscriptionDetails.primaryContact)}</primaryContact>),
+      subscriptionDetails.secondaryContact.map(sc => <secondaryContact>{transformContactInformation(sc)}</secondaryContact>)
     ).filter(_.isDefined).map(_.get)
 
   def transformContactInformation(
@@ -102,15 +90,9 @@ class TransformService @Inject() () {
 
   def transformIndividual(individual: IndividualDetails): NodeSeq =
     Seq(
-      Some(<firstName>
-        {individual.firstName}
-      </firstName>),
-      individual.middleName.map(middle => <middleName>
-        {middle}
-      </middleName>),
-      Some(<lastName>
-        {individual.lastName}
-      </lastName>)
+      Some(<firstName>{individual.firstName}</firstName>),
+      individual.middleName.map(middle => <middleName>{middle}</middleName>),
+      Some(<lastName>{individual.lastName}</lastName>)
     ).filter(_.isDefined).map(_.get)
 
   def addNameSpaces(file: NodeSeq, namespaces: Seq[NamespaceForNode]): NodeSeq = {
