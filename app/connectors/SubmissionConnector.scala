@@ -32,6 +32,9 @@ class SubmissionConnector @Inject() (
     extends Logging {
 
   def submitDisclosure(submission: NodeSeq, conversationId: ConversationId)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
+    logger.info("========submitDisclosure=connector====================")
+    logger.info(s"submission is  ${submission}")
+    logger.info("========submitDisclosure=connector=====================")
     val serviceName = "submission"
     val extraHeaders = Seq()
       .withBearerToken(s"${config.bearerToken(serviceName)}")

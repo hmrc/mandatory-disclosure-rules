@@ -49,6 +49,9 @@ class SubmissionController @Inject() (
     with Logging {
 
   def submitDisclosure: Action[NodeSeq] = authenticate.async(parse.xml) { implicit request =>
+    logger.info("========submitDisclosure=====================")
+    logger.info(s"request xml is  ${request.body}")
+    logger.info("========submitDisclosure=====================")
     val xml                      = request.body
     val fileName                 = (xml \ "fileName").text
     val messageRefId             = (xml \\ "MessageRefId").text
