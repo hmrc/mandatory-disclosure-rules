@@ -65,9 +65,7 @@ class TransformService @Inject() () {
         {name}
       </fileName>),
       Some(<subscriptionID>{subscriptionDetails.subscriptionID}</subscriptionID>),
-      subscriptionDetails.tradingName.map(tradingName => <tradingName>
-        {tradingName}
-      </tradingName>),
+      subscriptionDetails.tradingName.filter(_.trim.nonEmpty).map(tradingName => <tradingName>{tradingName}</tradingName>),
       Some(<isGBUser>
         {subscriptionDetails.isGBUser}
       </isGBUser>),
