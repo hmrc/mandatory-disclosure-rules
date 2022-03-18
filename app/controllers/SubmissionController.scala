@@ -65,8 +65,7 @@ class SubmissionController @Inject() (
         // Add metadata
         val submissionXml: NodeSeq = transformService.addSubscriptionDetailsToSubmission(uploadedXmlNode, value, submissionMetaData)
         val sanitisedXml           = submissionXml.map(node => scala.xml.Utility.trim(node))
-        println(sanitisedXml)
-        val validatedResponse = xmlValidationService.validate(xml = sanitisedXml, filePath = appConfig.submissionXSDFilePath)
+        val validatedResponse      = xmlValidationService.validate(xml = sanitisedXml, filePath = appConfig.submissionXSDFilePath)
 
         validatedResponse match {
           case Left(value) =>
