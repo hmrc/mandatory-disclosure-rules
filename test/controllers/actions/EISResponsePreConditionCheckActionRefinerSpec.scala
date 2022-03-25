@@ -36,9 +36,9 @@ class EISResponsePreConditionCheckActionRefinerSpec extends SpecBase with Before
   val uuid: UUID           = UUID.randomUUID()
   val headers: FakeHeaders = FakeHeaders(Seq("x-conversation-id" -> uuid.toString))
 
-  val acceptedXml: NodeSeq = <cadx:BREResponse xmlns:cadx="http://www.hmrc.gsi.gov.uk/mdr/cadx">
+  val acceptedXml: NodeSeq = <gsm:BREResponse xmlns:gsm="http://www.hmrc.gsi.gov.uk/gsm">
     <requestCommon>
-      <receiptDate>2001-12-17T09:30:47Z</receiptDate>
+      <receiptDate>2001-12-17T09:30:47.450Z</receiptDate>
       <regime>MDR</regime>
       <conversationID>{uuid}</conversationID>
       <schemaVersion>1.0.0</schemaVersion>
@@ -52,11 +52,11 @@ class EISResponsePreConditionCheckActionRefinerSpec extends SpecBase with Before
         </ValidationResult>
       </GenericStatusMessage>
     </requestDetail>
-  </cadx:BREResponse>
+  </gsm:BREResponse>
 
-  val rejectedXml: NodeSeq = <cadx:BREResponse xmlns:cadx="http://www.hmrc.gsi.gov.uk/mdr/cadx">
+  val rejectedXml: NodeSeq = <gsm:BREResponse xmlns:gsm="http://www.hmrc.gsi.gov.uk/gsm">
     <requestCommon>
-      <receiptDate>2001-12-17T09:30:47Z</receiptDate>
+      <receiptDate>2001-12-17T09:30:47.400Z</receiptDate>
       <regime>MDR</regime>
       <conversationID>{uuid}</conversationID>
       <schemaVersion>1.0.0</schemaVersion>
@@ -64,13 +64,23 @@ class EISResponsePreConditionCheckActionRefinerSpec extends SpecBase with Before
     <requestDetail>
       <GenericStatusMessage>
         <ValidationErrors>
+          <FileError>
+            <Code>50009</Code>
+            <Details>Duplicate message ref IDs</Details>
+          </FileError>
+          <RecordError>
+            <Code>80000</Code>
+            <Details>Duplicate doc ref IDs</Details>
+            <DocRefIDInError>MDRUSER001DHSJEURUT20001</DocRefIDInError>
+            <DocRefIDInError>MDRUSER001DHSJEURUT20002</DocRefIDInError>
+          </RecordError>
         </ValidationErrors>
         <ValidationResult>
-          <Status>Accepted</Status>
+          <Status>Rejected</Status>
         </ValidationResult>
       </GenericStatusMessage>
     </requestDetail>
-  </cadx:BREResponse>
+  </gsm:BREResponse>
 
   val appConfig: AppConfig                    = app.injector.instanceOf[AppConfig]
   val validationService: XMLValidationService = app.injector.instanceOf[XMLValidationService]

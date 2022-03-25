@@ -17,15 +17,16 @@
 package controllers
 
 import base.SpecBase
+import controllers.auth.{AuthAction, FakeAuthAction}
 import models.submission._
 import models.xml.ValidationErrors
 import org.mockito.ArgumentMatchers.any
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
-import play.api.http.Status.{ACCEPTED, BAD_REQUEST, INTERNAL_SERVER_ERROR, OK}
+import play.api.http.Status.{ACCEPTED, BAD_REQUEST, INTERNAL_SERVER_ERROR, NO_CONTENT}
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{defaultAwaitTimeout, route, running, status, writeableOf_AnyContentAsXml, POST}
+import play.api.test.Helpers.{POST, defaultAwaitTimeout, route, running, status, writeableOf_AnyContentAsXml}
 import repositories.submission.FileDetailsRepository
 import services.EmailService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -48,14 +49,15 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
   val application: Application = applicationBuilder()
     .overrides(
       bind[FileDetailsRepository].toInstance(mockFileDetailsRepository),
-      bind[EmailService].toInstance(mockEmailService)
+      bind[EmailService].toInstance(mockEmailService),
+      bind[AuthAction].to[FakeAuthAction]
     )
     .build()
 
   private val randomUUID = UUID.randomUUID()
-  val xml: NodeSeq = <cadx:BREResponse xmlns:cadx="http://www.hmrc.gsi.gov.uk/mdr/cadx">
+  val xml: NodeSeq = <gsm:BREResponse xmlns:gsm="http://www.hmrc.gsi.gov.uk/gsm">
     <requestCommon>
-      <receiptDate>2001-12-17T09:30:47Z</receiptDate>
+      <receiptDate>2001-12-17T09:30:47.400Z</receiptDate>
       <regime>MDR</regime>
       <conversationID>{randomUUID}</conversationID>
       <schemaVersion>1.0.0</schemaVersion>
@@ -65,12 +67,13 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
         <ValidationErrors>
           <FileError>
             <Code>50009</Code>
-            <Details Language="EN">Duplicate message ref ID</Details>
+            <Details>Duplicate message ref IDs</Details>
           </FileError>
           <RecordError>
-            <Code>80010</Code>
-            <Details Language="EN">A message can contain either new records (OECD1) or corrections/deletions (OECD2 and OECD3), but cannot contain a mixture of both</Details>
-            <DocRefIDInError>asjdhjjhjssjhdjshdAJGSJJS</DocRefIDInError>
+            <Code>80000</Code>
+            <Details>Duplicate doc ref IDs</Details>
+            <DocRefIDInError>MDRUSER001DHSJEURUT20001</DocRefIDInError>
+            <DocRefIDInError>MDRUSER001DHSJEURUT20002</DocRefIDInError>
           </RecordError>
         </ValidationErrors>
         <ValidationResult>
@@ -78,10 +81,10 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
         </ValidationResult>
       </GenericStatusMessage>
     </requestDetail>
-  </cadx:BREResponse>
+  </gsm:BREResponse>
 
   "EISResponseController" - {
-    "must return ok when input xml is valid" in {
+    "must return NoContent when input xml is valid" in {
       val fileDetails =
         FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Accepted, "file1.xml", LocalDateTime.now(), LocalDateTime.now())
 
@@ -95,7 +98,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
 
       val result = route(application, request).value
 
-      status(result) mustEqual OK
+      status(result) mustEqual NO_CONTENT
       verify(mockFileDetailsRepository, times(1)).updateStatus(any[String](), any[FileStatus]())
     }
 
@@ -113,7 +116,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
 
       val result = route(application, request).value
 
-      status(result) mustEqual OK
+      status(result) mustEqual NO_CONTENT
       verify(mockEmailService, times(1)).sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier])
     }
 
@@ -139,7 +142,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
 
       val result = route(application, request).value
 
-      status(result) mustEqual OK
+      status(result) mustEqual NO_CONTENT
       verify(mockEmailService, times(0)).sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier])
     }
 
@@ -165,7 +168,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
 
       val result = route(application, request).value
 
-      status(result) mustEqual OK
+      status(result) mustEqual NO_CONTENT
       verify(mockEmailService, times(0)).sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier])
     }
 
@@ -190,7 +193,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
 
       val result = route(application, request).value
 
-      status(result) mustEqual OK
+      status(result) mustEqual NO_CONTENT
       verify(mockEmailService, times(1)).sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier])
     }
 
@@ -216,7 +219,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
 
       val result = route(application, request).value
 
-      status(result) mustEqual OK
+      status(result) mustEqual NO_CONTENT
       verify(mockEmailService, times(1)).sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier])
     }
 
@@ -242,7 +245,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
 
       val result = route(application, request).value
 
-      status(result) mustEqual OK
+      status(result) mustEqual NO_CONTENT
       verify(mockEmailService, times(0)).sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier])
     }
     "must return BadRequest when input xml is invalid" in {

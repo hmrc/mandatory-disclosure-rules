@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- edited with XMLSpy v2020 rel. 2 sp1 (x64) (http://www.altova.com) by  (HMRC - HM Revenue & Customs) -->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:cadx="http://www.hmrc.gsi.gov.uk/mdr/cadx" xmlns:iso="urn:oecd:ties:isomdrtypes:v1" targetNamespace="http://www.hmrc.gsi.gov.uk/mdr/cadx">
-	<xs:import namespace="urn:oecd:ties:isomdrtypes:v1" schemaLocation="IsoMdrTypes_v1.0.xsd"/>
-	<xs:element name="BREResponse" type="cadx:BREResponse_Type"/>
+<!--  edited with XMLSpy v2020 rel. 2 sp1 (x64) (http://www.altova.com) by  (HMRC - HM Revenue & Customs)  -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:gsm="http://www.hmrc.gsi.gov.uk/gsm" targetNamespace="http://www.hmrc.gsi.gov.uk/gsm">
+	<xs:element name="BREResponse" type="gsm:BREResponse_Type"/>
 	<xs:complexType name="BREResponse_Type">
 		<xs:sequence>
-			<xs:element name="requestCommon" type="cadx:requestCommon_Type"/>
-			<xs:element name="requestDetail" type="cadx:requestDetail_Type">
+			<xs:element name="requestCommon" type="gsm:requestCommon_Type"/>
+			<xs:element name="requestDetail" type="gsm:requestDetail_Type">
 				<xs:annotation>
 					<xs:documentation>Wrapper tag for the MDR submission XML payload</xs:documentation>
 				</xs:annotation>
@@ -43,29 +42,29 @@
 	</xs:complexType>
 	<xs:complexType name="requestDetail_Type">
 		<xs:sequence>
-			<xs:element name="GenericStatusMessage" type="cadx:GenericStatusMessage_Type"/>
+			<xs:element name="GenericStatusMessage" type="gsm:GenericStatusMessage_Type"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="GenericStatusMessage_Type">
 		<xs:sequence>
-			<xs:element name="ValidationErrors" type="cadx:ValidationErrors_Type"/>
-			<xs:element name="ValidationResult" type="cadx:ValidationResult_Type"/>
+			<xs:element name="ValidationErrors" type="gsm:ValidationErrors_Type"/>
+			<xs:element name="ValidationResult" type="gsm:ValidationResult_Type"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="ValidationErrors_Type">
 		<xs:sequence>
-			<xs:element name="FileError" type="cadx:FileError_Type" minOccurs="0" maxOccurs="unbounded"/>
-			<xs:element name="RecordError" type="cadx:RecordError_Type" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="FileError" type="gsm:FileError_Type" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="RecordError" type="gsm:RecordError_Type" minOccurs="0" maxOccurs="unbounded"/>
 		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="FileError_Type">
 		<xs:sequence>
-			<xs:element name="Code" type="cadx:StringMin1Max10_Type">
+			<xs:element name="Code" type="gsm:StringMin1Max10_Type">
 				<xs:annotation>
 					<xs:documentation xml:lang="en">Error Code</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="Details" type="cadx:ErrorDetail_Type" minOccurs="0">
+			<xs:element name="Details" type="gsm:ErrorDetail_Type" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation xml:lang="en">Error Details</xs:documentation>
 				</xs:annotation>
@@ -74,17 +73,17 @@
 	</xs:complexType>
 	<xs:complexType name="RecordError_Type">
 		<xs:sequence>
-			<xs:element name="Code" type="cadx:StringMin1Max10_Type">
+			<xs:element name="Code" type="gsm:StringMin1Max10_Type">
 				<xs:annotation>
 					<xs:documentation xml:lang="en">Error Code</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="Details" type="cadx:ErrorDetail_Type" minOccurs="0">
+			<xs:element name="Details" type="gsm:ErrorDetail_Type" minOccurs="0">
 				<xs:annotation>
 					<xs:documentation xml:lang="en">Error Details</xs:documentation>
 				</xs:annotation>
 			</xs:element>
-			<xs:element name="DocRefIDInError" type="cadx:StringMin1Max200_Type" minOccurs="0" maxOccurs="unbounded">
+			<xs:element name="DocRefIDInError" type="gsm:StringMin1Max200_Type" minOccurs="0" maxOccurs="unbounded">
 				<xs:annotation>
 					<xs:documentation xml:lang="en">DocRefID of the record causing the error</xs:documentation>
 				</xs:annotation>
@@ -93,7 +92,7 @@
 	</xs:complexType>
 	<xs:complexType name="ValidationResult_Type">
 		<xs:sequence>
-			<xs:element name="Status" type="cadx:FileAcceptanceStatus_EnumType">
+			<xs:element name="Status" type="gsm:FileAcceptanceStatus_EnumType">
 				<xs:annotation>
 					<xs:documentation xml:lang="en">Indicate if the file was accepted or rejected by the receiver</xs:documentation>
 				</xs:annotation>
@@ -130,9 +129,7 @@
 			<xs:documentation xml:lang="en">Error message provide more details about the error</xs:documentation>
 		</xs:annotation>
 		<xs:simpleContent>
-			<xs:extension base="cadx:StringMin1Max4000_Type">
-				<xs:attribute name="Language" type="iso:LanguageCode_Type"/>
-			</xs:extension>
+			<xs:extension base="gsm:StringMin1Max4000_Type"/>
 		</xs:simpleContent>
 	</xs:complexType>
 	<!--  -->
