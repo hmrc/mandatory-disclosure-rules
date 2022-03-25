@@ -17,6 +17,7 @@
 package controllers
 
 import controllers.actions.EISResponsePreConditionCheckActionRefiner
+import controllers.auth.AuthAction
 import models.submission.{Accepted => FileStatusAccepted, FileStatus, Rejected}
 import models.xml.{BREResponse, ValidationStatus}
 import play.api.Logging
@@ -31,6 +32,7 @@ import scala.concurrent.ExecutionContext
 import scala.xml.NodeSeq
 
 class EISResponseController @Inject() (cc: ControllerComponents,
+                                       authAction: AuthAction,
                                        actionRefiner: EISResponsePreConditionCheckActionRefiner,
                                        fileDetailsRepository: FileDetailsRepository,
                                        emailService: EmailService
@@ -44,7 +46,7 @@ class EISResponseController @Inject() (cc: ControllerComponents,
       case ValidationStatus.rejected => Rejected(breResponse.genericStatusMessage.validationErrors)
     }
 
-  def processEISResponse(): Action[NodeSeq] = (Action(parse.xml) andThen actionRefiner).async { implicit request =>
+  def processEISResponse(): Action[NodeSeq] = (authAction(parse.xml) andThen actionRefiner).async { implicit request =>
     val conversationId = request.BREResponse.conversationID
     val fileStatus     = convertToFileStatus(request.BREResponse)
 
@@ -63,7 +65,7 @@ class EISResponseController @Inject() (cc: ControllerComponents,
           case _ =>
             logger.warn("Upload file status is rejected on fast journey. No email has been sent")
         }
-        Ok
+        NoContent
       case _ =>
         logger.warn("Failed to update the status:mongo error")
         InternalServerError
