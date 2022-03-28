@@ -26,7 +26,7 @@ import play.api.Application
 import play.api.http.Status.{ACCEPTED, BAD_REQUEST, INTERNAL_SERVER_ERROR, NO_CONTENT}
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{POST, defaultAwaitTimeout, route, running, status, writeableOf_AnyContentAsXml}
+import play.api.test.Helpers.{defaultAwaitTimeout, route, running, status, writeableOf_AnyContentAsXml, POST}
 import repositories.submission.FileDetailsRepository
 import services.EmailService
 import uk.gov.hmrc.http.HeaderCarrier
