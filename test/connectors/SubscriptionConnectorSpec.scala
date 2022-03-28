@@ -49,7 +49,7 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
     "read subscription" - {
       "must return status as OK for read Subscription" in {
         stubResponse(
-          "/mdr/dct70d/v1",
+          "/dac6/dct70d/v1",
           OK
         )
 
@@ -64,7 +64,7 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
 
         forAll(arbitrary[DisplaySubscriptionForMDRRequest], errorCodes) { (sub, errorCode) =>
           stubResponse(
-            "/mdr/dct70d/v1",
+            "/dac6/dct70d/v1",
             errorCode
           )
 
@@ -77,7 +77,7 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
     "update subscription" - {
       "must return status as OK for update Subscription" in {
         stubResponse(
-          "/mdr/dct70e/v1",
+          "/dac6/dct70e/v1",
           OK
         )
 
@@ -91,7 +91,7 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
 
         forAll(arbitrary[UpdateSubscriptionForMDRRequest], errorCodes) { (sub, errorCode) =>
           stubResponse(
-            "/mdr/dct70e/v1",
+            "/dac6/dct70e/v1",
             errorCode
           )
 
