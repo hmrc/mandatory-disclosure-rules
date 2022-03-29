@@ -18,8 +18,10 @@ package controllers
 
 import controllers.actions.EISResponsePreConditionCheckActionRefiner
 import controllers.auth.AuthAction
-import models.submission.{Accepted => FileStatusAccepted, FileStatus, Rejected}
-import models.xml.{BREResponse, ValidationStatus}
+import models.submission.{FileStatus, Rejected, Accepted => FileStatusAccepted}
+import models.xml.FileErrorCode.{FailedSchemaValidation, InvalidMessageRefIDFormat, NotMeantToBeReceivedByTheIndicatedJurisdiction, fileErrorCodesForProblemStatus}
+import models.xml.RecordErrorCode.DocRefIDFormat
+import models.xml.{BREResponse, ValidationErrors, ValidationStatus}
 import play.api.Logging
 import play.api.mvc.{Action, ControllerComponents}
 import repositories.submission.FileDetailsRepository
@@ -46,9 +48,23 @@ class EISResponseController @Inject() (cc: ControllerComponents,
       case ValidationStatus.rejected => Rejected(breResponse.genericStatusMessage.validationErrors)
     }
 
+  private val problemsStatusErrorCodes: Seq[String] = fileErrorCodesForProblemStatus.map(_.code).:+(DocRefIDFormat.code)
+
+  def isProblemStatus(breResponse: BREResponse): Boolean = {
+    val errors = breResponse.genericStatusMessage.validationErrors
+    val codes: Seq[String] = Seq(errors.fileError.map(_.map(_.code.code)).getOrElse(Nil), errors.recordError.map(_.map(_.code.code)).getOrElse(Nil)).flatten
+
+    codes.exists(problemsStatusErrorCodes.contains(_))
+  }
+
+
   def processEISResponse(): Action[NodeSeq] = (authAction(parse.xml) andThen actionRefiner).async { implicit request =>
     val conversationId = request.BREResponse.conversationID
     val fileStatus     = convertToFileStatus(request.BREResponse)
+
+    if (isProblemStatus(request.BREResponse)) {
+      logger.warn("a CDAX error has been invoked")
+    }
 
     fileDetailsRepository.updateStatus(conversationId, fileStatus) map {
       case Some(updatedFileDetails) =>
