@@ -18,14 +18,16 @@ package controllers
 
 import base.SpecBase
 import models.submission._
-import models.xml.ValidationErrors
+import models.xml.FileErrorCode.MessageRefIDHasAlreadyBeenUsed
+import models.xml.RecordErrorCode.MessageTypeIndic
+import models.xml.{BREResponse, FileErrors, GenericStatusMessage, RecordError, ValidationErrors, ValidationStatus}
 import org.mockito.ArgumentMatchers.any
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.http.Status._
 import play.api.inject.bind
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{defaultAwaitTimeout, route, running, status, writeableOf_AnyContentAsXml, POST}
+import play.api.test.Helpers.{POST, defaultAwaitTimeout, route, running, status, writeableOf_AnyContentAsXml}
 import repositories.submission.FileDetailsRepository
 import services.EmailService
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames}
@@ -288,6 +290,39 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
         status(result) mustEqual INTERNAL_SERVER_ERROR
         verify(mockFileDetailsRepository, times(1)).updateStatus(any[String](), any[FileStatus]())
       }
+    }
+
+    "Must return false when containing a non CDAX error code" in {
+      val uuid = UUID.randomUUID().toString
+      val fileErrors = Some(List(FileErrors(MessageRefIDHasAlreadyBeenUsed, Some("Duplicate message ref ID"))))
+      val breResponse = BREResponse(
+        "MDR",
+        uuid,
+        GenericStatusMessage(
+          ValidationErrors(
+            fileErrors,
+            Some(
+              List(
+                RecordError(
+                  MessageTypeIndic,
+                  Some("A message can contain either new records (OECD1) or corrections/deletions (OECD2 and OECD3), but cannot contain a mixture of both"),
+                  Some(List("asjdhjjhjssjhdjshdAJGSJJS"))
+                )
+              )
+            )
+          ),
+          ValidationStatus.rejected
+        )
+      )
+
+      when(mockFileDetailsRepository.updateStatus(any[String](), any[FileStatus]())).thenReturn(Future.successful(None))
+
+      running(application) {
+        val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
+          .withHeaders("x-conversation-id" -> randomUUID.toString)
+          .withXmlBody(xml)
+
+
     }
   }
 }
