@@ -23,13 +23,13 @@ import models.xml.ValidationErrors
 import org.mockito.ArgumentMatchers.any
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
-import play.api.http.Status.{ACCEPTED, BAD_REQUEST, INTERNAL_SERVER_ERROR, NO_CONTENT}
+import play.api.http.Status.{ACCEPTED, BAD_REQUEST, FORBIDDEN, INTERNAL_SERVER_ERROR, NO_CONTENT}
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{defaultAwaitTimeout, route, running, status, writeableOf_AnyContentAsXml, POST}
 import repositories.submission.FileDetailsRepository
 import services.EmailService
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames}
 
 import java.time.LocalDateTime
 import java.util.UUID
@@ -38,8 +38,10 @@ import scala.xml.NodeSeq
 
 class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
 
+  private val randomUUID                               = UUID.randomUUID()
   val mockFileDetailsRepository: FileDetailsRepository = mock[FileDetailsRepository]
   val mockEmailService: EmailService                   = mock[EmailService]
+  val headers                                          = ("x-conversation-id" -> randomUUID.toString, HeaderNames.authorisation -> s"Bearer token")
 
   override def beforeEach(): Unit = {
     reset(mockFileDetailsRepository, mockEmailService)
@@ -54,7 +56,6 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
     )
     .build()
 
-  private val randomUUID = UUID.randomUUID()
   val xml: NodeSeq = <gsm:BREResponse xmlns:gsm="http://www.hmrc.gsi.gov.uk/gsm">
     <requestCommon>
       <receiptDate>2001-12-17T09:30:47.400Z</receiptDate>
@@ -93,13 +94,26 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
         .thenReturn(Future.successful(ACCEPTED))
 
       val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
-        .withHeaders("x-conversation-id" -> randomUUID.toString)
+        .withHeaders("x-conversation-id" -> randomUUID.toString, HeaderNames.authorisation -> s"Bearer token")
         .withXmlBody(xml)
 
       val result = route(application, request).value
 
       status(result) mustEqual NO_CONTENT
       verify(mockFileDetailsRepository, times(1)).updateStatus(any[String](), any[FileStatus]())
+    }
+
+    "must return FORBIDDEN when auth token fails the validation" in {
+      when(mockEmailService.sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier]))
+        .thenReturn(Future.successful(ACCEPTED))
+
+      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
+        .withHeaders("x-conversation-id" -> randomUUID.toString, HeaderNames.authorisation -> s"wrong")
+        .withXmlBody(xml)
+
+      val result = route(application, request).value
+
+      status(result) mustEqual FORBIDDEN
     }
 
     "must send an email when on the fast journey and file upload is Accepted" in {
@@ -111,7 +125,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
         .thenReturn(Future.successful(ACCEPTED))
 
       val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
-        .withHeaders("x-conversation-id" -> randomUUID.toString)
+        .withHeaders("x-conversation-id" -> randomUUID.toString, HeaderNames.authorisation -> s"Bearer token")
         .withXmlBody(xml)
 
       val result = route(application, request).value
@@ -137,7 +151,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
         .thenReturn(Future.successful(ACCEPTED))
 
       val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
-        .withHeaders("x-conversation-id" -> randomUUID.toString)
+        .withHeaders("x-conversation-id" -> randomUUID.toString, HeaderNames.authorisation -> s"Bearer token")
         .withXmlBody(xml)
 
       val result = route(application, request).value
@@ -163,7 +177,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
         .thenReturn(Future.successful(ACCEPTED))
 
       val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
-        .withHeaders("x-conversation-id" -> randomUUID.toString)
+        .withHeaders("x-conversation-id" -> randomUUID.toString, HeaderNames.authorisation -> s"Bearer token")
         .withXmlBody(xml)
 
       val result = route(application, request).value
@@ -188,7 +202,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
         .thenReturn(Future.successful(ACCEPTED))
 
       val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
-        .withHeaders("x-conversation-id" -> randomUUID.toString)
+        .withHeaders("x-conversation-id" -> randomUUID.toString, HeaderNames.authorisation -> s"Bearer token")
         .withXmlBody(xml)
 
       val result = route(application, request).value
@@ -214,7 +228,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
         .thenReturn(Future.successful(ACCEPTED))
 
       val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
-        .withHeaders("x-conversation-id" -> randomUUID.toString)
+        .withHeaders("x-conversation-id" -> randomUUID.toString, HeaderNames.authorisation -> s"Bearer token")
         .withXmlBody(xml)
 
       val result = route(application, request).value
@@ -240,7 +254,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
         .thenReturn(Future.successful(ACCEPTED))
 
       val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
-        .withHeaders("x-conversation-id" -> randomUUID.toString)
+        .withHeaders("x-conversation-id" -> randomUUID.toString, HeaderNames.authorisation -> s"Bearer token")
         .withXmlBody(xml)
 
       val result = route(application, request).value
@@ -253,7 +267,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
       val invalidXml = <test>invalid</test>
 
       val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
-        .withHeaders("x-conversation-id" -> randomUUID.toString)
+        .withHeaders("x-conversation-id" -> randomUUID.toString, HeaderNames.authorisation -> s"Bearer token")
         .withXmlBody(invalidXml)
 
       val result = route(application, request).value
@@ -268,7 +282,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
 
       running(application) {
         val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
-          .withHeaders("x-conversation-id" -> randomUUID.toString)
+          .withHeaders("x-conversation-id" -> randomUUID.toString, HeaderNames.authorisation -> s"Bearer token")
           .withXmlBody(xml)
 
         val result = route(application, request).value
