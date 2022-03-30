@@ -61,8 +61,8 @@ class CustomAlertUtilSpec extends SpecBase {
       "when a 'problem' error occurs" in {
         val mockLogger = mock[Logger]
 
-        when(mockLogger.isWarnEnabled).thenReturn(true)
-        val errors = ValidationErrors(Some(Seq(FileErrors(FailedSchemaValidation, None))), Some(Seq(RecordError(DocRefIDFormat, None, None))))
+      val errors =
+        ValidationErrors(Some(Seq(FileErrors(MessageRefIDHasAlreadyBeenUsed, None))), Some(Seq(RecordError(MissingCorrDocRefId, None, None))))
 
         val alertUtil = new CustomAlertUtil {
           override val logger: Logger = mockLogger

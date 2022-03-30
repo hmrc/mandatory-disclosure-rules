@@ -66,7 +66,8 @@ class EISResponseController @Inject() (cc: ControllerComponents,
               updatedFileDetails.messageRefId,
               updatedFileDetails.status == FileStatusAccepted
             )
-          case _ =>
+          case Rejected(error) =>
+            customAlertUtil.alertForProblemStatus(error)
             logger.warn("Upload file status is rejected on fast journey. No email has been sent")
         }
         NoContent
