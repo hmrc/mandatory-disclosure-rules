@@ -45,6 +45,7 @@ class ValidateAuthTokenActionImpl @Inject() (appConfig: AppConfig)(implicit val 
     if (validateBearerToken(request)) {
       Future.successful(Right(request))
     } else {
+      logger.warn("Unexpected auth Bearer token received")
       Future.successful(Left(Forbidden))
     }
   }
