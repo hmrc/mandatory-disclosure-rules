@@ -17,8 +17,8 @@
 package utils
 
 import base.SpecBase
-import models.xml.FileErrorCode.{FailedSchemaValidation, MessageRefIDHasAlreadyBeenUsed}
-import models.xml.RecordErrorCode.{DocRefIDFormat, MissingCorrDocRefId}
+import models.xml.FileErrorCode.{FailedSchemaValidation, MessageRefIDHasAlreadyBeenUsed, UnknownFileErrorCode}
+import models.xml.RecordErrorCode.{DocRefIDFormat, MissingCorrDocRefId, UnknownRecordErrorCode}
 import models.xml.{FileErrors, RecordError, ValidationErrors}
 import play.api.Logger
 
@@ -26,33 +26,51 @@ class CustomAlertUtilSpec extends SpecBase {
 
   "alertForProblemStatus" - {
 
-    "should return true when error messages have a 'problem' error" in {
-      val mockLogger = mock[Logger]
+    val loggerMessage = "File Rejected with unexpected error"
 
-      when(mockLogger.isWarnEnabled).thenReturn(true)
-      val errors = ValidationErrors(Some(Seq(FileErrors(FailedSchemaValidation, None))), Some(Seq(RecordError(DocRefIDFormat, None, None))))
+    s"should return logger warning with message '$loggerMessage'" - {
 
-      val alertUtil = new CustomAlertUtil {
-        override val logger: Logger = mockLogger
+      "when an 'unknown file' error occurs" in {
+        val mockLogger = mock[Logger]
+
+        when(mockLogger.isWarnEnabled).thenReturn(true)
+        val errors = ValidationErrors(None, Some(Seq(RecordError(UnknownRecordErrorCode("12345"), None, None))))
+
+        val alertUtil = new CustomAlertUtil {
+          override val logger: Logger = mockLogger
+        }
+
+        alertUtil.alertForProblemStatus(errors)
+        verify(mockLogger).warn(loggerMessage)
       }
 
-      alertUtil.alertForProblemStatus(errors)
-      verify(mockLogger).warn("a CDAX error has been invoked")
-    }
+      "when an 'unknown record' error occurs" in {
+        val mockLogger = mock[Logger]
 
-    "should return a when error messages have a 'problem' error" in {
-      val mockLogger = mock[Logger]
-      when(mockLogger.isInfoEnabled).thenReturn(true)
+        when(mockLogger.isWarnEnabled).thenReturn(true)
+        val errors = ValidationErrors(Some(Seq(FileErrors(UnknownFileErrorCode("12345"), None))), None)
 
-      val errors =
-        ValidationErrors(Some(Seq(FileErrors(MessageRefIDHasAlreadyBeenUsed, None))), Some(Seq(RecordError(MissingCorrDocRefId, None, None))))
+        val alertUtil = new CustomAlertUtil {
+          override val logger: Logger = mockLogger
+        }
 
-      val alertUtil = new CustomAlertUtil {
-        override val logger: Logger = mockLogger
+        alertUtil.alertForProblemStatus(errors)
+        verify(mockLogger).warn(loggerMessage)
       }
 
-      alertUtil.alertForProblemStatus(errors)
-      verify(mockLogger).info("File Rejected with business rule errors")
+      "when a 'problem' error occurs" in {
+        val mockLogger = mock[Logger]
+
+        when(mockLogger.isWarnEnabled).thenReturn(true)
+        val errors = ValidationErrors(Some(Seq(FileErrors(FailedSchemaValidation, None))), Some(Seq(RecordError(DocRefIDFormat, None, None))))
+
+        val alertUtil = new CustomAlertUtil {
+          override val logger: Logger = mockLogger
+        }
+
+        alertUtil.alertForProblemStatus(errors)
+        verify(mockLogger).warn(loggerMessage)
+      }
     }
   }
 

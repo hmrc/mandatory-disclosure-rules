@@ -18,20 +18,18 @@ package utils
 
 import models.xml.FileErrorCode.fileErrorCodesForProblemStatus
 import models.xml.RecordErrorCode.DocRefIDFormat
-import models.xml.ValidationErrors
+import models.xml.{FileErrorCode, RecordErrorCode, ValidationErrors}
 import play.api.Logging
 
 class CustomAlertUtil extends Logging {
 
+  private val expectedErrorCodes: Seq[String]       = FileErrorCode.values.map(_.code) ++ RecordErrorCode.values.map(_.code)
   private val problemsStatusErrorCodes: Seq[String] = fileErrorCodesForProblemStatus.map(_.code).:+(DocRefIDFormat.code)
 
   def alertForProblemStatus(errors: ValidationErrors): Unit = {
-    val codes: Seq[String] = Seq(errors.fileError.map(_.map(_.code.code)).getOrElse(Nil), errors.recordError.map(_.map(_.code.code)).getOrElse(Nil)).flatten
-    if (codes.exists(problemsStatusErrorCodes.contains(_))) {
-      logger.warn("a CDAX error has been invoked")
-    } else {
-      logger.info("File Rejected with business rule errors")
+    val errorCodes = Seq(errors.fileError.map(_.map(_.code.code)).getOrElse(Nil), errors.recordError.map(_.map(_.code.code)).getOrElse(Nil)).flatten
+    if (errorCodes.exists(!expectedErrorCodes.contains(_) || errorCodes.exists(problemsStatusErrorCodes.contains(_)))) {
+      logger.warn("File Rejected with unexpected error")
     }
   }
-
 }
