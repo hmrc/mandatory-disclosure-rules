@@ -45,7 +45,9 @@ class EISResponseController @Inject() (cc: ControllerComponents,
   private def convertToFileStatus(breResponse: BREResponse): FileStatus =
     breResponse.genericStatusMessage.status match {
       case ValidationStatus.accepted => FileStatusAccepted
-      case ValidationStatus.rejected => Rejected(breResponse.genericStatusMessage.validationErrors)
+      case ValidationStatus.rejected =>
+        customAlertUtil.alertForProblemStatus(breResponse.genericStatusMessage.validationErrors)
+        Rejected(breResponse.genericStatusMessage.validationErrors)
     }
 
   def processEISResponse(): Action[NodeSeq] = (authAction(parse.xml) andThen actionRefiner).async { implicit request =>
@@ -54,26 +56,17 @@ class EISResponseController @Inject() (cc: ControllerComponents,
 
     fileDetailsRepository.updateStatus(conversationId, fileStatus) map {
       case Some(updatedFileDetails) =>
-        val isSlowJourney = updatedFileDetails.lastUpdated.isAfter(updatedFileDetails.submitted.plusSeconds(10))
+        val fastJourney = updatedFileDetails.lastUpdated.isBefore(updatedFileDetails.submitted.plusSeconds(10))
 
-        updatedFileDetails.status match {
-          case FileStatusAccepted =>
+        (fastJourney, updatedFileDetails.status) match {
+          case (_, FileStatusAccepted) | (false, Rejected(_)) =>
             emailService.sendAndLogEmail(
               updatedFileDetails.subscriptionId,
               dateFormatted(updatedFileDetails.submitted),
               updatedFileDetails.messageRefId,
-              isUploadSuccessful = true
+              updatedFileDetails.status == FileStatusAccepted
             )
-          case Rejected(error) if isSlowJourney =>
-            customAlertUtil.alertForProblemStatus(error)
-            emailService.sendAndLogEmail(
-              updatedFileDetails.subscriptionId,
-              dateFormatted(updatedFileDetails.submitted),
-              updatedFileDetails.messageRefId,
-              isUploadSuccessful = false
-            )
-          case Rejected(error) =>
-            customAlertUtil.alertForProblemStatus(error)
+          case _ =>
             logger.warn("Upload file status is rejected on fast journey. No email has been sent")
         }
         NoContent
