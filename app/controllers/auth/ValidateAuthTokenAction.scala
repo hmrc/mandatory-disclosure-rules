@@ -21,7 +21,6 @@ import config.AppConfig
 import play.api.Logging
 import play.api.mvc.Results.Forbidden
 import play.api.mvc._
-import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.{Authorization, HeaderCarrier}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
