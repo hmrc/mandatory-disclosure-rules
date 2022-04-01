@@ -41,7 +41,7 @@ class CustomAlertUtilSpec extends SpecBase {
         }
 
         alertUtil.alertForProblemStatus(errors)
-        verify(mockLogger).warn(loggerMessage)
+        verify(mockLogger, times(1)).warn(loggerMessage)
       }
 
       "when an 'unknown record' error occurs" in {
@@ -55,7 +55,7 @@ class CustomAlertUtilSpec extends SpecBase {
         }
 
         alertUtil.alertForProblemStatus(errors)
-        verify(mockLogger).warn(loggerMessage)
+        verify(mockLogger, times(1)).warn(loggerMessage)
       }
 
       "when a 'problem' error occurs" in {
@@ -69,7 +69,7 @@ class CustomAlertUtilSpec extends SpecBase {
         }
 
         alertUtil.alertForProblemStatus(errors)
-        verify(mockLogger).warn(loggerMessage)
+        verify(mockLogger, times(1)).warn(loggerMessage)
       }
     }
   }
