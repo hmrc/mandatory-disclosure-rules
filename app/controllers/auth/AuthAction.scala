@@ -17,7 +17,7 @@
 package controllers.auth
 
 import com.google.inject.ImplementedBy
-import play.api.http.Status.FORBIDDEN
+import play.api.http.Status.UNAUTHORIZED
 import play.api.mvc.Results.Status
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions, NoActiveSession}
@@ -38,7 +38,7 @@ class AuthActionImpl @Inject() (override val authConnector: AuthConnector, val p
     authorised() {
       block(request)
     } recover { case _: NoActiveSession =>
-      Status(FORBIDDEN)
+      Status(UNAUTHORIZED)
     }
   }
 

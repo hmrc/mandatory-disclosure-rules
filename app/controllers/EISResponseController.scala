@@ -17,7 +17,7 @@
 package controllers
 
 import controllers.actions.EISResponsePreConditionCheckActionRefiner
-import controllers.auth.{AuthAction, ValidateAuthTokenAction}
+import controllers.auth.ValidateAuthTokenAction
 import models.submission.{Accepted => FileStatusAccepted, FileStatus, Rejected}
 import models.xml.{BREResponse, ValidationStatus}
 import play.api.Logging
@@ -32,7 +32,6 @@ import scala.concurrent.ExecutionContext
 import scala.xml.NodeSeq
 
 class EISResponseController @Inject() (cc: ControllerComponents,
-                                       authAction: AuthAction,
                                        validateAuth: ValidateAuthTokenAction,
                                        actionRefiner: EISResponsePreConditionCheckActionRefiner,
                                        fileDetailsRepository: FileDetailsRepository,
@@ -47,7 +46,7 @@ class EISResponseController @Inject() (cc: ControllerComponents,
       case ValidationStatus.rejected => Rejected(breResponse.genericStatusMessage.validationErrors)
     }
 
-  def processEISResponse(): Action[NodeSeq] = (authAction(parse.xml) andThen validateAuth andThen actionRefiner).async { implicit request =>
+  def processEISResponse(): Action[NodeSeq] = (Action(parse.xml) andThen validateAuth andThen actionRefiner).async { implicit request =>
     val conversationId = request.BREResponse.conversationID
     val fileStatus     = convertToFileStatus(request.BREResponse)
 
