@@ -25,6 +25,7 @@ import play.api.mvc.{Action, ControllerComponents}
 import repositories.submission.FileDetailsRepository
 import services.EmailService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import utils.CustomAlertUtil
 import utils.DateTimeFormatUtil.dateFormatted
 
 import javax.inject.Inject
@@ -35,7 +36,8 @@ class EISResponseController @Inject() (cc: ControllerComponents,
                                        authAction: AuthAction,
                                        actionRefiner: EISResponsePreConditionCheckActionRefiner,
                                        fileDetailsRepository: FileDetailsRepository,
-                                       emailService: EmailService
+                                       emailService: EmailService,
+                                       customAlertUtil: CustomAlertUtil
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
@@ -43,7 +45,9 @@ class EISResponseController @Inject() (cc: ControllerComponents,
   private def convertToFileStatus(breResponse: BREResponse): FileStatus =
     breResponse.genericStatusMessage.status match {
       case ValidationStatus.accepted => FileStatusAccepted
-      case ValidationStatus.rejected => Rejected(breResponse.genericStatusMessage.validationErrors)
+      case ValidationStatus.rejected =>
+        customAlertUtil.alertForProblemStatus(breResponse.genericStatusMessage.validationErrors)
+        Rejected(breResponse.genericStatusMessage.validationErrors)
     }
 
   def processEISResponse(): Action[NodeSeq] = (authAction(parse.xml) andThen actionRefiner).async { implicit request =>

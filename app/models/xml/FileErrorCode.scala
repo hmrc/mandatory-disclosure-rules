@@ -40,6 +40,12 @@ object FileErrorCode {
     NotMeantToBeReceivedByTheIndicatedJurisdiction
   )
 
+  val fileErrorCodesForProblemStatus: Seq[FileErrorCode] = Seq(
+    FailedSchemaValidation,
+    InvalidMessageRefIDFormat,
+    NotMeantToBeReceivedByTheIndicatedJurisdiction
+  )
+
   implicit val writes: Writes[FileErrorCode] = Writes[FileErrorCode] { x =>
     JsString(x.code)
   }
