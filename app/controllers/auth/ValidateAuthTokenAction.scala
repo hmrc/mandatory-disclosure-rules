@@ -21,7 +21,7 @@ import config.AppConfig
 import play.api.Logging
 import play.api.mvc.Results.Forbidden
 import play.api.mvc._
-import uk.gov.hmrc.http.{Authorization, HeaderCarrier}
+import uk.gov.hmrc.http.Authorization
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import javax.inject.Inject
@@ -31,23 +31,20 @@ class ValidateAuthTokenActionImpl @Inject() (appConfig: AppConfig)(implicit val 
     extends ValidateAuthTokenAction
     with Logging {
 
-  private def validateBearerToken[A](request: Request[A]): Boolean =
+  private def validateBearerToken[A](request: Request[A]): Boolean = {
     HeaderCarrierConverter.fromRequest(request).authorization match {
       case Some(Authorization(value)) => value == s"Bearer ${appConfig.bearerToken("eis-response")}"
       case _                          => false
     }
+  }
 
-  override def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] = {
-
-    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
-
+  override def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] =
     if (validateBearerToken(request)) {
       Future.successful(Right(request))
     } else {
       logger.warn("Unexpected auth Bearer token received")
       Future.successful(Left(Forbidden))
     }
-  }
 }
 
 @ImplementedBy(classOf[ValidateAuthTokenActionImpl])

@@ -17,13 +17,12 @@
 package controllers
 
 import base.SpecBase
-import controllers.auth.{AuthAction, FakeAuthAction}
 import models.submission._
 import models.xml.ValidationErrors
 import org.mockito.ArgumentMatchers.any
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
-import play.api.http.Status.{ACCEPTED, BAD_REQUEST, FORBIDDEN, INTERNAL_SERVER_ERROR, NO_CONTENT}
+import play.api.http.Status._
 import play.api.inject.bind
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{defaultAwaitTimeout, route, running, status, writeableOf_AnyContentAsXml, POST}
