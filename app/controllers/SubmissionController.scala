@@ -28,6 +28,7 @@ import repositories.submission.FileDetailsRepository
 import services.submission.TransformService
 import services.subscription.SubscriptionService
 import services.validation.XMLValidationService
+import uk.gov.hmrc.http.HttpReads.is2xx
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import java.time.LocalDateTime
@@ -74,8 +75,8 @@ class SubmissionController @Inject() (
           case Right(_) =>
             submissionConnector.submitDisclosure(submissionXml, conversationId).flatMap { httpResponse =>
               httpResponse.status match {
-                case OK => fileDetailsRepository.insert(submissionDetails).map(_ => Ok(Json.toJson(conversationId)))
-                case _  => Future.successful(httpResponse.handleResponse)
+                case status if is2xx(status) => fileDetailsRepository.insert(submissionDetails).map(_ => Ok(Json.toJson(conversationId)))
+                case _                       => Future.successful(httpResponse.handleResponse)
               }
             }
         }

@@ -77,7 +77,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
       when(mockReadSubscriptionService.getContactInformation(any[String]())(any[HeaderCarrier](), any[ExecutionContext]()))
         .thenReturn(Future.successful(Right(responseDetail)))
       when(mockSubmissionConnector.submitDisclosure(any[NodeSeq](), any[ConversationId])(any[HeaderCarrier]()))
-        .thenReturn(Future.successful(HttpResponse(OK, "")))
+        .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
       when(mockXMLValidationService.validate(any[NodeSeq], any[String]))
         .thenReturn(Right(basicXml))
       val submission = basicXml
