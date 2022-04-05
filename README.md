@@ -1,7 +1,6 @@
-
 # Mandatory Disclosure Rules
 
-This service takes a users XML from `[mandatory-disclosure-rules-frontend](https://github.com/hmrc/mandatory-disclosure-rules-frontend)` that has been checked by upscan. It validates the submission against XML schema and submits it to EIS.
+This service takes a users XML from [mandatory-disclosure-rules-frontend](https://github.com/hmrc/mandatory-disclosure-rules-frontend) that has been checked by upscan. It validates the submission against XML schema and submits it to EIS.
 
 ## Run Locally
 
