@@ -58,7 +58,6 @@ class SubscriptionService @Inject() (subscriptionConnector: SubscriptionConnecto
         case OK => Right(())
         case status =>
           logger.warn(s"Update Subscription Got Status $status")
-          logger.debug(s"Update Subscription Got Status $res")
           Left(UpdateSubscriptionError(status))
       }
     }

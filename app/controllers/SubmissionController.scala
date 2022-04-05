@@ -63,7 +63,6 @@ class SubmissionController @Inject() (
     val submissionMetaData = SubmissionMetaData.build(submissionTime, conversationId, fileName)
     readSubscriptionService.getContactInformation(subscriptionId).flatMap {
       case Right(value) =>
-        // Add metadata
         val submissionXml: NodeSeq = transformService.addSubscriptionDetailsToSubmission(uploadedXmlNode, value, submissionMetaData)
         val sanitisedXml           = submissionXml.map(node => scala.xml.Utility.trim(node))
         val validatedResponse      = xmlValidationService.validate(xml = sanitisedXml, filePath = appConfig.submissionXSDFilePath)
@@ -75,8 +74,8 @@ class SubmissionController @Inject() (
           case Right(_) =>
             submissionConnector.submitDisclosure(submissionXml, conversationId).flatMap { httpResponse =>
               httpResponse.status match {
-                case status if is2xx(status) => fileDetailsRepository.insert(submissionDetails).map(_ => Ok(Json.toJson(conversationId)))
-                case _                       => Future.successful(httpResponse.handleResponse)
+                case OK => fileDetailsRepository.insert(submissionDetails).map(_ => Ok(Json.toJson(conversationId)))
+                case _  => Future.successful(httpResponse.handleResponse(implicitly[Logger](logger)))
               }
             }
         }

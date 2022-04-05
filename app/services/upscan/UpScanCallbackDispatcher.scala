@@ -22,7 +22,7 @@ import play.api.Logging
 
 import scala.concurrent.Future
 
-class UpscanCallbackDispatcher @Inject() (sessionStorage: UploadProgressTracker) extends Logging {
+class UpScanCallbackDispatcher @Inject()(sessionStorage: UploadProgressTracker) extends Logging {
 
   def handleCallback(callback: CallbackBody): Future[Boolean] = {
     val uploadStatus = callback match {

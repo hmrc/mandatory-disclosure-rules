@@ -69,7 +69,7 @@ class XMLValidationService @Inject() () {
   }
 
   def validate(xml: NodeSeq, filePath: String): Either[ListBuffer[SaxParseError], Elem] = {
-    val list: ListBuffer[SaxParseError] = new ListBuffer[SaxParseError]
+    val list: ListBuffer[SaxParseError] = new ListBuffer[SaxParseError] 
     val loadedXML                       = xmlLoader(filePath, list).load(new StringReader(xml.mkString))
     if (list.isEmpty) Right(loadedXML) else Left(list)
   }

@@ -20,7 +20,7 @@ import models.upscan.CallbackBody
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.json.JsValue
 import play.api.mvc.{Action, BaseController, MessagesControllerComponents}
-import services.upscan.UpscanCallbackDispatcher
+import services.upscan.UpScanCallbackDispatcher
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
@@ -28,9 +28,9 @@ import uk.gov.hmrc.play.bootstrap.controller.WithJsonBody
 
 @Singleton
 class UploadCallbackController @Inject() (
-  val controllerComponents: MessagesControllerComponents,
-  val upscanCallbackDispatcher: UpscanCallbackDispatcher,
-  implicit override val messagesApi: MessagesApi
+                                           val controllerComponents: MessagesControllerComponents,
+                                           val upscanCallbackDispatcher: UpScanCallbackDispatcher,
+                                           implicit override val messagesApi: MessagesApi
 )(implicit val ec: ExecutionContext)
     extends BaseController
     with WithJsonBody

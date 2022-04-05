@@ -25,17 +25,17 @@ import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.mvc.Result
 import play.api.test.{FakeHeaders, FakeRequest}
-import services.upscan.UpscanCallbackDispatcher
+import services.upscan.UpScanCallbackDispatcher
 import play.api.test.Helpers.{defaultAwaitTimeout, status}
 
 import scala.concurrent.Future
 
 class UploadCallbackControllerSpec extends SpecBase with JsonMatchers {
-  val mockUpscanCallbackDispatcher = mock[UpscanCallbackDispatcher]
+  val mockUpscanCallbackDispatcher = mock[UpScanCallbackDispatcher]
 
   val application = applicationBuilder()
     .overrides(
-      bind[UpscanCallbackDispatcher].toInstance(mockUpscanCallbackDispatcher)
+      bind[UpScanCallbackDispatcher].toInstance(mockUpscanCallbackDispatcher)
     )
 
   "UploadCallback Controller" - {
