@@ -179,7 +179,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
                     "messageRefId",
                     Accepted,
                     "file1.xml",
-                    LocalDateTime.now().minusSeconds(20),
+                    LocalDateTime.now().minusSeconds(11),
                     LocalDateTime.now()
         )
 
@@ -205,7 +205,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
           "messageRefId",
           Rejected(ValidationErrors(None, None)),
           "file1.xml",
-          LocalDateTime.now().minusSeconds(20),
+          LocalDateTime.now().minusSeconds(11),
           LocalDateTime.now()
         )
 
@@ -231,7 +231,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
           "messageRefId",
           Pending,
           "file1.xml",
-          LocalDateTime.now().minusSeconds(20),
+          LocalDateTime.now().minusSeconds(11),
           LocalDateTime.now()
         )
 

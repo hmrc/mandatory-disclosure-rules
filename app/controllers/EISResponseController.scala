@@ -16,6 +16,7 @@
 
 package controllers
 
+import config.AppConfig
 import controllers.actions.EISResponsePreConditionCheckActionRefiner
 import controllers.auth.AuthAction
 import models.submission.{Accepted => FileStatusAccepted, FileStatus, Rejected}
@@ -37,6 +38,7 @@ class EISResponseController @Inject() (cc: ControllerComponents,
                                        actionRefiner: EISResponsePreConditionCheckActionRefiner,
                                        fileDetailsRepository: FileDetailsRepository,
                                        emailService: EmailService,
+                                       appConfig: AppConfig,
                                        customAlertUtil: CustomAlertUtil
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
@@ -56,7 +58,7 @@ class EISResponseController @Inject() (cc: ControllerComponents,
 
     fileDetailsRepository.updateStatus(conversationId, fileStatus) map {
       case Some(updatedFileDetails) =>
-        val fastJourney = updatedFileDetails.lastUpdated.isBefore(updatedFileDetails.submitted.plusSeconds(10))
+        val fastJourney = updatedFileDetails.lastUpdated.isBefore(updatedFileDetails.submitted.plusSeconds(appConfig.eisResponseWaitTime))
 
         (fastJourney, updatedFileDetails.status) match {
           case (_, FileStatusAccepted) | (false, Rejected(_)) =>
