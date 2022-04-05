@@ -19,7 +19,6 @@ package connectors
 import com.google.inject.Inject
 import config.AppConfig
 import models.subscription.{DisplaySubscriptionForMDRRequest, UpdateSubscriptionForMDRRequest}
-import play.api.Logging
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -27,7 +26,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class SubscriptionConnector @Inject() (
   val config: AppConfig,
   val http: HttpClient
-) extends Logging {
+) {
 
   def readSubscriptionInformation(
     subscription: DisplaySubscriptionForMDRRequest
@@ -43,8 +42,6 @@ class SubscriptionConnector @Inject() (
       .withContentType(Some("application/json"))
       .withAccept(Some("application/json"))
       .withEnvironment(Some(config.environment(serviceName)))
-    logger.info(s"ExtraHeaders size = ${extraHeaders.size}")
-    logger.debug(s"ExtraHeaders = $extraHeaders")
 
     http.POST[DisplaySubscriptionForMDRRequest, HttpResponse](
       config.serviceUrl(serviceName),
@@ -72,8 +69,6 @@ class SubscriptionConnector @Inject() (
       .withContentType(Some("application/json"))
       .withAccept(Some("application/json"))
       .withEnvironment(Some(config.environment(serviceName)))
-    logger.info(s"ExtraHeaders size = ${extraHeaders.size}")
-    logger.debug(s"ExtraHeaders = $extraHeaders")
 
     http.POST[UpdateSubscriptionForMDRRequest, HttpResponse](config.serviceUrl(serviceName), updateSubscription, extraHeaders)(
       wts = UpdateSubscriptionForMDRRequest.format,

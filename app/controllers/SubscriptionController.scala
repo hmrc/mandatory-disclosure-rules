@@ -21,7 +21,7 @@ import models.error.{ReadSubscriptionError, UpdateSubscriptionError}
 import models.subscription.RequestDetailForUpdate
 import play.api.Logging
 import play.api.libs.json.{JsResult, JsValue, Json}
-import play.api.mvc.{Action, ControllerComponents}
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import services.subscription.SubscriptionService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -36,7 +36,7 @@ class SubscriptionController @Inject() (
     extends BackendController(cc)
     with Logging {
 
-  def readSubscription() = authenticate.async { implicit request =>
+  def readSubscription(): Action[AnyContent] = authenticate.async { implicit request =>
     subscriptionService.getContactInformation(request.subscriptionId).map {
       case Right(value) => Ok(Json.toJson(value))
       case Left(ReadSubscriptionError(value)) =>
@@ -52,8 +52,7 @@ class SubscriptionController @Inject() (
     updateSubscriptionResult.fold(
       invalid =>
         Future.successful {
-          logger.warn(s" updateSubscription Json Validation Failed")
-          logger.debug(s" updateSubscription Json Validation Failed: $invalid")
+          logger.warn(s" updateSubscription Json Validation Failed: $invalid")
           InternalServerError("Json Validation Failed")
         },
       validReq =>

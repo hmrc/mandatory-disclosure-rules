@@ -203,5 +203,20 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
 
     }
 
+    "should return BAD_REQUEST when Json is Invalid" in {
+
+      when(
+        mockSubscriptionService
+          .updateSubscription(any[RequestDetailForUpdate]())(
+            any[HeaderCarrier](),
+            any[ExecutionContext]()
+          )
+      ).thenReturn(
+        Future.successful(
+          Left(UpdateSubscriptionError(500))
+        )
+      )
+
+    }
   }
 }

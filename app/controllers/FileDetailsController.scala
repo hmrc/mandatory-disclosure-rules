@@ -39,7 +39,7 @@ class FileDetailsController @Inject() (
     fileDetailsRepository.findByConversationId(conversationId) map {
       case Some(fileDetails) => Ok(Json.toJson(ResponseFileDetails.build(fileDetails)))
       case _ =>
-        logger.info(s"No record found for the conversationId: ${conversationId.value}")
+        logger.warn(s"No record found for the conversationId: ${conversationId.value}")
         NotFound
     }
   }
@@ -55,7 +55,7 @@ class FileDetailsController @Inject() (
     fileDetailsRepository.findStatusByConversationId(conversationId) map {
       case Some(status) => Ok(Json.toJson(status))
       case _ =>
-        logger.info(s"No status found for the conversationId: $conversationId")
+        logger.warn(s"No status found for the conversationId: $conversationId")
         NotFound
     }
   }

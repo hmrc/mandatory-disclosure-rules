@@ -36,7 +36,6 @@ class SubmissionValidationController @Inject() (
     extends BackendController(cc)
     with Logging {
 
-  //TODO replace Action.async with IdentifierAuthAction and instead of request.body.asText read it as a json
   def validateSubmission: Action[JsValue] = authenticate(parse.json).async { implicit request =>
     request.body.validate[UpscanURL] match {
       case JsSuccess(upscanURL, _) =>
@@ -48,15 +47,15 @@ class SubmissionValidationController @Inject() (
             Ok(Json.toJson(SubmissionValidationFailure(errors)))
 
           case InvalidXmlError(saxException) =>
-            logger.info("InvalidXmlError: Failed to validate xml submission")
+            logger.warn("InvalidXmlError: Failed to validate xml submission")
             BadRequest(InvalidXmlError(saxException).toString)
 
           case _ =>
-            logger.info("Failed to validate xml submission")
+            logger.warn("Failed to validate xml submission")
             InternalServerError("failed to validateSubmission")
         }
       case JsError(errors) =>
-        logger.info(s"Missing upscan URL: $errors")
+        logger.warn(s"Missing upscan URL: $errors")
         Future.successful(InternalServerError("Missing upscan URL"))
     }
   }
