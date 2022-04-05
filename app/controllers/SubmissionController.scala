@@ -58,7 +58,6 @@ class SubmissionController @Inject() (
     val conversationId           = ConversationId()
     val uploadedXmlNode: NodeSeq = xml \ "file" \ "MDR_OECD"
     val submissionDetails        = FileDetails(conversationId, subscriptionId, messageRefId, Pending, fileName, submissionTime, submissionTime)
-    implicit val log: Logger     = logger
 
     val submissionMetaData = SubmissionMetaData.build(submissionTime, conversationId, fileName)
     readSubscriptionService.getContactInformation(subscriptionId).flatMap {
@@ -74,8 +73,8 @@ class SubmissionController @Inject() (
           case Right(_) =>
             submissionConnector.submitDisclosure(submissionXml, conversationId).flatMap { httpResponse =>
               httpResponse.status match {
-                case OK => fileDetailsRepository.insert(submissionDetails).map(_ => Ok(Json.toJson(conversationId)))
-                case _  => Future.successful(httpResponse.handleResponse(implicitly[Logger](logger)))
+                case status if is2xx(status) => fileDetailsRepository.insert(submissionDetails).map(_ => Ok(Json.toJson(conversationId)))
+                case _                       => Future.successful(httpResponse.handleResponse(implicitly[Logger](logger)))
               }
             }
         }
@@ -84,7 +83,5 @@ class SubmissionController @Inject() (
         logger.warn(s"ReadSubscriptionError $value")
         Future.successful(InternalServerError)
     }
-
   }
-
 }

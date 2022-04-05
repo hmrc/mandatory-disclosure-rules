@@ -28,9 +28,9 @@ import uk.gov.hmrc.play.bootstrap.controller.WithJsonBody
 
 @Singleton
 class UploadCallbackController @Inject() (
-                                           val controllerComponents: MessagesControllerComponents,
-                                           val upscanCallbackDispatcher: UpScanCallbackDispatcher,
-                                           implicit override val messagesApi: MessagesApi
+  val controllerComponents: MessagesControllerComponents,
+  val upscanCallbackDispatcher: UpScanCallbackDispatcher,
+  implicit override val messagesApi: MessagesApi
 )(implicit val ec: ExecutionContext)
     extends BaseController
     with WithJsonBody
