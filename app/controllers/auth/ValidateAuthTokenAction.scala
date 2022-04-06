@@ -21,8 +21,7 @@ import config.AppConfig
 import play.api.Logging
 import play.api.mvc.Results.Forbidden
 import play.api.mvc._
-import uk.gov.hmrc.http.Authorization
-import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import uk.gov.hmrc.http.HeaderNames
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
@@ -31,12 +30,11 @@ class ValidateAuthTokenActionImpl @Inject() (appConfig: AppConfig)(implicit val 
     extends ValidateAuthTokenAction
     with Logging {
 
-  private def validateBearerToken[A](request: Request[A]): Boolean = {
-    HeaderCarrierConverter.fromRequest(request).authorization match {
-      case Some(Authorization(value)) => value == s"Bearer ${appConfig.bearerToken("eis-response")}"
-      case _                          => false
+  private def validateBearerToken[A](request: Request[A]): Boolean =
+    request.headers.get(HeaderNames.authorisation) match {
+      case Some(value) => value == s"Bearer ${appConfig.bearerToken("eis-response")}"
+      case _           => false
     }
-  }
 
   override def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] =
     if (validateBearerToken(request)) {
