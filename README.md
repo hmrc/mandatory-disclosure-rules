@@ -1,11 +1,14 @@
 # Mandatory disclosure rules
 
-This microservice receives a users XML from [mandatory-disclosure-rules-frontend](https://github.com/hmrc/mandatory-disclosure-rules-frontend). It validates the submission against XML schema and submits it to EIS for CADX business rule validation. If the file submits successfully it will return an Accepted status else it will return a Rejected status containing business rule validation errors. 
+This microservice is used to submit an XML file to EIS.
 
-It provides APIs to different consumers, currently they are:
-`mandatory-disclosure-rules-frontend`
+## Overview:
 
-## Information:
+This microservice receives an upscan url from [mandatory-disclosure-rules-frontend](https://github.com/hmrc/mandatory-disclosure-rules-frontend). It loads the XML and then validates it against XML schema. If this fails validation we pass errors back to the frontend to be displayed to the user. If it passes schema validation the submission undergoes a second layer of validation against business rules handled by CADX. If the submission passes this validation and is submitted successfully an Accepted status is returned. If the submission fails business rule validation a Rejected status containing error codes is returned which is then passed back to the frontend.
+
+This service notifies users if the submission is successfully submitted or has problems.
+
+This service interacts with [mandatory disclosure rules frontend](https://github.com/hmrc/mandatory-disclosure-rules-frontend), [Upscan](https://github.com/hmrc/upscan-initiate),  [Email Service](https://github.com/hmrc/email) & EIS/CADX.
 
 ### API 
 | PATH | Supported Methods | Description |
