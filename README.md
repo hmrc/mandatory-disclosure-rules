@@ -5,9 +5,9 @@ This microservice receives a users XML from [mandatory-disclosure-rules-frontend
 It provides APIs to different consumers, currently they are:
 `mandatory-disclosure-rules-frontend`
 
-## Information
+## Information:
 
-### API:
+### API 
 | PATH | Supported Methods | Description |
 |------|-------------------|-------------|
 |```/callback ``` | POST | Upscan callback |
@@ -23,23 +23,22 @@ It provides APIs to different consumers, currently they are:
 |```/files/:conversationId/status``` | GET | Retrieves file status for a specific file from Mongo store |
 |```/validation-result``` | POST | Retrieves & Processes result from CADX validation |
 
-***API Specs:***
-[MDR Read Subscription API](https://confluence.tools.tax.service.gov.uk/display/DAC6/MDR+Specs?preview=/388662598/434373869/AEOI-DCT70d-1.2-EISAPISpecification-MDRSubscriptionDisplay.pdf)
-[MDR Update Subscription API](https://confluence.tools.tax.service.gov.uk/display/DAC6/MDR+Specs?preview=/388662598/434373871/AEOI-DCT70e-1.2-EISAPISpecification-MDRSubscriptionAmend.pdf)
-[File Submission MDTP to CADX](https://confluence.tools.tax.service.gov.uk/display/DAC6/MDR+Specs?preview=/388662598/434373874/AEOI-DCT72a-v0.3-EISAPISpecification-MDRCustomerFileSubmissionfromMDTPtoCADX.pdf)
-[Result of MDR Business Rule Check](https://confluence.tools.tax.service.gov.uk/display/DAC6/MDR+Specs?preview=/388662598/420709843/DCT72b.pdf)
+#### *API specs*: 
+
+ - [MDR Read Subscription API](https://confluence.tools.tax.service.gov.uk/display/DAC6/MDR+Specs?preview=/388662598/434373869/AEOI-DCT70d-1.2-EISAPISpecification-MDRSubscriptionDisplay.pdf)
+ - [MDR Update Subscription API](https://confluence.tools.tax.service.gov.uk/display/DAC6/MDR+Specs?preview=/388662598/434373871/AEOI-DCT70e-1.2-EISAPISpecification-MDRSubscriptionAmend.pdf)
+ - [File Submission MDTP to CADX](https://confluence.tools.tax.service.gov.uk/display/DAC6/MDR+Specs?preview=/388662598/434373874/AEOI-DCT72a-v0.3-EISAPISpecification-MDRCustomerFileSubmissionfromMDTPtoCADX.pdf)
+  - [Result of MDR Business Rule Check](https://confluence.tools.tax.service.gov.uk/display/DAC6/MDR+Specs?preview=/388662598/420709843/DCT72b.pdf)
 
 ## Run Locally
+This service runs on port 10019 and is named MANDATORY_DISCLOSURE_RULES in service manager. 
 
 Run the following command to start services locally:
 
     sm --start MDR_ALL -f
     
-Mandatory Disclosure Rules runs on port 10019
-
-To run all tests:
-`sbt test `
-
+#### *Acceptance test repo*:  
+[mandatory-disclosure-rules-file-upload-ui-tests](https://github.com/hmrc/mandatory-disclosure-rules-file-upload-ui-tests)
 
 ## Requirements
 
