@@ -18,12 +18,12 @@ This service interacts with [mandatory disclosure rules frontend](https://github
 |```/upscan/status/:uploadId``` | GET | Retrieves only the upload Status |
 |```/upscan/upload``` | POST | Request an upload |
 |```/validate-submission``` | POST | Performs XML schema validation & returns either messageSpecData containing messageRefID & messageTypeIndic or errors |
-|```/submit``` | POST | Submits disclosure to EIS |
-|```/subscription/read-subscription``` | POST | Retrieves Subscription Details (Contact Details) |
-|```/subscription/update-subscription``` | POST | Updates Subscription Details (Contact Details) |
 |```/files/:conversationId/details``` | GET | Retrieves specific file details from Mongo store containing subscriptionID, messageRefID, file status, file name & timestamps  |
 |```/files/details``` | GET | Retrieves details of all submitted files from Mongo store |
 |```/files/:conversationId/status``` | GET | Retrieves file status for a specific file from Mongo store |
+|```/dac6/dct72a/v1``` | POST | Submits disclosure to EIS |
+|```/dac6/dct70d/v1``` | POST | Retrieves Subscription Details (Contact Details) |
+|```/dac6/dct70e/v1``` | POST | Updates Subscription Details (Contact Details) |
 |```/validation-result``` | POST | Retrieves & Processes result from CADX validation |
 
 #### *API specs*: 
