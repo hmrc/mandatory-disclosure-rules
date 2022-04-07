@@ -1,6 +1,6 @@
 # Mandatory disclosure rules
 
-This microservice receives a users XML from [mandatory-disclosure-rules-frontend](https://github.com/hmrc/mandatory-disclosure-rules-frontend). It validates the submission against XML schema and submits it to EIS. If the file submits successfully it will return an Accepted status else it will return a Rejected status containing validation errors. 
+This microservice receives a users XML from [mandatory-disclosure-rules-frontend](https://github.com/hmrc/mandatory-disclosure-rules-frontend). It validates the submission against XML schema and submits it to EIS for CADX business rule validation. If the file submits successfully it will return an Accepted status else it will return a Rejected status containing business rule validation errors. 
 
 It provides APIs to different consumers, currently they are:
 `mandatory-disclosure-rules-frontend`
