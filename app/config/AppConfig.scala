@@ -35,6 +35,8 @@ class AppConfig @Inject() (
 
   val maxValidationErrors: Int = config.get[Int]("xml.validation.max-errors")
 
+  val eisResponseWaitTime: Int = config.get[Int]("microservice.services.eis-response.wait-time")
+
   def serviceUrl(serviceName: String): String =
     s"${servicesConfig.baseUrl(serviceName)}${servicesConfig.getString(s"microservice.services.$serviceName.context")}"
 
