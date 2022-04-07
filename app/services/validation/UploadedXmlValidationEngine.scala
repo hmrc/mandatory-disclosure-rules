@@ -29,10 +29,10 @@ import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
 import scala.xml.Elem
 
-class SubmissionValidationEngine @Inject() (xmlValidationService: XMLValidationService,
-                                            xmlErrorMessageHelper: XmlErrorMessageHelper,
-                                            dataExtraction: DataExtraction,
-                                            appConfig: AppConfig
+class UploadedXmlValidationEngine @Inject() (xmlValidationService: XMLValidationService,
+                                             xmlErrorMessageHelper: XmlErrorMessageHelper,
+                                             dataExtraction: DataExtraction,
+                                             appConfig: AppConfig
 ) extends Logging {
 
   def validateUploadSubmission(upScanUrl: String): Future[SubmissionValidationResult] =

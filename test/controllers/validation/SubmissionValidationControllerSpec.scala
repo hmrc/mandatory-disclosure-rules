@@ -28,19 +28,19 @@ import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{status, POST, _}
-import services.validation.SubmissionValidationEngine
+import services.validation.UploadedXmlValidationEngine
 
 import scala.concurrent.Future
 
 class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEach {
 
-  val mockUploadSubmissionValidationEngine: SubmissionValidationEngine = mock[SubmissionValidationEngine]
-  val messageSpecData: MessageSpecData                                 = MessageSpecData("XBC99999999999", MDR401)
+  val mockUploadSubmissionValidationEngine: UploadedXmlValidationEngine = mock[UploadedXmlValidationEngine]
+  val messageSpecData: MessageSpecData                                  = MessageSpecData("XBC99999999999", MDR401)
 
   val application: Application =
     applicationBuilder()
       .overrides(
-        bind[SubmissionValidationEngine].toInstance(mockUploadSubmissionValidationEngine),
+        bind[UploadedXmlValidationEngine].toInstance(mockUploadSubmissionValidationEngine),
         bind[IdentifierAuthAction].to[FakeIdentifierAuthAction]
       )
       .build()

@@ -69,7 +69,7 @@ class EISResponsePreConditionCheckActionRefiner @Inject() (validationService: XM
         Left(BadRequest(s"Failed to read the xml from EIS: $errors"))
 
       case ParseFailure(errors) =>
-        logger.warn(s"ParseFailure:failed to read the xml from EIS: $errors")
+        logger.warn(s"ParseFailure: failed to read the xml from EIS: $errors")
         Left(BadRequest(s"failed to read the xml from EIS with errors: $errors"))
     }
 

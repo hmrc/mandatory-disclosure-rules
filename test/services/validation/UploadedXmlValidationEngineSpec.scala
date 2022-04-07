@@ -29,7 +29,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
 import scala.xml.Elem
 
-class SubmissionValidationEngineSpec extends SpecBase {
+class UploadedXmlValidationEngineSpec extends SpecBase {
 
   val xsdError                            = "xsd-error"
   val defaultError                        = "There is a problem with this line number"
@@ -133,7 +133,7 @@ class SubmissionValidationEngineSpec extends SpecBase {
     val appConfig: AppConfig                             = app.injector.instanceOf[AppConfig]
     val mockDataExtraction: DataExtraction               = mock[DataExtraction]
 
-    val validationEngine = new SubmissionValidationEngine(mockXmlValidationService, mockXmlErrorMessageHelper, mockDataExtraction, appConfig)
+    val validationEngine = new UploadedXmlValidationEngine(mockXmlValidationService, mockXmlErrorMessageHelper, mockDataExtraction, appConfig)
 
     val source        = "src"
     val elem: Elem    = <dummyElement>Test</dummyElement>
