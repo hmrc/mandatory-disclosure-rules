@@ -17,10 +17,11 @@
 package utils
 
 import base.SpecBase
-import models.xml.FileErrorCode.{FailedSchemaValidation, MessageRefIDHasAlreadyBeenUsed, UnknownFileErrorCode}
-import models.xml.RecordErrorCode.{DocRefIDFormat, MissingCorrDocRefId, UnknownRecordErrorCode}
+import models.xml.FileErrorCode.{FailedSchemaValidation, UnknownFileErrorCode}
+import models.xml.RecordErrorCode.{CustomError, DocRefIDFormat, UnknownRecordErrorCode}
 import models.xml.{FileErrors, RecordError, ValidationErrors}
 import play.api.Logger
+import utils.ErrorDetails.error_details_901
 
 class CustomAlertUtilSpec extends SpecBase {
 
@@ -70,6 +71,48 @@ class CustomAlertUtilSpec extends SpecBase {
 
         alertUtil.alertForProblemStatus(errors)
         verify(mockLogger, times(1)).warn(loggerMessage)
+      }
+
+      "when a 'problem' error occurs for unsupported ErrorDetails for CustomError" in {
+        val mockLogger = mock[Logger]
+
+        when(mockLogger.isWarnEnabled).thenReturn(true)
+        val errors = ValidationErrors(Some(Seq(FileErrors(FailedSchemaValidation, None))), Some(Seq(RecordError(CustomError, Some("something"), None))))
+
+        val alertUtil = new CustomAlertUtil {
+          override val logger: Logger = mockLogger
+        }
+
+        alertUtil.alertForProblemStatus(errors)
+        verify(mockLogger, times(1)).warn(loggerMessage)
+      }
+
+      "when a 'problem' error occurs for CustomError with ErrorDetails 'None'" in {
+        val mockLogger = mock[Logger]
+
+        when(mockLogger.isWarnEnabled).thenReturn(true)
+        val errors = ValidationErrors(None, Some(Seq(RecordError(CustomError, None, None))))
+
+        val alertUtil = new CustomAlertUtil {
+          override val logger: Logger = mockLogger
+        }
+
+        alertUtil.alertForProblemStatus(errors)
+        verify(mockLogger, times(1)).warn(loggerMessage)
+      }
+
+      "when a 'Rejected' error occurs for supported ErrorDetails" in {
+        val mockLogger = mock[Logger]
+
+        when(mockLogger.isWarnEnabled).thenReturn(true)
+        val errors = ValidationErrors(None, Some(Seq(RecordError(CustomError, Some(error_details_901), None))))
+
+        val alertUtil = new CustomAlertUtil {
+          override val logger: Logger = mockLogger
+        }
+
+        alertUtil.alertForProblemStatus(errors)
+        verify(mockLogger, never).warn(loggerMessage)
       }
     }
   }

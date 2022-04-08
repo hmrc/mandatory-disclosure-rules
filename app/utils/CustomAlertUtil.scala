@@ -17,9 +17,10 @@
 package utils
 
 import models.xml.FileErrorCode.fileErrorCodesForProblemStatus
-import models.xml.RecordErrorCode.DocRefIDFormat
-import models.xml.{FileErrorCode, RecordErrorCode, ValidationErrors}
+import models.xml.RecordErrorCode.{CustomError, DocRefIDFormat}
+import models.xml.{FileErrorCode, RecordError, RecordErrorCode, ValidationErrors}
 import play.api.Logging
+import utils.ErrorDetails.errorList
 
 class CustomAlertUtil extends Logging {
 
@@ -28,8 +29,16 @@ class CustomAlertUtil extends Logging {
 
   def alertForProblemStatus(errors: ValidationErrors): Unit = {
     val errorCodes = Seq(errors.fileError.map(_.map(_.code.code)).getOrElse(Nil), errors.recordError.map(_.map(_.code.code)).getOrElse(Nil)).flatten
-    if (errorCodes.exists(!expectedErrorCodes.contains(_) || errorCodes.exists(problemsStatusErrorCodes.contains(_)))) {
+    if (
+      errorCodes.exists(!expectedErrorCodes.contains(_) || errorCodes.exists(problemsStatusErrorCodes.contains(_)) || errorDetailNotAllowed(errors.recordError))
+    ) {
       logger.warn("File Rejected with unexpected error")
     }
   }
+
+  private def errorDetailNotAllowed(errors: Option[Seq[RecordError]]): Boolean =
+    errors.exists(
+      _.exists(error => error.code == CustomError && !errorList.exists(_.equals(error.details.getOrElse(""))))
+    )
+
 }
