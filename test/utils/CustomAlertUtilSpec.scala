@@ -17,8 +17,8 @@
 package utils
 
 import base.SpecBase
-import models.xml.FileErrorCode.{FailedSchemaValidation, MessageRefIDHasAlreadyBeenUsed, UnknownFileErrorCode}
-import models.xml.RecordErrorCode.{DocRefIDFormat, MissingCorrDocRefId, UnknownRecordErrorCode}
+import models.xml.FileErrorCode.{FailedSchemaValidation, UnknownFileErrorCode}
+import models.xml.RecordErrorCode.{DocRefIDFormat, UnknownRecordErrorCode}
 import models.xml.{FileErrors, RecordError, ValidationErrors}
 import play.api.Logger
 
