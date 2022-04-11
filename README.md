@@ -38,7 +38,7 @@ This service runs on port 10019 and is named MANDATORY_DISCLOSURE_RULES in servi
 
 Run the following command to start services locally:
 
-    sm --start MDR_ALL -f
+    sm --start MDR_ALL -r
     
 #### *Acceptance test repo*:  
 [mandatory-disclosure-rules-file-upload-ui-tests](https://github.com/hmrc/mandatory-disclosure-rules-file-upload-ui-tests)
