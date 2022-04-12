@@ -16,11 +16,11 @@
 
 package utils
 
-import models.xml.FileErrorCode.fileErrorCodesForProblemStatus
+import models.xml.FileErrorCode.{fileErrorCodesForProblemStatus, CustomError => FileCustomError}
 import models.xml.RecordErrorCode.{CustomError, DocRefIDFormat}
-import models.xml.{FileErrorCode, RecordError, RecordErrorCode, ValidationErrors}
+import models.xml.{FileErrorCode, FileErrors, RecordError, RecordErrorCode, ValidationErrors}
 import play.api.Logging
-import utils.ErrorDetails.errorList
+import utils.ErrorDetails.{errorList, error_details_910}
 
 class CustomAlertUtil extends Logging {
 
@@ -30,15 +30,25 @@ class CustomAlertUtil extends Logging {
   def alertForProblemStatus(errors: ValidationErrors): Unit = {
     val errorCodes = Seq(errors.fileError.map(_.map(_.code.code)).getOrElse(Nil), errors.recordError.map(_.map(_.code.code)).getOrElse(Nil)).flatten
     if (
-      errorCodes.exists(!expectedErrorCodes.contains(_) || errorCodes.exists(problemsStatusErrorCodes.contains(_)) || errorDetailNotAllowed(errors.recordError))
+      errorCodes.exists(
+        !expectedErrorCodes.contains(_)
+          || errorCodes.exists(problemsStatusErrorCodes.contains(_))
+          || recordErrorDetailNotAllowed(errors.recordError)
+          || fileErrorDetailNotAllowed(errors.fileError)
+      )
     ) {
       logger.warn("File Rejected with unexpected error")
     }
   }
 
-  private def errorDetailNotAllowed(errors: Option[Seq[RecordError]]): Boolean =
+  private def recordErrorDetailNotAllowed(errors: Option[Seq[RecordError]]): Boolean =
     errors.exists(
       _.exists(error => error.code == CustomError && !errorList.exists(_.equals(error.details.getOrElse(""))))
+    )
+
+  private def fileErrorDetailNotAllowed(errors: Option[Seq[FileErrors]]): Boolean =
+    errors.exists(
+      _.exists(error => error.code == FileCustomError && !error.details.contains(error_details_910))
     )
 
 }

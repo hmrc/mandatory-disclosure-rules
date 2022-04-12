@@ -19,9 +19,10 @@ package utils
 import base.SpecBase
 import models.xml.FileErrorCode.{FailedSchemaValidation, UnknownFileErrorCode}
 import models.xml.RecordErrorCode.{CustomError, DocRefIDFormat, UnknownRecordErrorCode}
+import models.xml.FileErrorCode.{CustomError => FileCustomError}
 import models.xml.{FileErrors, RecordError, ValidationErrors}
 import play.api.Logger
-import utils.ErrorDetails.error_details_901
+import utils.ErrorDetails.{error_details_901, error_details_910}
 
 class CustomAlertUtilSpec extends SpecBase {
 
@@ -106,6 +107,48 @@ class CustomAlertUtilSpec extends SpecBase {
 
         when(mockLogger.isWarnEnabled).thenReturn(true)
         val errors = ValidationErrors(None, Some(Seq(RecordError(CustomError, Some(error_details_901), None))))
+
+        val alertUtil = new CustomAlertUtil {
+          override val logger: Logger = mockLogger
+        }
+
+        alertUtil.alertForProblemStatus(errors)
+        verify(mockLogger, never).warn(loggerMessage)
+      }
+
+      "when a 'problem' error occurs for CustomError with ErrorDetails 'None' for FileError" in {
+        val mockLogger = mock[Logger]
+
+        when(mockLogger.isWarnEnabled).thenReturn(true)
+        val errors = ValidationErrors(Some(Seq(FileErrors(FileCustomError, None))), None)
+
+        val alertUtil = new CustomAlertUtil {
+          override val logger: Logger = mockLogger
+        }
+
+        alertUtil.alertForProblemStatus(errors)
+        verify(mockLogger, times(1)).warn(loggerMessage)
+      }
+
+      "when a 'problem' error occurs for CustomError with unacceptable ErrorDetails  for FileError" in {
+        val mockLogger = mock[Logger]
+
+        when(mockLogger.isWarnEnabled).thenReturn(true)
+        val errors = ValidationErrors(Some(Seq(FileErrors(FileCustomError, Some("something")))), None)
+
+        val alertUtil = new CustomAlertUtil {
+          override val logger: Logger = mockLogger
+        }
+
+        alertUtil.alertForProblemStatus(errors)
+        verify(mockLogger, times(1)).warn(loggerMessage)
+      }
+
+      "when a 'Rejected' error occurs for supported ErrorDetails for FileError" in {
+        val mockLogger = mock[Logger]
+
+        when(mockLogger.isWarnEnabled).thenReturn(true)
+        val errors = ValidationErrors(Some(Seq(FileErrors(FileCustomError, Some(error_details_910)))), None)
 
         val alertUtil = new CustomAlertUtil {
           override val logger: Logger = mockLogger
