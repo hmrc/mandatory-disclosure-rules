@@ -39,6 +39,7 @@ class EISResponsePreConditionCheckActionRefiner @Inject() (validationService: XM
       case xml: NodeSeq =>
         request.headers.get("x-conversation-id") match {
           case Some(conversationId) =>
+            logger.warn(s"EISResponse input request body: ${request.body}")
             validationService.validate(xml, appConfig.eisResponseXSDFilePath) match {
               case Right(xml) => Future.successful(readXmlAsBREResponse(request, xml, conversationId))
               case Left(errors) =>
