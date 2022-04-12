@@ -36,7 +36,7 @@ class EISResponsePreConditionCheckActionRefiner @Inject() (validationService: XM
 
   override protected def refine[A](request: Request[A]): Future[Either[Result, EISRequest[A]]] = {
 
-    logger.warn(s"EISResponse input request body: ${request.body}")
+    logger.warn(s"EISResponse input request body: ${request.body}") //TODO please remove this log message after QA end-2-end
     request.body match {
       case xml: NodeSeq =>
         request.headers.get("x-conversation-id") match {
