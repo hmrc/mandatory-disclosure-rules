@@ -34,12 +34,13 @@ class EISResponsePreConditionCheckActionRefiner @Inject() (validationService: XM
 ) extends ActionRefiner[Request, EISRequest]
     with Logging {
 
-  override protected def refine[A](request: Request[A]): Future[Either[Result, EISRequest[A]]] =
+  override protected def refine[A](request: Request[A]): Future[Either[Result, EISRequest[A]]] = {
+
+    logger.warn(s"EISResponse input request body: ${request.body}")
     request.body match {
       case xml: NodeSeq =>
         request.headers.get("x-conversation-id") match {
           case Some(conversationId) =>
-            logger.warn(s"EISResponse input request body: ${request.body}")
             validationService.validate(xml, appConfig.eisResponseXSDFilePath) match {
               case Right(xml) => Future.successful(readXmlAsBREResponse(request, xml, conversationId))
               case Left(errors) =>
@@ -54,6 +55,7 @@ class EISResponsePreConditionCheckActionRefiner @Inject() (validationService: XM
         logger.warn(s"Invalid request body, Expected XML but found: ${invalidBody.getClass}")
         Future.successful(Left(BadRequest("request body must be an XML")))
     }
+  }
 
   private def readXmlAsBREResponse[A](request: Request[A], xml: NodeSeq, conversationId: String): Either[Result, EISRequest[A]] =
     XmlReader.of[BREResponse].read(xml) match {
