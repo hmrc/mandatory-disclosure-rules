@@ -57,6 +57,7 @@ object FileErrorCode {
     case "50009"   => MessageRefIDHasAlreadyBeenUsed
     case "50010"   => FileContainsTestDataForProductionEnvironment
     case "50012"   => NotMeantToBeReceivedByTheIndicatedJurisdiction
+    case "99999"   => CustomError
     case otherCode => UnknownFileErrorCode(otherCode)
   }
 
