@@ -31,12 +31,11 @@ class ValidateAuthTokenActionImpl @Inject() (appConfig: AppConfig)(implicit val 
     extends ValidateAuthTokenAction
     with Logging {
 
-  private def validateBearerToken[A](request: Request[A]): Boolean = {
+  private def validateBearerToken[A](request: Request[A]): Boolean =
     HeaderCarrierConverter.fromRequest(request).authorization match {
       case Some(Authorization(value)) => value == s"Bearer ${appConfig.bearerToken("eis-response")}"
       case _                          => false
     }
-  }
 
   override def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] =
     if (validateBearerToken(request)) {
