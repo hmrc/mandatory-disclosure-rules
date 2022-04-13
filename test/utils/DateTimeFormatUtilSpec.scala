@@ -16,16 +16,27 @@
 
 package utils
 
-import java.time.format.DateTimeFormatter
-import java.time.{LocalDateTime, ZoneId}
+import base.SpecBase
 
-object DateTimeFormatUtil {
+import java.time.LocalDateTime
 
-  val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
-  val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("h:mma")
+class DateTimeFormatUtilSpec extends SpecBase {
 
-  def dateFormatted(dateTime: LocalDateTime): String = {
-    val toZonedDateTime = dateTime.atZone(ZoneId.of("Europe/London"))
-    s"${toZonedDateTime.format(timeFormatter).toLowerCase} on ${toZonedDateTime.format(dateFormatter)}"
+  private def generateDate(hour: Int) =
+    LocalDateTime.of(2022, 1, 1, hour, 1, 0, 0)
+
+  "dateFormatted" - {
+
+    "should format submission timestamp for morning(AM)" in {
+
+      val result = DateTimeFormatUtil.dateFormatted(generateDate(4))
+      result mustBe s"4:01am on 1 January 2022"
+    }
+
+    "should format submission timestamp for afternoon(PM)" in {
+
+      val result = DateTimeFormatUtil.dateFormatted(generateDate(16))
+      result mustBe s"4:01pm on 1 January 2022"
+    }
   }
 }

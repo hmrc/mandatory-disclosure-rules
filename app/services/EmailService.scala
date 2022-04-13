@@ -68,7 +68,6 @@ class EmailService @Inject() (emailConnector: EmailConnector, emailTemplate: Ema
         val secondaryName         = responseDetail.secondaryContact.map(contactInfo => getContactName(contactInfo.contactType))
 
         for {
-
           primaryResponse <- emailAddress
             .filter(EmailAddress.isValid)
             .fold(Future.successful(Option.empty[HttpResponse])) { email =>
