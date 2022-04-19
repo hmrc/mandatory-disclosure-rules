@@ -19,29 +19,30 @@ package utils
 object ErrorDetails {
   val error_details_901 =
     "The CorrDocRefId does not match a DocRefId from the same type of section (either Disclosing or MdrReport). It must refer to the same element"
-  val error_details_902 = "The MdrReport CorrDocRefId does not refer to the same previously sent MdrBody as the Disclosing element"
-  val error_details_903 = "The Disclosing section contains resent data (DocTypeIndic = OECD0) so it must not have a CorrDocRefId"
-  val error_details_904 = "Disclosing Capacity is not one of the allowed values for the MdrReport CrsAvoidance or OOS Reason provided"
-  val error_details_905 = "Since the DocTypeIndic of Disclosing is OECD0, the DocTypeIndic of MdrReport must be OECD2"
-
-  val error_details_906 =
-    "Since the MdrReport has a DocTypeIndic of OECD3, indicating this section must be deleted, this Disclosing section must be deleted too"
-
-  val error_details_907 =
-    "Since the MessageTypeIndic contains the value of MDR401 for new information, the Disclosing DocTypeIndic must contain the value of OECD1 for new information"
-
-  val error_details_908 =
-    "Since the MessageTypeIndic contains the value of MDR401 for new information, an MdrReport section must be provided with a DocTypeIndic of OECD1 for new information"
-  val error_details_909 = "DocRefId must be 100 characters or less, start with your 15-character MDR ID and include up to 85 other characters of your choice"
-  val error_details_910 = "MessageRefId must be 85 characters or less, start with your 15-character MDR ID and include up to 70 other characters of your choice"
-  val error_details_911 = "Provide an issuedBy for every TIN that has a value other than NOTIN"
-  val error_details_912 = "The top level of the StructureChart must not have an Ownership or InvestAmount"
+  val error_details_902  = "The MdrReport CorrDocRefId does not refer to the same previously sent MdrBody as the Disclosing element"
+  val error_details_903  = "The Disclosing section contains resent data (DocTypeIndic = OECD0) so it must not have a CorrDocRefId"
+  val error_details_904a = "If the only Capacity entry is MDR501 the Reason must be either MDR701 or MDR901."
+  val error_details_904b = "If the only Capacity entry is MDR502 the Reason must be either MDR702 or MDR902."
+  val error_details_904c = "If the only Capacity entry is MDR503 the Reason must be either MDR701, MDR702, MDR901 or MDR902."
+  val error_details_904d = "If the only Capacity entry is MDR504 then Reason must not be provided."
+  val error_details_905  = "If DocTypeIndic of Disclosing is OECD0 the DocTypeIndic of MdrReport must OECD2."
+  val error_details_906  = "If DocTypeIndic of MdrReport is OECD3 the DocTypeIndic of Disclosing must be OECD3."
+  val error_details_907  = "If MessageTypeIndic is MDR401, Disclosing DocTypeIndic can only be OECD1."
+  val error_details_908  = "If MessageTypeIndic is MDR401 and Diclosing DocTypeIndic is OECD1, the MdrReport must be present and have DocTypeIndic of OECD1."
+  val error_details_909  = "DocRefID format does not match the format as set out in the HMRC MDR user guide."
+  val error_details_910  = "MessageRefID format does not match the format as set out in the HMRC MDR user guide."
+  val error_details_911  = """TIN issuedby must be provided where a TIN has been reported. The only exception is where "NOTIN" has been reported."""
+  val error_details_912 =
+    "The top level of the structure chart must not include the elements: mdr:ownership and mdr:InvestAmount. These should only be provided in the  mdr:ListChilds tag."
 
   val errorList: Seq[String] = Seq(
     error_details_901,
     error_details_902,
     error_details_903,
-    error_details_904,
+    error_details_904a,
+    error_details_904b,
+    error_details_904c,
+    error_details_904d,
     error_details_905,
     error_details_906,
     error_details_907,
