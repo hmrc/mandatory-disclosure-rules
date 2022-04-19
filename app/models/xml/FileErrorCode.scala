@@ -30,6 +30,7 @@ object FileErrorCode {
   case object MessageRefIDHasAlreadyBeenUsed extends FileErrorCode("50009")
   case object FileContainsTestDataForProductionEnvironment extends FileErrorCode("50010")
   case object NotMeantToBeReceivedByTheIndicatedJurisdiction extends FileErrorCode("50012")
+  case object CustomError extends FileErrorCode("99999")
   case class UnknownFileErrorCode(override val code: String) extends FileErrorCode(code)
 
   val values: Seq[FileErrorCode] = Seq(
@@ -56,6 +57,7 @@ object FileErrorCode {
     case "50009"   => MessageRefIDHasAlreadyBeenUsed
     case "50010"   => FileContainsTestDataForProductionEnvironment
     case "50012"   => NotMeantToBeReceivedByTheIndicatedJurisdiction
+    case "99999"   => CustomError
     case otherCode => UnknownFileErrorCode(otherCode)
   }
 
