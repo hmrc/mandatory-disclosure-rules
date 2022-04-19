@@ -19,7 +19,7 @@ package controllers
 import config.AppConfig
 import controllers.actions.EISResponsePreConditionCheckActionRefiner
 import controllers.auth.ValidateAuthTokenAction
-import models.submission.{FileStatus, Rejected, Accepted => FileStatusAccepted}
+import models.submission.{Accepted => FileStatusAccepted, FileStatus, Rejected}
 import models.xml.{BREResponse, ValidationStatus}
 import play.api.Logging
 import play.api.mvc.{Action, ControllerComponents}
