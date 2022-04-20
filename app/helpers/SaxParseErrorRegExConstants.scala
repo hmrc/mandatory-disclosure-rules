@@ -18,26 +18,26 @@ package helpers
 
 trait SaxParseErrorRegExConstants {
   final val missingDeclarationErrorFormat =
-    """cvc-elt.1: Cannot find the declaration of element '(.*?)'.""".stripMargin.r
+    """cvc-elt.1: Cannot find the declaration of element '(?:mdr:)?(.*?)'.""".stripMargin.r
 
-  final val missingAttributeErrorFormat = """cvc-complex-type.4: Attribute '(.*?)' must appear on element '(.*?)'.""".stripMargin.r
+  final val missingAttributeErrorFormat = """cvc-complex-type.4: Attribute '(.*?)' must appear on element '(?:mdr:)?(.*?)'.""".stripMargin.r
 
-  final val missingOrInvalidErrorFormat = """cvc-type.3.1.3: The value '((?s).*)' of element '(.*?)' is not valid.""".stripMargin.r
+  final val missingOrInvalidErrorFormat = """cvc-type.3.1.3: The value '((?s).*)' of element '(?:mdr:)?(.*?)' is not valid.""".stripMargin.r
 
   final val emptyTagErrorFormat =
     """cvc-minLength-valid: Value '' with length = '0' is not facet-valid with respect to minLength '(.*?)' for type '(.*?)'.""".stripMargin.r
 
   final val emptySubTagErrorFormat =
-    """cvc-complex-type.2.4.b: The content of element '(.*?)' is not complete. One of '"urn:oecd:ties:mdr:v1":(.*?)' is expected.""".stripMargin.r
+    """cvc-complex-type.2.4.b: The content of element '(?:mdr:)?(.*?)' is not complete. One of '"urn:oecd:ties:mdr:v1":(?:mdr:)?(.*?)' is expected.""".stripMargin.r
 
   final val missingTagErrorFormat =
-    """cvc-complex-type.2.4.a: Invalid content was found starting with element '(.*?)'. One of '"urn:oecd:ties:mdr:v1":(.*?)' is expected.""".stripMargin.r
+    """cvc-complex-type.2.4.a: Invalid content was found starting with element '(?:mdr:)?(.*?)'. One of '"urn:oecd:ties:mdr:v1":(?:mdr:)?(.*?)' is expected.""".stripMargin.r
 
   final val fieldTooLongErrorFormat =
     """cvc-maxLength-valid: Value '((?s).*)' with length = '(.*?)' is not facet-valid with respect to maxLength '(.*?)' for type '(.*?)'.""".stripMargin.r
 
   final val invalidTypeErrorFormat =
-    """cvc-attribute.3: The value '((?s).*)' of attribute '(.*?)' on element '(.*?)' is not valid with respect to its type, '(.*?)'.""".stripMargin.r
+    """cvc-attribute.3: The value '((?s).*)' of attribute '(.*?)' on element '(?:mdr:)?(.*?)' is not valid with respect to its type, '(.*?)'.""".stripMargin.r
 
   final val invalidEnumErrorFormat =
     """cvc-enumeration-valid: Value '((?s).*)' is not facet-valid with respect to enumeration '(.*?)'. It must be a value from the enumeration.""".stripMargin.r
@@ -45,11 +45,11 @@ trait SaxParseErrorRegExConstants {
   final val genericInvalidErrorFormat = """cvc-datatype-valid.1.2.1: '((?s).*)' is not a valid value for '(.*?)'.""".stripMargin.r
 
   final val genericInvalidSecondErrorFormat =
-    """cvc-complex-type.2.2: Element '(.*?)' must have no element children, and the value must be valid.""".stripMargin.r
+    """cvc-complex-type.2.2: Element '(?:mdr:)?(.*?)' must have no element children, and the value must be valid.""".stripMargin.r
 
   final val outOfRangeErrorFormat =
     """cvc-maxInclusive-valid: Value '((?s).*)' is not facet-valid with respect to maxInclusive '(.*?)' for type '(.*?)'.""".stripMargin.r
 
   final val unorderedTagErrorFormat =
-    """cvc-complex-type.2.4.d: Invalid content was found starting with element '(.*?)'. No child element is expected at this point.""".stripMargin.r
+    """cvc-complex-type.2.4.d: Invalid content was found starting with element '(?:mdr:)?(.*?)'. No child element is expected at this point.""".stripMargin.r
 }
