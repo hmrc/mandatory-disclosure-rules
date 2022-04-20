@@ -43,7 +43,7 @@ class CustomAlertUtil extends Logging {
 
   private def recordErrorDetailNotAllowed(errors: Option[Seq[RecordError]]): Boolean =
     errors.exists(
-      _.exists(error => error.code == CustomError && !errorList.exists(error.details.contains(_)))
+      _.exists(error => error.code == CustomError && !errorList.exists(error.details.getOrElse("").contains(_)))
     )
 
   private def fileErrorDetailNotAllowed(errors: Option[Seq[FileErrors]]): Boolean =
