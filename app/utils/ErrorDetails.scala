@@ -17,10 +17,9 @@
 package utils
 
 object ErrorDetails {
-  val error_details_901 =
-    "The CorrDocRefId does not match a DocRefId from the same type of section (either Disclosing or MdrReport). It must refer to the same element"
-  val error_details_902  = "The MdrReport CorrDocRefId does not refer to the same previously sent MdrBody as the Disclosing element"
-  val error_details_903  = "The Disclosing section contains resent data (DocTypeIndic = OECD0) so it must not have a CorrDocRefId"
+  val error_details_901  = "CorrDocRefID element type does not match original DocRefID element type"
+  val error_details_902  = "Correction is not for the relevant Disclosing element"
+  val error_details_903  = "CorrDocRefID must not be present for OECD0 at Disclosing Element"
   val error_details_904a = "If the only Capacity entry is MDR501 the Reason must be either MDR701 or MDR901."
   val error_details_904b = "If the only Capacity entry is MDR502 the Reason must be either MDR702 or MDR902."
   val error_details_904c = "If the only Capacity entry is MDR503 the Reason must be either MDR701, MDR702, MDR901 or MDR902."
