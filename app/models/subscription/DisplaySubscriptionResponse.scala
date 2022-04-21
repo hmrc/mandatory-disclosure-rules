@@ -18,6 +18,7 @@ package models.subscription
 
 import play.api.Logger
 import play.api.libs.json._
+import cats.data.NonEmptyList
 
 case class ResponseDetail(subscriptionID: String,
                           tradingName: Option[String],
@@ -27,6 +28,14 @@ case class ResponseDetail(subscriptionID: String,
 )
 
 object ResponseDetail {
+
+  implicit def formatsNonEmptyList[A](implicit listReads: Reads[List[A]], listWrites: Writes[List[A]]): Format[NonEmptyList[A]] =
+    new Format[NonEmptyList[A]] {
+      override def writes(o: NonEmptyList[A]): JsValue = Json.toJson(o.toList)
+
+      override def reads(json: JsValue): JsResult[NonEmptyList[A]] = json.validate(listReads).map(NonEmptyList.fromListUnsafe)
+    }
+
   val logger = Logger.apply(getClass)
   implicit lazy val reads: Reads[ResponseDetail] = {
     import play.api.libs.functional.syntax._
@@ -35,7 +44,7 @@ object ResponseDetail {
       (__ \ "subscriptionID").read[String] and
         (__ \ "tradingName").readNullable[String] and
         (__ \ "isGBUser").read[Boolean] and
-        (__ \ "primaryContact").read[Seq[ContactInformation]] and
+        (__ \ "primaryContact").read[NonEmptyList[ContactInformation]] and
         (__ \ "secondaryContact").readNullable[Seq[ContactInformation]]
     ) { (subscriptionID, tradingName, isGBUser, primaryContact, secondaryContact) =>
       logger.warn(s"ResponseDetail: received ${primaryContact.size} primary contacts and ${secondaryContact.getOrElse(0)} secondaryContacts")

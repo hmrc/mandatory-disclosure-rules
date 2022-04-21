@@ -59,5 +59,32 @@ class ResponseDetailModelSpec extends SpecBase {
       val responseDetail = json.as[ResponseDetail]
       Json.toJson(responseDetail) mustBe Json.parse(expectedJson)
     }
+
+    "must throw exception for Empty primary Contact List when serialise and de-serialise ResponseDetail" in {
+
+      val responseDetailJson: String =
+        """{
+          |"subscriptionID": "111111111",
+          |"tradingName": "",
+          |"isGBUser": true,
+          |"primaryContact": [
+          |],
+          |"secondaryContact": [
+          |{
+          |"email": "",
+          |"organisation": {
+          |"organisationName": ""
+          |}
+          |}
+          |]
+          |}""".stripMargin
+
+      val json: JsValue =
+        Json.parse(responseDetailJson)
+      assertThrows[IllegalArgumentException] {
+        json.as[ResponseDetail]
+      }
+
+    }
   }
 }
