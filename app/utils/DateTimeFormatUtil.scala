@@ -17,15 +17,21 @@
 package utils
 
 import java.time.format.DateTimeFormatter
-import java.time.{LocalDateTime, ZoneId}
+import java.time.{LocalDateTime, ZoneId, ZonedDateTime}
+import javax.inject.Inject
 
 object DateTimeFormatUtil {
 
+  private val euLondonZoneId: ZoneId = ZoneId.of("Europe/London")
+
   val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
   val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("h:mma")
+  //HTTP-date format defined by RFC 7231 e.g. Fri, 01 Aug 2020 15:51:38 GMT+1
+  val connectorDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss O")
 
-  def dateFormatted(dateTime: LocalDateTime): String = {
-    val toZonedDateTime = dateTime.atZone(ZoneId.of("Europe/London"))
-    s"${toZonedDateTime.format(timeFormatter).toLowerCase} on ${toZonedDateTime.format(dateFormatter)}"
-  }
+  def zonedDateTimeNow: ZonedDateTime = ZonedDateTime.now(euLondonZoneId)
+
+  def displayFormattedDate(dateTime: LocalDateTime): String =
+    s"${dateTime.atZone(euLondonZoneId).format(timeFormatter).toLowerCase} on ${dateTime.atZone(euLondonZoneId).format(dateFormatter)}"
+
 }

@@ -22,20 +22,20 @@ import java.time.LocalDateTime
 
 class DateTimeFormatUtilSpec extends SpecBase {
 
-  private def generateDate(hour: Int) =
+  private def generateDate(hour: Int): LocalDateTime =
     LocalDateTime.of(2022, 1, 1, hour, 1, 0, 0)
 
-  "dateFormatted" - {
+  "displayFormattedDate" - {
 
     "should format submission timestamp for morning(AM)" in {
 
-      val result = DateTimeFormatUtil.dateFormatted(generateDate(4))
+      val result = DateTimeFormatUtil.displayFormattedDate(generateDate(4))
       result mustBe s"4:01am on 1 January 2022"
     }
 
     "should format submission timestamp for afternoon(PM)" in {
 
-      val result = DateTimeFormatUtil.dateFormatted(generateDate(16))
+      val result = DateTimeFormatUtil.displayFormattedDate(generateDate(16))
       result mustBe s"4:01pm on 1 January 2022"
     }
   }
