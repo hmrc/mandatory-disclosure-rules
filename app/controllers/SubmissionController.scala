@@ -30,8 +30,8 @@ import services.subscription.SubscriptionService
 import services.validation.XMLValidationService
 import uk.gov.hmrc.http.HttpReads.is2xx
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import utils.DateTimeFormatUtil
 
-import java.time.LocalDateTime
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
@@ -54,7 +54,7 @@ class SubmissionController @Inject() (
     val fileName                 = (xml \ "fileName").text
     val messageRefId             = (xml \\ "MessageRefId").text
     val subscriptionId           = request.subscriptionId
-    val submissionTime           = LocalDateTime.now()
+    val submissionTime           = DateTimeFormatUtil.zonedDateTimeNow.toLocalDateTime
     val conversationId           = ConversationId()
     val uploadedXmlNode: NodeSeq = xml \ "file" \ "MDR_OECD"
     val submissionDetails        = FileDetails(conversationId, subscriptionId, messageRefId, Pending, fileName, submissionTime, submissionTime)

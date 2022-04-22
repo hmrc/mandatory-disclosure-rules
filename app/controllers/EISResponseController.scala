@@ -26,8 +26,7 @@ import play.api.mvc.{Action, ControllerComponents}
 import repositories.submission.FileDetailsRepository
 import services.EmailService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
-import utils.CustomAlertUtil
-import utils.DateTimeFormatUtil.dateFormatted
+import utils.{CustomAlertUtil, DateTimeFormatUtil}
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
@@ -64,7 +63,7 @@ class EISResponseController @Inject() (cc: ControllerComponents,
           case (_, FileStatusAccepted) | (false, Rejected(_)) =>
             emailService.sendAndLogEmail(
               updatedFileDetails.subscriptionId,
-              dateFormatted(updatedFileDetails.submitted),
+              DateTimeFormatUtil.displayFormattedDate(updatedFileDetails.submitted),
               updatedFileDetails.messageRefId,
               updatedFileDetails.status == FileStatusAccepted
             )

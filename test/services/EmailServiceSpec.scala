@@ -32,7 +32,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.OK
 import services.subscription.SubscriptionService
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import utils.DateTimeFormatUtil.dateFormatted
+import utils.DateTimeFormatUtil
 
 import java.time.LocalDateTime
 import scala.concurrent.{ExecutionContext, Future}
@@ -71,8 +71,7 @@ class EmailServiceSpec extends SpecBase with Generators with ScalaCheckPropertyC
     None
   )
 
-  val submissionTime = dateFormatted(LocalDateTime.now)
-
+  val submissionTime = DateTimeFormatUtil.displayFormattedDate(LocalDateTime.now)
   val messageRefId   = "messageRefId"
   val subscriptionId = "subscriptionId"
 
