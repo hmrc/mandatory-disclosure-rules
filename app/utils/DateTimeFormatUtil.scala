@@ -26,8 +26,6 @@ object DateTimeFormatUtil {
 
   val dateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("d MMMM yyyy")
   val timeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("h:mma")
-  //HTTP-date format defined by RFC 7231 e.g. Fri, 01 Aug 2020 15:51:38 GMT+1
-  val connectorDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss O")
 
   def zonedDateTimeNow: ZonedDateTime = ZonedDateTime.now(euLondonZoneId)
 
