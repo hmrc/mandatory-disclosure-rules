@@ -17,6 +17,7 @@
 package repositories.submission
 
 import base.SpecBase
+import metrics.MetricsService
 import models.submission._
 import models.xml.{FileErrorCode, FileErrors, ValidationErrors}
 import play.api.Configuration
@@ -27,7 +28,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepositorySupport[FileDetails] {
 
   lazy val config              = app.injector.instanceOf[Configuration]
-  override lazy val repository = new FileDetailsRepository(mongoComponent, config)
+  lazy val metricsService      = app.injector.instanceOf[MetricsService]
+  override lazy val repository = new FileDetailsRepository(mongoComponent, config, metricsService)
 
   val dateTimeNow: LocalDateTime = LocalDateTime.now()
   val fileDetails: FileDetails =

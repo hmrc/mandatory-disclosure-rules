@@ -15,12 +15,13 @@
  */
 
 package repositories.submission
+import metrics.MetricsService
 import models.submission.{ConversationId, FileDetails, FileStatus}
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.Updates.set
-import org.mongodb.scala.model.{FindOneAndUpdateOptions, IndexModel, IndexOptions, ReturnDocument, Updates}
+import org.mongodb.scala.model._
 import play.api.Configuration
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
@@ -33,7 +34,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class FileDetailsRepository @Inject() (
   val mongo: MongoComponent,
-  config: Configuration
+  config: Configuration,
+  metricsService: MetricsService
 )(implicit ec: ExecutionContext)
     extends PlayMongoRepository[FileDetails](
       mongoComponent = mongo,
@@ -56,9 +58,11 @@ class FileDetailsRepository @Inject() (
     val options: FindOneAndUpdateOptions =
       FindOneAndUpdateOptions().returnDocument(ReturnDocument.AFTER)
 
-    collection
-      .findOneAndUpdate(filter, modifier, options)
-      .toFutureOption()
+    metricsService.processFileStatusMetrics(newStatus) {
+      collection
+        .findOneAndUpdate(filter, modifier, options)
+        .toFutureOption()
+    }
   }
 
   def findByConversationId(conversationId: ConversationId): Future[Option[FileDetails]] = {
@@ -89,7 +93,10 @@ class FileDetailsRepository @Inject() (
     collection
       .insertOne(fileDetails)
       .toFuture
-      .map(_ => true)
+      .map { _ =>
+        metricsService.fileStatusPendingCounter.inc()
+        true
+      }
 
 }
 
