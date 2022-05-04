@@ -38,7 +38,8 @@ object FileErrorCode {
     InvalidMessageRefIDFormat,
     MessageRefIDHasAlreadyBeenUsed,
     FileContainsTestDataForProductionEnvironment,
-    NotMeantToBeReceivedByTheIndicatedJurisdiction
+    NotMeantToBeReceivedByTheIndicatedJurisdiction,
+    CustomError
   )
 
   val fileErrorCodesForProblemStatus: Seq[FileErrorCode] = Seq(
