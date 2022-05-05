@@ -34,7 +34,8 @@ import utils.DateTimeFormatUtil
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import scala.xml.NodeSeq
+import scala.xml.{Elem, NodeSeq}
+import scala.xml.NodeSeq.seqToNodeSeq
 
 class SubmissionController @Inject() (
   authenticate: IdentifierAuthAction,
@@ -63,7 +64,7 @@ class SubmissionController @Inject() (
     readSubscriptionService.getContactInformation(subscriptionId).flatMap {
       case Right(value) =>
         val submissionXml: NodeSeq = transformService.addSubscriptionDetailsToSubmission(uploadedXmlNode, value, submissionMetaData)
-        val sanitisedXml           = submissionXml.map(node => scala.xml.Utility.trim(node))
+        val sanitisedXml           = scala.xml.Utility.trim(scala.xml.XML.loadString(submissionXml.mkString)) //trim only behaves correctly with xml.Elem
         val validatedResponse      = xmlValidationService.validate(xml = sanitisedXml, filePath = appConfig.submissionXSDFilePath)
 
         validatedResponse match {

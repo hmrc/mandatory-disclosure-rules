@@ -94,6 +94,31 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
       verify(mockFileDetailsRepository, times(1)).insert(argumentCaptorSubmissionDetails.capture())
       verify(mockSubmissionConnector, times(1)).submitDisclosure(argumentCaptor.capture(), argumentCaptorConversationId.capture())(any[HeaderCarrier]())
     }
+
+    "when a file is posted we transform it and trim and blank spaces on the node send it to the HOD expect return OK" in {
+      when(mockFileDetailsRepository.insert(any[FileDetails]()))
+        .thenReturn(Future.successful(true))
+      when(mockReadSubscriptionService.getContactInformation(any[String]())(any[HeaderCarrier](), any[ExecutionContext]()))
+        .thenReturn(Future.successful(Right(responseDetailForIndividual)))
+      when(mockSubmissionConnector.submitDisclosure(any[NodeSeq](), any[ConversationId])(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
+      when(mockXMLValidationService.validate(any[NodeSeq], any[String]))
+        .thenReturn(Right(basicXml))
+      val submission = basicXml
+
+      val request                = FakeRequest(POST, SubmissionController.submitDisclosure().url).withXmlBody(submission)
+      val result: Future[Result] = route(application, request).value
+
+      status(result) mustBe OK
+
+      val argumentCaptor: ArgumentCaptor[NodeSeq]                      = ArgumentCaptor.forClass(classOf[NodeSeq])
+      val argumentCaptorSubmissionDetails: ArgumentCaptor[FileDetails] = ArgumentCaptor.forClass(classOf[FileDetails])
+      val argumentCaptorConversationId: ArgumentCaptor[ConversationId] = ArgumentCaptor.forClass(classOf[ConversationId])
+
+      verify(mockFileDetailsRepository, times(1)).insert(argumentCaptorSubmissionDetails.capture())
+      verify(mockSubmissionConnector, times(1)).submitDisclosure(argumentCaptor.capture(), argumentCaptorConversationId.capture())(any[HeaderCarrier]())
+    }
+
     "when a read subscription returns not OK response INTERNAL_SERVER_ERROR" in {
       when(mockFileDetailsRepository.insert(any[FileDetails]()))
         .thenReturn(Future.successful(true))

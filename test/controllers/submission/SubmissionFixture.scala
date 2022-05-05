@@ -16,7 +16,7 @@
 
 package controllers.submission
 
-import models.subscription.{ContactInformation, OrganisationDetails, ResponseDetail}
+import models.subscription.{ContactInformation, IndividualDetails, OrganisationDetails, ResponseDetail}
 
 object SubmissionFixture {
   val basicXml =
@@ -306,6 +306,33 @@ object SubmissionFixture {
         mobile = None,
         contactType = OrganisationDetails(
           organisationName = "Example"
+        )
+      ),
+      secondaryContact = Some(
+        ContactInformation(
+          email = "ddd",
+          phone = Some("12345678"),
+          mobile = Some("1222222"),
+          contactType = OrganisationDetails(
+            organisationName = "AnotherExample"
+          )
+        )
+      )
+    )
+
+  val responseDetailForIndividual =
+    ResponseDetail(
+      subscriptionID = "subscriptionID",
+      tradingName = Some("tradingName"),
+      isGBUser = true,
+      primaryContact = ContactInformation(
+        email = "aaa@test.com",
+        phone = Some("1234567"),
+        mobile = None,
+        contactType = IndividualDetails(
+          firstName = "\n        Individual without id first name\n      ",
+          middleName = None,
+          lastName = "\n        Individual without id last name\n      "
         )
       ),
       secondaryContact = Some(
