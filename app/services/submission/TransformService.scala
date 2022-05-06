@@ -100,15 +100,9 @@ class TransformService @Inject() () {
 
   def transformIndividual(individual: IndividualDetails): NodeSeq =
     Seq(
-      Some(<firstName>
-        {individual.firstName}
-      </firstName>),
-      individual.middleName.map(middle => <middleName>
-        {middle}
-      </middleName>),
-      Some(<lastName>
-        {individual.lastName}
-      </lastName>)
+      Some(<firstName>{individual.firstName}</firstName>),
+      individual.middleName.map(middle => <middleName>{middle}</middleName>),
+      Some(<lastName>{individual.lastName}</lastName>)
     ).filter(_.isDefined).map(_.get)
 
   def addNameSpaces(file: NodeSeq, namespaces: Seq[NamespaceForNode]): NodeSeq = {
