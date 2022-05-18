@@ -18,7 +18,6 @@ package utils
 
 import java.time.format.DateTimeFormatter
 import java.time.{LocalDateTime, ZoneId, ZonedDateTime}
-import javax.inject.Inject
 
 object DateTimeFormatUtil {
 

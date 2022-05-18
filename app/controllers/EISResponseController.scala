@@ -19,12 +19,15 @@ package controllers
 import config.AppConfig
 import controllers.actions.EISResponsePreConditionCheckActionRefiner
 import controllers.auth.ValidateAuthTokenAction
+import models.audit.AuditType
 import models.submission.{Accepted => FileStatusAccepted, FileStatus, Rejected}
 import models.xml.{BREResponse, ValidationStatus}
 import play.api.Logging
+import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
 import repositories.submission.FileDetailsRepository
 import services.EmailService
+import services.audit.AuditService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import utils.{CustomAlertUtil, DateTimeFormatUtil}
 
@@ -38,7 +41,8 @@ class EISResponseController @Inject() (cc: ControllerComponents,
                                        fileDetailsRepository: FileDetailsRepository,
                                        emailService: EmailService,
                                        appConfig: AppConfig,
-                                       customAlertUtil: CustomAlertUtil
+                                       customAlertUtil: CustomAlertUtil,
+                                       auditService: AuditService
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
@@ -52,6 +56,7 @@ class EISResponseController @Inject() (cc: ControllerComponents,
     }
 
   def processEISResponse(): Action[NodeSeq] = (Action(parse.xml) andThen validateAuth andThen actionRefiner).async { implicit request =>
+    auditService.sendAuditEvent(AuditType.eisResponse, Json.toJson(request.BREResponse))
     val conversationId = request.BREResponse.conversationID
     val fileStatus     = convertToFileStatus(request.BREResponse)
 

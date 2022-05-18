@@ -18,6 +18,7 @@ package models.xml
 
 import cats.implicits.catsSyntaxTuple3Semigroupal
 import com.lucidchart.open.xtract.{__, XmlReader}
+import play.api.libs.json.{Json, OWrites}
 
 case class BREResponse(regime: String, conversationID: String, genericStatusMessage: GenericStatusMessage)
 
@@ -28,4 +29,6 @@ object BREResponse {
     (__ \ "requestCommon" \ "conversationID").read[String],
     (__ \ "requestDetail" \ "GenericStatusMessage").read[GenericStatusMessage]
   ).mapN(apply)
+
+  implicit val writes: OWrites[BREResponse] = Json.writes[BREResponse]
 }

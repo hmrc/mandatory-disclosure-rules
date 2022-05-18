@@ -20,6 +20,7 @@ import base.SpecBase
 import com.lucidchart.open.xtract.{ParseFailure, ParseSuccess, XmlReader}
 import models.xml.FileErrorCode.MessageRefIDHasAlreadyBeenUsed
 import models.xml.RecordErrorCode.MessageTypeIndic
+import play.api.libs.json.{JsValue, Json}
 
 import scala.xml.Elem
 
@@ -34,7 +35,12 @@ class GenericStatusMessageSpec extends SpecBase {
                         </gsm:ValidationResult>
                       </gsm:GenericStatusMessage>
 
-      XmlReader.of[GenericStatusMessage].read(xml) mustBe ParseSuccess(GenericStatusMessage(ValidationErrors(None, None), ValidationStatus.accepted))
+      val result = XmlReader.of[GenericStatusMessage].read(xml)
+
+      result mustBe ParseSuccess(GenericStatusMessage(ValidationErrors(None, None), ValidationStatus.accepted))
+
+      Json.toJson(result.toOption.get) mustBe Json.parse("""{"validationErrors":{},"status":"Accepted"}""")
+
     }
 
     "must read xml as GenericStatusMessage when status is 'Rejected'" in {
@@ -55,7 +61,8 @@ class GenericStatusMessageSpec extends SpecBase {
                       </gsm:ValidationResult>
                     </gsm:GenericStatusMessage>
 
-      XmlReader.of[GenericStatusMessage].read(xml) mustBe ParseSuccess(
+      val result = XmlReader.of[GenericStatusMessage].read(xml)
+      result mustBe ParseSuccess(
         GenericStatusMessage(
           ValidationErrors(
             Some(List(FileErrors(MessageRefIDHasAlreadyBeenUsed, Some("Duplicate message ref ID")))),
@@ -72,6 +79,15 @@ class GenericStatusMessageSpec extends SpecBase {
           ValidationStatus.rejected
         )
       )
+
+      val expectedJson: JsValue = Json.parse("""
+          |{"validationErrors":
+          |{"fileError":[{"code":"50009","details":"Duplicate message ref ID"}],
+          |"recordError":[{"code":"80010","details":"A message can contain either new records (OECD1) or corrections/deletions (OECD2 and OECD3), but cannot contain a mixture of both","docRefIDInError":["asjdhjjhjssjhdjshdAJGSJJS"]}]},
+          |"status":"Rejected"}""".stripMargin)
+
+      Json.toJson(result.toOption.get) mustBe expectedJson
+
     }
 
     "must fail for an invalid xml" in {
