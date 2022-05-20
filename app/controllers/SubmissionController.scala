@@ -34,8 +34,7 @@ import utils.DateTimeFormatUtil
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
-import scala.xml.{Elem, NodeSeq}
-import scala.xml.NodeSeq.seqToNodeSeq
+import scala.xml.NodeSeq
 
 class SubmissionController @Inject() (
   authenticate: IdentifierAuthAction,

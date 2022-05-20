@@ -14,17 +14,8 @@
  * limitations under the License.
  */
 
-package models.xml
+package models.audit
 
-import play.api.libs.json.{JsString, Writes}
-
-object ValidationStatus extends Enumeration {
-  type ValidationStatus = Value
-  val accepted: Value = Value("Accepted")
-  val rejected: Value = Value("Rejected")
-
-  implicit val writes: Writes[ValidationStatus] = Writes[ValidationStatus] { v =>
-    JsString(v.toString)
-  }
-
+object AuditType {
+  val eisResponse = "MandatoryDisclosureRulesEISResponse"
 }
