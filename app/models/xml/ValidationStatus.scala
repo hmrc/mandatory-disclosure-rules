@@ -26,6 +26,5 @@ object ValidationStatus extends Enumeration {
   implicit val writes: Writes[ValidationStatus] = Writes[ValidationStatus] { v =>
     JsString(v.toString)
   }
-  // implicit def enumWrites[E <: Enumeration]: Writes[E#Value] = (v: E#Value) => JsString(v.toString)
 
 }
