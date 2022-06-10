@@ -18,6 +18,7 @@ package connectors
 
 import config.AppConfig
 import models.submission.ConversationId
+import play.api.Logging
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
 import javax.inject.Inject
@@ -27,7 +28,7 @@ import scala.xml.NodeSeq
 class SubmissionConnector @Inject() (
   val config: AppConfig,
   http: HttpClient
-)(implicit ec: ExecutionContext) {
+)(implicit ec: ExecutionContext) extends Logging {
 
   def submitDisclosure(submission: NodeSeq, conversationId: ConversationId)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
     val serviceName = "submission"
@@ -41,6 +42,8 @@ class SubmissionConnector @Inject() (
       .withAccept(Some("application/xml"))
       .withEnvironment(Some(config.environment(serviceName)))
 
+
+    logger.warn(s"MDR submitDisclosure: ${submission} and extraHeaders: ${extraHeaders}")
     http.POSTString[HttpResponse](config.serviceUrl(serviceName), submission.mkString, extraHeaders)(implicitly, hc, ec)
   }
 
