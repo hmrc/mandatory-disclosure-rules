@@ -52,7 +52,7 @@ class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEac
       when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[String]()))
         .thenReturn(Future.successful(SubmissionValidationFailure(ValidationErrors(Seq(GenericError(1, Message("xml.enter.an.element")))))))
 
-      val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url).withJsonBody(Json.toJson(UpscanURL("someUrl")))
+      val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission.url).withJsonBody(Json.toJson(UpscanURL("someUrl")))
       val result  = route(application, request).value
 
       status(result) mustBe OK
@@ -63,7 +63,7 @@ class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEac
       when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[String]()))
         .thenReturn(Future.successful(SubmissionValidationSuccess(messageSpecData)))
 
-      val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url).withJsonBody(Json.toJson(UpscanURL("someUrl")))
+      val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission.url).withJsonBody(Json.toJson(UpscanURL("someUrl")))
       val result  = route(application, request).value
 
       status(result) mustBe OK
@@ -73,7 +73,7 @@ class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEac
       when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[String]()))
         .thenReturn(Future.successful(InvalidXmlError("")))
 
-      val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission().url).withJsonBody(Json.toJson(UpscanURL("someUrl")))
+      val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission.url).withJsonBody(Json.toJson(UpscanURL("someUrl")))
       val result  = route(application, request).value
 
       status(result) mustBe BAD_REQUEST

@@ -54,7 +54,7 @@ class UploadFormControllerSpec extends SpecBase with BeforeAndAfterEach {
       val identifiers = UpscanIdentifiers(uploadId, Reference("xxxx"))
 
       val request =
-        FakeRequest(POST, routes.UploadFormController.requestUpload().url).withJsonBody(Json.toJson(identifiers))
+        FakeRequest(POST, routes.UploadFormController.requestUpload.url).withJsonBody(Json.toJson(identifiers))
 
       when(mockUploadProgressTracker.requestUpload(identifiers.uploadId, identifiers.fileReference)).thenReturn(Future.successful(true))
 
@@ -66,7 +66,7 @@ class UploadFormControllerSpec extends SpecBase with BeforeAndAfterEach {
 
       val json = Json.parse("""{"aString": "a"}""")
       val request =
-        FakeRequest(POST, routes.UploadFormController.requestUpload().url).withJsonBody(json)
+        FakeRequest(POST, routes.UploadFormController.requestUpload.url).withJsonBody(json)
 
       val result = route(application, request).value
 

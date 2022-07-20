@@ -97,7 +97,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
         .thenReturn(Future.successful(ACCEPTED))
       when(mockAuditService.sendAuditEvent(any(), any())(any())).thenReturn(Future.successful(Success))
 
-      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
+      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse.url)
         .withHeaders("x-conversation-id" -> randomUUID.toString, HeaderNames.authorisation -> s"Bearer token")
         .withXmlBody(xml)
 
@@ -112,7 +112,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
       when(mockEmailService.sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier]))
         .thenReturn(Future.successful(ACCEPTED))
 
-      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
+      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse.url)
         .withHeaders("x-conversation-id" -> randomUUID.toString, HeaderNames.authorisation -> s"wrong")
         .withXmlBody(xml)
 
@@ -129,7 +129,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
       when(mockEmailService.sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier]))
         .thenReturn(Future.successful(ACCEPTED))
 
-      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
+      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse.url)
         .withHeaders("x-conversation-id" -> randomUUID.toString, HeaderNames.authorisation -> s"Bearer token")
         .withXmlBody(xml)
 
@@ -156,7 +156,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
       when(mockEmailService.sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier]))
         .thenReturn(Future.successful(ACCEPTED))
 
-      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
+      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse.url)
         .withHeaders("x-conversation-id" -> randomUUID.toString, HeaderNames.authorisation -> s"Bearer token")
         .withXmlBody(xml)
 
@@ -183,7 +183,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
       when(mockEmailService.sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier]))
         .thenReturn(Future.successful(ACCEPTED))
 
-      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
+      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse.url)
         .withHeaders("x-conversation-id" -> randomUUID.toString, HeaderNames.authorisation -> s"Bearer token")
         .withXmlBody(xml)
 
@@ -209,7 +209,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
       when(mockEmailService.sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier]))
         .thenReturn(Future.successful(ACCEPTED))
 
-      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
+      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse.url)
         .withHeaders("x-conversation-id" -> randomUUID.toString, HeaderNames.authorisation -> s"Bearer token")
         .withXmlBody(xml)
 
@@ -236,7 +236,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
       when(mockEmailService.sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier]))
         .thenReturn(Future.successful(ACCEPTED))
 
-      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
+      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse.url)
         .withHeaders("x-conversation-id" -> randomUUID.toString, HeaderNames.authorisation -> s"Bearer token")
         .withXmlBody(xml)
 
@@ -263,7 +263,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
       when(mockEmailService.sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier]))
         .thenReturn(Future.successful(ACCEPTED))
 
-      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
+      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse.url)
         .withHeaders("x-conversation-id" -> randomUUID.toString, HeaderNames.authorisation -> s"Bearer token")
         .withXmlBody(xml)
 
@@ -277,7 +277,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
 
       val invalidXml = <test>invalid</test>
 
-      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
+      val request = FakeRequest(POST, routes.EISResponseController.processEISResponse.url)
         .withHeaders("x-conversation-id" -> randomUUID.toString, HeaderNames.authorisation -> s"Bearer token")
         .withXmlBody(invalidXml)
 
@@ -292,7 +292,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
       when(mockFileDetailsRepository.updateStatus(any[String](), any[FileStatus]())).thenReturn(Future.successful(None))
 
       running(application) {
-        val request = FakeRequest(POST, routes.EISResponseController.processEISResponse().url)
+        val request = FakeRequest(POST, routes.EISResponseController.processEISResponse.url)
           .withHeaders("x-conversation-id" -> randomUUID.toString, HeaderNames.authorisation -> s"Bearer token")
           .withXmlBody(xml)
 
