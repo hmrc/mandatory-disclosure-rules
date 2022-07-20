@@ -82,7 +82,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
         .thenReturn(Right(basicXml))
       val submission = basicXml
 
-      val request                = FakeRequest(POST, SubmissionController.submitDisclosure().url).withXmlBody(submission)
+      val request                = FakeRequest(POST, SubmissionController.submitDisclosure.url).withXmlBody(submission)
       val result: Future[Result] = route(application, request).value
 
       status(result) mustBe OK
@@ -106,7 +106,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
         .thenReturn(Right(basicXml))
       val submission = basicXml
 
-      val request                = FakeRequest(POST, SubmissionController.submitDisclosure().url).withXmlBody(submission)
+      val request                = FakeRequest(POST, SubmissionController.submitDisclosure.url).withXmlBody(submission)
       val result: Future[Result] = route(application, request).value
 
       status(result) mustBe OK
@@ -129,7 +129,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
 
       val submission = basicXml
 
-      val request                = FakeRequest(POST, SubmissionController.submitDisclosure().url).withXmlBody(submission)
+      val request                = FakeRequest(POST, SubmissionController.submitDisclosure.url).withXmlBody(submission)
       val result: Future[Result] = route(application, request).value
 
       status(result) mustBe INTERNAL_SERVER_ERROR
@@ -154,7 +154,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
       when(mockXMLValidationService.validate(any[NodeSeq], any[String]))
         .thenReturn(Left(ListBuffer(SaxParseError(1, "Invalid Node at line 1"))))
 
-      val request                = FakeRequest(POST, SubmissionController.submitDisclosure().url).withXmlBody(submission)
+      val request                = FakeRequest(POST, SubmissionController.submitDisclosure.url).withXmlBody(submission)
       val result: Future[Result] = route(application, request).value
 
       status(result) mustBe INTERNAL_SERVER_ERROR

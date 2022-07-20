@@ -106,7 +106,7 @@ class FileDetailsControllerSpec extends SpecBase with BeforeAndAfterEach {
       val request =
         FakeRequest(
           GET,
-          routes.FileDetailsController.getAllFileDetails().url
+          routes.FileDetailsController.getAllFileDetails.url
         )
 
       val result = route(application, request).value
@@ -125,7 +125,7 @@ class FileDetailsControllerSpec extends SpecBase with BeforeAndAfterEach {
       val request =
         FakeRequest(
           GET,
-          routes.FileDetailsController.getAllFileDetails().url
+          routes.FileDetailsController.getAllFileDetails.url
         )
 
       val result = route(application, request).value
