@@ -20,7 +20,7 @@ object AppDependencies {
     "org.scalatestplus"      %% "scalatestplus-scalacheck" % "3.1.0.0-RC2"       % Test,
     "wolfendale"             %% "scalacheck-gen-regexp"    % "0.1.2"             % Test,
     "uk.gov.hmrc"            %% "bootstrap-test-play-28"   % "5.21.0"            % Test,
-    "uk.gov.hmrc.mongo"      %% "hmrc-mongo-test-play-28"  % "0.60.0"            % Test,
+    "uk.gov.hmrc.mongo"      %% "hmrc-mongo-test-play-28"  % "0.68.0"            % Test,
     "org.mockito"            %% "mockito-scala"            % "1.10.6"            % Test,
     "com.vladsch.flexmark"    % "flexmark-all"             % "0.36.8"            % "test, it",
     "org.scalatest"          %% "scalatest"                % "3.1.0"             % Test,
