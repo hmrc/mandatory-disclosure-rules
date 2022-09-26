@@ -95,7 +95,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
       when(mockFileDetailsRepository.updateStatus(any[String], any[FileStatus])).thenReturn(Future.successful(Some(fileDetails)))
       when(mockEmailService.sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier]))
         .thenReturn(Future.successful(ACCEPTED))
-      when(mockAuditService.sendAuditEvent(any(), any())(any())).thenReturn(Future.successful(Success))
+      when(mockAuditService.sendAuditEvent(any[String], any[JsValue])(any[HeaderCarrier])).thenReturn(Future.successful(Success))
 
       val request = FakeRequest(POST, routes.EISResponseController.processEISResponse.url)
         .withHeaders("x-conversation-id" -> randomUUID.toString, HeaderNames.authorisation -> s"Bearer token")
@@ -124,7 +124,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
     "must send an email when on the fast journey and file upload is Accepted" in {
       val fileDetails =
         FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Accepted, "file1.xml", LocalDateTime.now(), LocalDateTime.now())
-      when(mockAuditService.sendAuditEvent(any(), any())(any())).thenReturn(Future.successful(Success))
+      when(mockAuditService.sendAuditEvent(any[String], any[JsValue])(any[HeaderCarrier])).thenReturn(Future.successful(Success))
       when(mockFileDetailsRepository.updateStatus(any[String], any[FileStatus])).thenReturn(Future.successful(Some(fileDetails)))
       when(mockEmailService.sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier]))
         .thenReturn(Future.successful(ACCEPTED))
@@ -151,7 +151,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
           LocalDateTime.now(),
           LocalDateTime.now()
         )
-      when(mockAuditService.sendAuditEvent(any(), any())(any())).thenReturn(Future.successful(Success))
+      when(mockAuditService.sendAuditEvent(any[String], any[JsValue])(any[HeaderCarrier])).thenReturn(Future.successful(Success))
       when(mockFileDetailsRepository.updateStatus(any[String], any[FileStatus])).thenReturn(Future.successful(Some(fileDetails)))
       when(mockEmailService.sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier]))
         .thenReturn(Future.successful(ACCEPTED))
@@ -178,7 +178,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
           LocalDateTime.now(),
           LocalDateTime.now()
         )
-      when(mockAuditService.sendAuditEvent(any(), any())(any())).thenReturn(Future.successful(Success))
+      when(mockAuditService.sendAuditEvent(any[String], any[JsValue])(any[HeaderCarrier])).thenReturn(Future.successful(Success))
       when(mockFileDetailsRepository.updateStatus(any[String], any[FileStatus])).thenReturn(Future.successful(Some(fileDetails)))
       when(mockEmailService.sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier]))
         .thenReturn(Future.successful(ACCEPTED))
@@ -204,7 +204,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
                     LocalDateTime.now().minusSeconds(11),
                     LocalDateTime.now()
         )
-      when(mockAuditService.sendAuditEvent(any(), any())(any())).thenReturn(Future.successful(Success))
+      when(mockAuditService.sendAuditEvent(any[String], any[JsValue])(any[HeaderCarrier])).thenReturn(Future.successful(Success))
       when(mockFileDetailsRepository.updateStatus(any[String], any[FileStatus])).thenReturn(Future.successful(Some(fileDetails)))
       when(mockEmailService.sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier]))
         .thenReturn(Future.successful(ACCEPTED))
@@ -231,7 +231,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
           LocalDateTime.now().minusSeconds(11),
           LocalDateTime.now()
         )
-      when(mockAuditService.sendAuditEvent(any(), any())(any())).thenReturn(Future.successful(Success))
+      when(mockAuditService.sendAuditEvent(any[String], any[JsValue])(any[HeaderCarrier])).thenReturn(Future.successful(Success))
       when(mockFileDetailsRepository.updateStatus(any[String], any[FileStatus])).thenReturn(Future.successful(Some(fileDetails)))
       when(mockEmailService.sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier]))
         .thenReturn(Future.successful(ACCEPTED))
@@ -258,7 +258,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
           LocalDateTime.now().minusSeconds(11),
           LocalDateTime.now()
         )
-      when(mockAuditService.sendAuditEvent(any(), any())(any())).thenReturn(Future.successful(Success))
+      when(mockAuditService.sendAuditEvent(any[String], any[JsValue])(any[HeaderCarrier])).thenReturn(Future.successful(Success))
       when(mockFileDetailsRepository.updateStatus(any[String], any[FileStatus])).thenReturn(Future.successful(Some(fileDetails)))
       when(mockEmailService.sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier]))
         .thenReturn(Future.successful(ACCEPTED))
@@ -288,7 +288,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
     }
 
     "must return InternalServerError on failing to update the status" in {
-      when(mockAuditService.sendAuditEvent(any(), any())(any())).thenReturn(Future.successful(Success))
+      when(mockAuditService.sendAuditEvent(any[String], any[JsValue])(any[HeaderCarrier])).thenReturn(Future.successful(Success))
       when(mockFileDetailsRepository.updateStatus(any[String](), any[FileStatus]())).thenReturn(Future.successful(None))
 
       running(application) {

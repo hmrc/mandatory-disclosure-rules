@@ -31,7 +31,7 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
   lazy val metricsService      = app.injector.instanceOf[MetricsService]
   override lazy val repository = new FileDetailsRepository(mongoComponent, config, metricsService)
 
-  val dateTimeNow: LocalDateTime = LocalDateTime.now()
+  val dateTimeNow: LocalDateTime = LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.MILLIS)
   val fileDetails: FileDetails =
     FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Pending, "file1.xml", dateTimeNow, dateTimeNow)
 
