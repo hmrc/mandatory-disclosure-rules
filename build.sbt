@@ -5,10 +5,8 @@ val appName = "mandatory-disclosure-rules"
 
 val silencerVersion = "1.7.6"
 
-
 lazy val scalaCompilerOptions = Seq(
   "-Xlint:-missing-interpolator,_",
-  "-Yno-adapted-args",
   "-Ywarn-unused:imports",
   "-Ywarn-unused:privates",
   "-Ywarn-unused:locals",
@@ -26,22 +24,15 @@ lazy val scalaCompilerOptions = Seq(
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .settings(
-    majorVersion                     := 0,
-    scalaVersion                     := "2.12.15",
+    majorVersion             := 0,
+    scalaVersion             := "2.13.8",
     PlayKeys.playDefaultPort := 10019,
-    libraryDependencies              ++= AppDependencies.compile ++ AppDependencies.test,
-    scalafmtOnCompile in Compile := true,
-    scalafmtOnCompile in Test := true,
-    scalafmtOnCompile.withRank(KeyRanks.Invisible) in ThisBuild := true,
+    libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
+    Compile / scalafmtOnCompile                                := true,
+    Test / scalafmtOnCompile                                   := true,
+    ThisBuild / scalafmtOnCompile.withRank(KeyRanks.Invisible) := true,
     scalacOptions ++= scalaCompilerOptions,
-    // ***************
-    // Use the silencer plugin to suppress warnings
-    scalacOptions += "-P:silencer:pathFilters=routes",
-    libraryDependencies ++= Seq(
-      compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
-      "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
-    )
-    // ***************
+    scalacOptions += "-Wconf:src=routes/.*:s"
   )
   .settings(publishingSettings: _*)
   .configs(IntegrationTest)
