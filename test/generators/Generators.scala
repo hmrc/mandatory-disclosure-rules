@@ -143,4 +143,10 @@ trait Generators extends ModelGenerators {
       size  <- Gen.choose(1, maxSize)
       items <- Gen.listOfN(size, gen)
     } yield items
+
+  def validEmailAddressService: Gen[String] = {
+    val emailRegexWithQuantifier = """^([a-zA-Z0-9.!#$%&’'*+/=?^_`{|}~-]+)@([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*)$"""
+
+    RegexpGen.from(emailRegexWithQuantifier)
+  }
 }
