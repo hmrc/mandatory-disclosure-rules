@@ -32,7 +32,15 @@ lazy val microservice = Project(appName, file("."))
     Test / scalafmtOnCompile                                   := true,
     ThisBuild / scalafmtOnCompile.withRank(KeyRanks.Invisible) := true,
     scalacOptions ++= scalaCompilerOptions,
-    scalacOptions += "-Wconf:src=routes/.*:s"
+    scalacOptions += "-Wconf:src=routes/.*:s",
+    scalacOptions ++= Seq(
+      "-Wconf:src=routes/.*:s",
+      "-Wconf:src=.+/test/.+:s",
+      "-Wconf:cat=deprecation&msg=\\.*()\\.*:s",
+      "-Wconf:cat=unused-imports&site=<empty>:s",
+      "-Wconf:cat=unused&src=.*RoutesPrefix\\.scala:s",
+      "-Wconf:cat=unused&src=.*Routes\\.scala:s"
+    )
   )
   .settings(publishingSettings: _*)
   .configs(IntegrationTest)
