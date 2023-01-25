@@ -25,6 +25,7 @@ import org.mongodb.scala.model.{FindOneAndUpdateOptions, IndexModel, IndexOption
 import play.api.Configuration
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
+import javax.inject.Singleton
 
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -45,6 +46,7 @@ object UpScanSessionRepository {
   )
 }
 
+@Singleton
 class UpScanSessionRepository @Inject() (
   val mongo: MongoComponent,
   config: Configuration
