@@ -50,7 +50,7 @@ class EISResponseController @Inject() (cc: ControllerComponents,
   private def convertToFileStatus(breResponse: BREResponse): FileStatus =
     breResponse.genericStatusMessage.status match {
       case ValidationStatus.accepted => FileStatusAccepted
-      case ValidationStatus.rejected =>
+      case _ =>
         customAlertUtil.alertForProblemStatus(breResponse.genericStatusMessage.validationErrors)
         Rejected(breResponse.genericStatusMessage.validationErrors)
     }

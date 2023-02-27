@@ -54,6 +54,7 @@ class TransformService @Inject() () {
     for (node <- submissionFile) yield node match {
       case elem: Elem =>
         elem.copy(scope = NamespaceBinding("xsi", "http://www.w3.org/2001/XMLSchema-instance", NamespaceBinding("mdr", "urn:oecd:ties:mdr:v1", TopScope)))
+      case node => node
     }
 
   def transformSubscriptionDetails(
