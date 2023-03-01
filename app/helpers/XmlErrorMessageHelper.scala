@@ -168,6 +168,7 @@ class XmlErrorMessageHelper extends SaxParseErrorRegExConstants {
             } else {
               Some(Message("xml.add.mdr"))
             }
+          case _ => None
         }
       case invalidEnumErrorFormat(suppliedValue, allowedValues) =>
         errorMessage2 match {
@@ -210,6 +211,7 @@ class XmlErrorMessageHelper extends SaxParseErrorRegExConstants {
                 }
               case _ => Some(Message(s"xml.$attribute.format", Seq(element)))
             }
+          case _ => None
         }
       case _ => None
     }

@@ -18,7 +18,8 @@ lazy val scalaCompilerOptions = Seq(
   "-deprecation",
   "-feature",
   "-unchecked",
-  "-language:implicitConversions"
+  "-language:implicitConversions",
+  "-Xlint:-byname-implicit"
 )
 
 lazy val microservice = Project(appName, file("."))
