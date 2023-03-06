@@ -53,9 +53,6 @@ object OrganisationDetails {
 
   implicit val writes: Writes[OrganisationDetails] =
     (__ \ "organisation" \ "organisationName").write[String] contramap unlift(OrganisationDetails.unapply)
-
-  def convertTo(contactName: Option[String]): Option[OrganisationDetails] =
-    contactName.map(OrganisationDetails(_))
 }
 
 case class IndividualDetails(firstName: String, middleName: Option[String], lastName: String) extends ContactType
