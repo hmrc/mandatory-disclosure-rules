@@ -185,7 +185,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
     "when auditFileSubmission is enabled must send a MandatoryDisclosureRulesFileSubmissionType audit event" in {
 
       val application = applicationBuilder()
-        .configure("auditing.enabled" -> true, "auditFileSubmission" -> true)
+        .configure("auditing.enabled" -> true, "auditing.event.fileSubmission.enabled" -> true)
         .overrides(
           bind[AuditService].toInstance(mockAuditService),
           bind[SubmissionConnector].toInstance(mockSubmissionConnector),
@@ -218,7 +218,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
     "when auditFileSubmission is disabled must not send a MandatoryDisclosureRulesFileSubmissionType audit event" in {
 
       val application = applicationBuilder()
-        .configure("auditing.enabled" -> true, "auditFileSubmission" -> false)
+        .configure("auditing.enabled" -> true, "auditing.event.fileSubmission.enabled" -> false)
         .overrides(
           bind[AuditService].toInstance(mockAuditService),
           bind[SubmissionConnector].toInstance(mockSubmissionConnector),

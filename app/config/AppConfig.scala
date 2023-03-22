@@ -31,7 +31,7 @@ class AppConfig @Inject() (
 
   val auditingEnabled: Boolean = config.get[Boolean]("auditing.enabled")
 
-  val auditFileSubmission: Boolean = config.get[Boolean]("auditFileSubmission")
+  val auditFileSubmission: Boolean = config.get[Boolean]("auditing.event.fileSubmission.enabled")
 
   val graphiteHost: String =
     config.get[String]("microservice.metrics.graphite.host")
