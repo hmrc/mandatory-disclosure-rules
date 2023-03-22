@@ -17,5 +17,6 @@
 package models.audit
 
 object AuditType {
-  val eisResponse = "MandatoryDisclosureRulesEISResponse"
+  val eisResponse    = "MandatoryDisclosureRulesEISResponse"
+  val fileSubmission = "MandatoryDisclosureRulesFileSubmissionType"
 }

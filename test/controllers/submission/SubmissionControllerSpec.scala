@@ -22,28 +22,35 @@ import connectors.{SubmissionConnector, SubscriptionConnector}
 import controllers.auth.{FakeIdentifierAuthAction, IdentifierAuthAction}
 import controllers.routes._
 import controllers.submission.SubmissionFixture._
+import models.audit.AuditType
 import models.error.ReadSubscriptionError
 import models.submission.{ConversationId, FileDetails}
 import models.validation.SaxParseError
 import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentCaptor, MockitoSugar}
+import org.mockito.{ArgumentCaptor, ArgumentMatchers, MockitoSugar}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
+import play.api.{Application, Configuration}
 import play.api.inject.bind
+import play.api.libs.json.JsValue
 import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{status, _}
 import repositories.submission.FileDetailsRepository
+import services.audit.AuditService
 import services.submission.TransformService
 import services.subscription.SubscriptionService
 import services.validation.XMLValidationService
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.play.audit.http.connector.AuditResult
+import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
 class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaCheckDrivenPropertyChecks with BeforeAndAfterEach {
 
+  val mockAuditService: AuditService                   = mock[AuditService]
   val mockTransformService                             = mock[TransformService]
   val mockSubmissionConnector: SubmissionConnector     = mock[SubmissionConnector]
   val mockSubscriptionConnector: SubscriptionConnector = mock[SubscriptionConnector]
@@ -55,7 +62,15 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
   val errorStatusCodes: Seq[Int] = Seq(BAD_REQUEST, FORBIDDEN, NOT_FOUND, METHOD_NOT_ALLOWED, CONFLICT, INTERNAL_SERVER_ERROR, SERVICE_UNAVAILABLE)
 
   override def beforeEach(): Unit =
-    reset(mockAppConf, mockXMLValidationService, mockReadSubscriptionService, mockSubscriptionConnector, mockSubmissionConnector, mockFileDetailsRepository)
+    reset(
+      mockAppConf,
+      mockAuditService,
+      mockXMLValidationService,
+      mockReadSubscriptionService,
+      mockSubscriptionConnector,
+      mockSubmissionConnector,
+      mockFileDetailsRepository
+    )
 
   "submission controller" - {
 
@@ -165,6 +180,72 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
 
       verify(mockFileDetailsRepository, times(0)).insert(argumentCaptorSubmissionDetails.capture())
       verify(mockSubmissionConnector, times(0)).submitDisclosure(argumentCaptor.capture(), argumentCaptorConversationId.capture())(any[HeaderCarrier]())
+    }
+
+    "when auditFileSubmission is enabled must send a MandatoryDisclosureRulesFileSubmissionType audit event" in {
+
+      val application = applicationBuilder()
+        .configure("auditing.enabled" -> true, "auditFileSubmission" -> true)
+        .overrides(
+          bind[AuditService].toInstance(mockAuditService),
+          bind[SubmissionConnector].toInstance(mockSubmissionConnector),
+          bind[SubscriptionService].toInstance(mockReadSubscriptionService),
+          bind[FileDetailsRepository].toInstance(mockFileDetailsRepository),
+          bind[XMLValidationService].toInstance(mockXMLValidationService),
+          bind[IdentifierAuthAction].to[FakeIdentifierAuthAction]
+        )
+        .build()
+
+      when(mockFileDetailsRepository.insert(any[FileDetails]()))
+        .thenReturn(Future.successful(true))
+      when(mockAuditService.sendAuditEvent(ArgumentMatchers.eq("MandatoryDisclosureRulesFileSubmissionType"), any[JsValue]())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Success))
+      when(mockReadSubscriptionService.getContactInformation(any[String]())(any[HeaderCarrier](), any[ExecutionContext]()))
+        .thenReturn(Future.successful(Right(responseDetail)))
+      when(mockSubmissionConnector.submitDisclosure(any[NodeSeq](), any[ConversationId])(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
+      when(mockXMLValidationService.validate(any[NodeSeq], any[String]))
+        .thenReturn(Right(basicXml))
+      val submission = basicXml
+
+      val request                = FakeRequest(POST, SubmissionController.submitDisclosure.url).withXmlBody(submission)
+      val result: Future[Result] = route(application, request).value
+
+      status(result) mustBe OK
+      verify(mockAuditService, times(1)).sendAuditEvent(ArgumentMatchers.eq("MandatoryDisclosureRulesFileSubmissionType"), any[JsValue])(any[HeaderCarrier])
+    }
+
+    "when auditFileSubmission is disabled must not send a MandatoryDisclosureRulesFileSubmissionType audit event" in {
+
+      val application = applicationBuilder()
+        .configure("auditing.enabled" -> true, "auditFileSubmission" -> false)
+        .overrides(
+          bind[AuditService].toInstance(mockAuditService),
+          bind[SubmissionConnector].toInstance(mockSubmissionConnector),
+          bind[SubscriptionService].toInstance(mockReadSubscriptionService),
+          bind[FileDetailsRepository].toInstance(mockFileDetailsRepository),
+          bind[XMLValidationService].toInstance(mockXMLValidationService),
+          bind[IdentifierAuthAction].to[FakeIdentifierAuthAction]
+        )
+        .build()
+
+      when(mockFileDetailsRepository.insert(any[FileDetails]()))
+        .thenReturn(Future.successful(true))
+      when(mockAuditService.sendAuditEvent(ArgumentMatchers.eq("MandatoryDisclosureRulesFileSubmissionType"), any[JsValue]())(any[HeaderCarrier]))
+        .thenReturn(Future.successful(Success))
+      when(mockReadSubscriptionService.getContactInformation(any[String]())(any[HeaderCarrier](), any[ExecutionContext]()))
+        .thenReturn(Future.successful(Right(responseDetail)))
+      when(mockSubmissionConnector.submitDisclosure(any[NodeSeq](), any[ConversationId])(any[HeaderCarrier]()))
+        .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
+      when(mockXMLValidationService.validate(any[NodeSeq], any[String]))
+        .thenReturn(Right(basicXml))
+      val submission = basicXml
+
+      val request                = FakeRequest(POST, SubmissionController.submitDisclosure.url).withXmlBody(submission)
+      val result: Future[Result] = route(application, request).value
+
+      status(result) mustBe OK
+      verify(mockAuditService, times(0)).sendAuditEvent(ArgumentMatchers.eq("MandatoryDisclosureRulesFileSubmissionType"), any[JsValue])(any[HeaderCarrier])
     }
   }
 }
