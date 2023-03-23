@@ -19,12 +19,14 @@ package controllers
 import config.AppConfig
 import connectors.SubmissionConnector
 import controllers.auth.IdentifierAuthAction
+import models.audit.{AuditFileSubmission, AuditType}
 import models.error.ReadSubscriptionError
-import models.submission.{ConversationId, FileDetails, Pending, SubmissionMetaData}
+import models.submission.{ConversationId, FileDetails, MessageTypeIndic, Pending, SubmissionMetaData}
 import play.api.libs.json.Json
 import play.api.mvc.{Action, ControllerComponents}
 import play.api.{Logger, Logging}
 import repositories.submission.FileDetailsRepository
+import services.audit.AuditService
 import services.submission.TransformService
 import services.subscription.SubscriptionService
 import services.validation.XMLValidationService
@@ -44,6 +46,7 @@ class SubmissionController @Inject() (
   submissionConnector: SubmissionConnector,
   fileDetailsRepository: FileDetailsRepository,
   xmlValidationService: XMLValidationService,
+  auditService: AuditService,
   appConfig: AppConfig
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
@@ -58,6 +61,9 @@ class SubmissionController @Inject() (
     val conversationId           = ConversationId()
     val uploadedXmlNode: NodeSeq = xml \ "file" \ "MDR_OECD"
     val submissionDetails        = FileDetails(conversationId, subscriptionId, messageRefId, Pending, fileName, submissionTime, submissionTime)
+    val mdrBodyCount             = (xml \\ "MdrBody").length
+    val messageTypeIndic         = (xml \\ "MessageTypeIndic").text
+    val docTypeIndic             = (xml \\ "DocTypeIndic").text
 
     val submissionMetaData = SubmissionMetaData.build(submissionTime, conversationId, fileName)
     readSubscriptionService.getContactInformation(subscriptionId).flatMap {
@@ -72,6 +78,20 @@ class SubmissionController @Inject() (
             Future.successful(InternalServerError)
           case Right(_) =>
             submissionConnector.submitDisclosure(submissionXml, conversationId).flatMap { httpResponse =>
+              if (appConfig.auditFileSubmission) {
+                auditService.sendAuditEvent(
+                  AuditType.fileSubmission,
+                  Json.toJson(
+                    AuditFileSubmission(request.subscriptionId,
+                                        conversationId,
+                                        fileName,
+                                        mdrBodyCount,
+                                        MessageTypeIndic.fromString(messageTypeIndic),
+                                        docTypeIndic
+                    )
+                  )
+                )
+              }
               httpResponse.status match {
                 case status if is2xx(status) => fileDetailsRepository.insert(submissionDetails).map(_ => Ok(Json.toJson(conversationId)))
                 case _                       => Future.successful(httpResponse.handleResponse(implicitly[Logger](logger)))
