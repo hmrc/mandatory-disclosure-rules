@@ -53,8 +53,10 @@ class SubmissionController @Inject() (
     with Logging {
 
   def submitDisclosure: Action[NodeSeq] = authenticate.async(parse.xml) { implicit request =>
-    val xml                      = request.body
-    val fileName                 = (xml \ "fileName").text
+    val xml      = request.body
+    val fileName = (xml \ "fileName").text
+    val fileSize = (xml \ "fileSize").text
+
     val messageRefId             = (xml \\ "MessageRefId").text
     val subscriptionId           = request.subscriptionId
     val submissionTime           = DateTimeFormatUtil.zonedDateTimeNow.toLocalDateTime
@@ -64,6 +66,9 @@ class SubmissionController @Inject() (
     val mdrBodyCount             = (xml \\ "MdrBody").length
     val messageTypeIndic         = (xml \\ "MessageTypeIndic").text
     val docTypeIndic             = (xml \\ "DocTypeIndic").text
+
+    println(s"\n\n\n\n\nFile $fileSize\n\n\n\n")
+    val mimeType = "application\\xml"
 
     val submissionMetaData = SubmissionMetaData.build(submissionTime, conversationId, fileName)
     readSubscriptionService.getContactInformation(subscriptionId).flatMap {
