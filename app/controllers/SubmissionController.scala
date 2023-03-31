@@ -53,9 +53,9 @@ class SubmissionController @Inject() (
     with Logging {
 
   def submitDisclosure: Action[NodeSeq] = authenticate.async(parse.xml) { implicit request =>
-    val xml      = request.body
-    val fileName = (xml \ "fileName").text
-    val fileSize = (xml \ "fileSize").text
+    val xml         = request.body
+    val fileName    = (xml \ "fileName").text.trim
+    val fileSizeOpt = (xml \ "fileSize").headOption.map(_.text)
 
     val messageRefId             = (xml \\ "MessageRefId").text
     val subscriptionId           = request.subscriptionId
@@ -65,10 +65,11 @@ class SubmissionController @Inject() (
     val submissionDetails        = FileDetails(conversationId, subscriptionId, messageRefId, Pending, fileName, submissionTime, submissionTime)
     val mdrBodyCount             = (xml \\ "MdrBody").length
     val messageTypeIndic         = (xml \\ "MessageTypeIndic").text
-    val docTypeIndic             = (xml \\ "DocTypeIndic").text
 
-    println(s"\n\n\n\n\nFile $fileSize\n\n\n\n")
-    val mimeType = "application\\xml"
+    val docTypeIndic = (xml \\ "DocTypeIndic").text
+    val mimeType     = "application/xml"
+
+    val fileSize: String = fileSizeOpt.getOrElse("0").trim //ToDo redirect to large file journey if fileSize missing possibly
 
     val submissionMetaData = SubmissionMetaData.build(submissionTime, conversationId, fileName)
     readSubscriptionService.getContactInformation(subscriptionId).flatMap {
@@ -90,6 +91,8 @@ class SubmissionController @Inject() (
                     AuditFileSubmission(request.subscriptionId,
                                         conversationId,
                                         fileName,
+                                        fileSize,
+                                        mimeType,
                                         mdrBodyCount,
                                         MessageTypeIndic.fromString(messageTypeIndic),
                                         docTypeIndic
