@@ -15,18 +15,10 @@
  */
 
 package handlers
+import controllers.submission.SubmissionFixture
 
-import java.net.URL
 import scala.xml.Elem
 
-trait XmlHandler {
-  def load(url: String): Elem
-}
-
-class XmlHandlerImpl extends XmlHandler {
-
-  override def load(url: String): Elem =
-    new scala.xml.factory.XMLLoader[scala.xml.Elem] {
-      override def adapter = new scala.xml.parsing.NoBindingFactoryAdapter
-    }.load(new URL(url))
+class XmlMockBasicHandler extends XmlHandler {
+  override def load(url: String): Elem = SubmissionFixture.basicXml
 }

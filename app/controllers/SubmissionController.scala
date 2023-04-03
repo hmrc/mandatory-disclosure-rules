@@ -22,10 +22,10 @@ import controllers.auth.IdentifierAuthAction
 import handlers.XmlHandler
 import models.audit.{AuditFileSubmission, AuditType}
 import models.error.ReadSubscriptionError
-import models.submission.{ConversationId, FileDetails, MessageTypeIndic, Pending, SubmissionMetaData}
+import models.submission._
 import models.submissions.SubmissionDetails
-import play.api.libs.json.{JsResult, JsValue, Json}
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import play.api.libs.json.{JsValue, Json}
+import play.api.mvc.{Action, ControllerComponents}
 import play.api.{Logger, Logging}
 import repositories.submission.FileDetailsRepository
 import services.audit.AuditService
