@@ -19,11 +19,13 @@ package controllers
 import config.AppConfig
 import connectors.SubmissionConnector
 import controllers.auth.IdentifierAuthAction
+import handlers.XmlHandler
 import models.audit.{AuditFileSubmission, AuditType}
 import models.error.ReadSubscriptionError
 import models.submission.{ConversationId, FileDetails, MessageTypeIndic, Pending, SubmissionMetaData}
-import play.api.libs.json.Json
-import play.api.mvc.{Action, ControllerComponents}
+import models.submissions.SubmissionDetails
+import play.api.libs.json.{JsResult, JsValue, Json}
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import play.api.{Logger, Logging}
 import repositories.submission.FileDetailsRepository
 import services.audit.AuditService
@@ -46,22 +48,24 @@ class SubmissionController @Inject() (
   submissionConnector: SubmissionConnector,
   fileDetailsRepository: FileDetailsRepository,
   xmlValidationService: XMLValidationService,
+  xmlHandler: XmlHandler,
   auditService: AuditService,
   appConfig: AppConfig
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
-  def submitDisclosure: Action[NodeSeq] = authenticate.async(parse.xml) { implicit request =>
-    val xml         = request.body
-    val fileName    = (xml \ "fileName").text.trim
-    val fileSizeOpt = (xml \ "fileSize").headOption.map(_.text)
+  def submitDisclosure: Action[JsValue] = authenticate.async(parse.json) { implicit request =>
+    val submission: SubmissionDetails = request.body.as[SubmissionDetails]
+    val xml                           = xmlHandler.load(submission.documentUrl)
+
+    val fileName = submission.fileName
 
     val messageRefId             = (xml \\ "MessageRefId").text
     val subscriptionId           = request.subscriptionId
     val submissionTime           = DateTimeFormatUtil.zonedDateTimeNow.toLocalDateTime
     val conversationId           = ConversationId()
-    val uploadedXmlNode: NodeSeq = xml \ "file" \ "MDR_OECD"
+    val uploadedXmlNode: NodeSeq = xml \\ "MDR_OECD"
     val submissionDetails        = FileDetails(conversationId, subscriptionId, messageRefId, Pending, fileName, submissionTime, submissionTime)
     val mdrBodyCount             = (xml \\ "MdrBody").length
     val messageTypeIndic         = (xml \\ "MessageTypeIndic").text
