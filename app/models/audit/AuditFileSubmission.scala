@@ -23,6 +23,8 @@ case class AuditFileSubmission(regime: String,
                                subscriptionId: String,
                                conversationId: ConversationId,
                                filename: String,
+                               fileSize: String,
+                               mimeType: String,
                                submissionType: String,
                                reportType: String
 )
@@ -34,6 +36,8 @@ object AuditFileSubmission {
   def apply(subscriptionId: String,
             conversationId: ConversationId,
             filename: String,
+            fileSize: String,
+            mimeType: String,
             mdrBodyCount: Int,
             messageTypeIndic: MessageTypeIndic,
             docTypeIndic: String
@@ -51,6 +55,8 @@ object AuditFileSubmission {
       subscriptionId,
       conversationId,
       filename,
+      fileSize,
+      mimeType,
       submissionType,
       reportType
     )
