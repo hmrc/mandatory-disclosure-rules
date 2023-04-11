@@ -182,7 +182,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
       verify(mockSubmissionConnector, times(0)).submitDisclosure(argumentCaptor.capture(), argumentCaptorConversationId.capture())(any[HeaderCarrier]())
     }
 
-    "when auditFileSubmission is enabled must send a MandatoryDisclosureRulesFileSubmissionType audit event" in {
+    "when auditFileSubmission is enabled must send a MandatoryDisclosureRulesFileSubmission audit event" in {
 
       val application = applicationBuilder()
         .configure("auditing.enabled" -> true, "auditing.event.fileSubmission.enabled" -> true)
@@ -198,7 +198,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
 
       when(mockFileDetailsRepository.insert(any[FileDetails]()))
         .thenReturn(Future.successful(true))
-      when(mockAuditService.sendAuditEvent(ArgumentMatchers.eq("MandatoryDisclosureRulesFileSubmissionType"), any[JsValue]())(any[HeaderCarrier]))
+      when(mockAuditService.sendAuditEvent(ArgumentMatchers.eq("MandatoryDisclosureRulesFileSubmission"), any[JsValue]())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Success))
       when(mockReadSubscriptionService.getContactInformation(any[String]())(any[HeaderCarrier](), any[ExecutionContext]()))
         .thenReturn(Future.successful(Right(responseDetail)))
@@ -212,7 +212,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
       val result: Future[Result] = route(application, request).value
 
       status(result) mustBe OK
-      verify(mockAuditService, times(1)).sendAuditEvent(ArgumentMatchers.eq("MandatoryDisclosureRulesFileSubmissionType"), any[JsValue])(any[HeaderCarrier])
+      verify(mockAuditService, times(1)).sendAuditEvent(ArgumentMatchers.eq("MandatoryDisclosureRulesFileSubmission"), any[JsValue])(any[HeaderCarrier])
     }
 
     "when auditFileSubmission is disabled must not send a MandatoryDisclosureRulesFileSubmissionType audit event" in {
@@ -231,7 +231,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
 
       when(mockFileDetailsRepository.insert(any[FileDetails]()))
         .thenReturn(Future.successful(true))
-      when(mockAuditService.sendAuditEvent(ArgumentMatchers.eq("MandatoryDisclosureRulesFileSubmissionType"), any[JsValue]())(any[HeaderCarrier]))
+      when(mockAuditService.sendAuditEvent(ArgumentMatchers.eq("MandatoryDisclosureRulesFileSubmission"), any[JsValue]())(any[HeaderCarrier]))
         .thenReturn(Future.successful(Success))
       when(mockReadSubscriptionService.getContactInformation(any[String]())(any[HeaderCarrier](), any[ExecutionContext]()))
         .thenReturn(Future.successful(Right(responseDetail)))
@@ -245,7 +245,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
       val result: Future[Result] = route(application, request).value
 
       status(result) mustBe OK
-      verify(mockAuditService, times(0)).sendAuditEvent(ArgumentMatchers.eq("MandatoryDisclosureRulesFileSubmissionType"), any[JsValue])(any[HeaderCarrier])
+      verify(mockAuditService, times(0)).sendAuditEvent(ArgumentMatchers.eq("MandatoryDisclosureRulesFileSubmission"), any[JsValue])(any[HeaderCarrier])
     }
   }
 }
