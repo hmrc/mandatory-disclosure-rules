@@ -48,7 +48,7 @@ object AuditFileSubmission {
       case (_, _, Some("OECD1"))           => ("SingleReport", "NewInformation")
       case (_, _, Some("OECD2"))           => ("SingleReport", "Correction")
       case (_, _, Some("OECD3"))           => ("SingleReport", "Deletion")
-      case _                               => ("N/A", "N/A")
+      case _                               => ("SingleReport", "Other")
     }
 
     AuditFileSubmission(
