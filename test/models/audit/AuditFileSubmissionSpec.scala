@@ -101,12 +101,12 @@ class AuditFileSubmissionSpec extends SpecBase {
         result mustBe AuditFileSubmission("MDR", "subscriptionId", ConversationId("id"), "Filename.xml", "1000", "application/xml", "SingleReport", "Deletion")
       }
 
-      "if DocTypeIndic is Anything else must have a ReportType of 'N/A' and a SubmissionType of 'N/A'" in {
+      "if DocTypeIndic is Anything else must have a ReportType of 'SingleReport' and a SubmissionType of 'Other'" in {
         val mdrBodyCount = 1
         val docTypeIndic = Some("OECD1OECD2OECD3")
         val result = AuditFileSubmission("subscriptionId", ConversationId("id"), "Filename.xml", "1000", "application/xml", mdrBodyCount, MDR401, docTypeIndic)
 
-        result mustBe AuditFileSubmission("MDR", "subscriptionId", ConversationId("id"), "Filename.xml", "1000", "application/xml", "N/A", "N/A")
+        result mustBe AuditFileSubmission("MDR", "subscriptionId", ConversationId("id"), "Filename.xml", "1000", "application/xml", "SingleReport", "Other")
       }
     }
 
