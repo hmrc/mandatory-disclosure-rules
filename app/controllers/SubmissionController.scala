@@ -66,9 +66,9 @@ class SubmissionController @Inject() (
     val mdrBodyCount             = (xml \\ "MdrBody").length
     val messageTypeIndic         = (xml \\ "MessageTypeIndic").text
 
-    val docTypeIndic = (xml \\ "DocTypeIndic").text
-    val mimeType     = "application/xml"
+    val docTypeIndic = (xml \\ "DocTypeIndic").headOption.map(_.text)
 
+    val mimeType         = "application/xml"
     val fileSize: String = fileSizeOpt.getOrElse("0").trim //ToDo redirect to large file journey if fileSize missing possibly
 
     val submissionMetaData = SubmissionMetaData.build(submissionTime, conversationId, fileName)

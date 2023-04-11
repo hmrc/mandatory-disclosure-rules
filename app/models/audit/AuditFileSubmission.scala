@@ -40,14 +40,15 @@ object AuditFileSubmission {
             mimeType: String,
             mdrBodyCount: Int,
             messageTypeIndic: MessageTypeIndic,
-            docTypeIndic: String
+            docTypeIndic: Option[String]
   ): AuditFileSubmission = {
     val (submissionType, reportType) = (mdrBodyCount, messageTypeIndic, docTypeIndic) match {
       case (count, MDR401, _) if count > 1 => ("MultipleReports", "NewInformation")
       case (count, _, _) if count > 1      => ("MultipleReports", "Corrections/Deletions")
-      case (_, _, "OECD1")                 => ("SingleReport", "NewInformation")
-      case (_, _, "OECD3")                 => ("SingleReport", "Deletion")
-      case _                               => ("SingleReport", "Correction")
+      case (_, _, Some("OECD1"))           => ("SingleReport", "NewInformation")
+      case (_, _, Some("OECD2"))           => ("SingleReport", "Correction")
+      case (_, _, Some("OECD3"))           => ("SingleReport", "Deletion")
+      case _                               => ("N/A", "N/A")
     }
 
     AuditFileSubmission(
