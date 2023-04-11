@@ -18,7 +18,7 @@ package controllers
 
 import config.AppConfig
 import connectors.SubmissionConnector
-import controllers.auth.IdentifierAuthAction
+import controllers.auth.{IdentifierAuthAction, UserRequest}
 import handlers.XmlHandler
 import models.audit.{AuditFileSubmission, AuditType}
 import models.error.ReadSubscriptionError
@@ -56,13 +56,29 @@ class SubmissionController @Inject() (
     with Logging {
 
   def submitDisclosure: Action[JsValue] = authenticate.async(parse.json) { implicit request =>
-    val submission: SubmissionDetails = request.body.as[SubmissionDetails]
-    val xml                           = xmlHandler.load(submission.documentUrl)
+    request.body
+      .validate[SubmissionDetails]
+      .fold(
+        invalid = _ => Future.successful(InternalServerError),
+        valid = submission => {
+          val xml = xmlHandler.load(submission.documentUrl)
+          processSubmission(xml, submission.enrolmentId, submission.fileName, submission.fileSize)
+        }
+      )
+  }
 
-    val fileName = submission.fileName
+  def submitDisclosureXML: Action[NodeSeq] = authenticate.async(parse.xml) { implicit request =>
+    val xml         = request.body
+    val fileName    = (xml \ "fileName").text.trim
+    val fileSizeOpt = (xml \ "fileSize").headOption.map(_.text).map(_.toLong)
+
+    processSubmission(xml, request.subscriptionId, fileName, fileSizeOpt)
+  }
+
+  private def processSubmission(xml: NodeSeq, enrolmentId: String, fileName: String, fileSize: Option[Long])(implicit request: UserRequest[_]) = {
 
     val messageRefId             = (xml \\ "MessageRefId").text
-    val subscriptionId           = request.subscriptionId
+    val subscriptionId           = enrolmentId
     val submissionTime           = DateTimeFormatUtil.zonedDateTimeNow.toLocalDateTime
     val conversationId           = ConversationId()
     val uploadedXmlNode: NodeSeq = xml \\ "MDR_OECD"
@@ -95,7 +111,7 @@ class SubmissionController @Inject() (
                     AuditFileSubmission(request.subscriptionId,
                                         conversationId,
                                         fileName,
-                                        fileSize,
+                                        size,
                                         mimeType,
                                         mdrBodyCount,
                                         MessageTypeIndic.fromString(messageTypeIndic),
