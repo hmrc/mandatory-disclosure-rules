@@ -28,7 +28,7 @@ class AuditFileSubmissionSpec extends SpecBase {
 
       "if MessageTypeIndic is `MDR401` must have a ReportType of 'MultipleReports' and a SubmissionType of 'NewInformation'" in {
         val mdrBodyCount = 2
-        val docTypeIndic = "OECD1"
+        val docTypeIndic = Some("OECD1")
         val result       = AuditFileSubmission("subscriptionId", ConversationId("id"), "Filename.xml", mdrBodyCount, MDR401, docTypeIndic)
 
         result mustBe AuditFileSubmission("MDR", "subscriptionId", ConversationId("id"), "Filename.xml", "MultipleReports", "NewInformation")
@@ -36,7 +36,7 @@ class AuditFileSubmissionSpec extends SpecBase {
 
       "if MessageTypeIndic is not `MDR401` must have a ReportType of 'MultipleReports' and a SubmissionType of 'Corrections/Deletions'" in {
         val mdrBodyCount = 2
-        val docTypeIndic = "OECD1"
+        val docTypeIndic = Some("OECD1")
         val result       = AuditFileSubmission("subscriptionId", ConversationId("id"), "Filename.xml", mdrBodyCount, MDR402, docTypeIndic)
 
         result mustBe AuditFileSubmission("MDR", "subscriptionId", ConversationId("id"), "Filename.xml", "MultipleReports", "Corrections/Deletions")
@@ -47,7 +47,7 @@ class AuditFileSubmissionSpec extends SpecBase {
 
       "if DocTypeIndic is `OECD1` must have a ReportType of 'SingleReport' and a SubmissionType of 'NewInformation'" in {
         val mdrBodyCount = 1
-        val docTypeIndic = "OECD1"
+        val docTypeIndic = Some("OECD1")
         val result       = AuditFileSubmission("subscriptionId", ConversationId("id"), "Filename.xml", mdrBodyCount, MDR401, docTypeIndic)
 
         result mustBe AuditFileSubmission("MDR", "subscriptionId", ConversationId("id"), "Filename.xml", "SingleReport", "NewInformation")
@@ -55,7 +55,7 @@ class AuditFileSubmissionSpec extends SpecBase {
 
       "if DocTypeIndic is `OECD2` must have a ReportType of 'SingleReport' and a SubmissionType of 'Correction'" in {
         val mdrBodyCount = 1
-        val docTypeIndic = "OECD2"
+        val docTypeIndic = Some("OECD2")
         val result       = AuditFileSubmission("subscriptionId", ConversationId("id"), "Filename.xml", mdrBodyCount, MDR401, docTypeIndic)
 
         result mustBe AuditFileSubmission("MDR", "subscriptionId", ConversationId("id"), "Filename.xml", "SingleReport", "Correction")
@@ -63,16 +63,24 @@ class AuditFileSubmissionSpec extends SpecBase {
 
       "if DocTypeIndic is `OECD3` must have a ReportType of 'SingleReport' and a SubmissionType of 'Deletion'" in {
         val mdrBodyCount = 1
-        val docTypeIndic = "OECD3"
+        val docTypeIndic = Some("OECD3")
         val result       = AuditFileSubmission("subscriptionId", ConversationId("id"), "Filename.xml", mdrBodyCount, MDR401, docTypeIndic)
 
         result mustBe AuditFileSubmission("MDR", "subscriptionId", ConversationId("id"), "Filename.xml", "SingleReport", "Deletion")
+      }
+
+      "if DocTypeIndic is Anything else must have a ReportType of 'N/A' and a SubmissionType of 'N/A'" in {
+        val mdrBodyCount = 1
+        val docTypeIndic = Some("OECD1OECD2OECD3")
+        val result       = AuditFileSubmission("subscriptionId", ConversationId("id"), "Filename.xml", mdrBodyCount, MDR401, docTypeIndic)
+
+        result mustBe AuditFileSubmission("MDR", "subscriptionId", ConversationId("id"), "Filename.xml", "N/A", "N/A")
       }
     }
 
     "and must serialize AuditFileSubmission" in {
       val mdrBodyCount = 1
-      val docTypeIndic = "OECD1"
+      val docTypeIndic = Some("OECD1")
       val result       = AuditFileSubmission("subscriptionId", ConversationId("id"), "Filename.xml", mdrBodyCount, MDR401, docTypeIndic)
       val expectedJson = Json.parse(
         """{

@@ -63,7 +63,7 @@ class SubmissionController @Inject() (
     val submissionDetails        = FileDetails(conversationId, subscriptionId, messageRefId, Pending, fileName, submissionTime, submissionTime)
     val mdrBodyCount             = (xml \\ "MdrBody").length
     val messageTypeIndic         = (xml \\ "MessageTypeIndic").text
-    val docTypeIndic             = (xml \\ "DocTypeIndic").text
+    val docTypeIndic             = (xml \\ "DocTypeIndic").headOption.map(_.text)
 
     val submissionMetaData = SubmissionMetaData.build(submissionTime, conversationId, fileName)
     readSubscriptionService.getContactInformation(subscriptionId).flatMap {
