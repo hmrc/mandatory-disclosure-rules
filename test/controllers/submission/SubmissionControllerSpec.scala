@@ -47,6 +47,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
+
 class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaCheckDrivenPropertyChecks with BeforeAndAfterEach {
 
   val mockAuditService: AuditService                   = mock[AuditService]

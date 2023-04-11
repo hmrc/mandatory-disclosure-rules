@@ -14,39 +14,30 @@
  * limitations under the License.
  */
 
-package controllers
+package controllers.testOnlyDoNotUseInAppConf
 
 import controllers.auth.IdentifierAuthAction
-import handlers.XmlHandler
-import models.submissions.SubmissionDetails
 import play.api.Logging
-import play.api.libs.json.JsValue
 import play.api.mvc.{Action, ControllerComponents}
 import services.submission.SubmissionService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.xml.NodeSeq
 
-class SubmissionController @Inject() (
+class TestSubmissionController @Inject() (
   authenticate: IdentifierAuthAction,
   cc: ControllerComponents,
-  submissionService: SubmissionService,
-  xmlHandler: XmlHandler
+  submissionService: SubmissionService
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
+  def submitDisclosureXML: Action[NodeSeq] = authenticate.async(parse.xml) { implicit request =>
+    val xml         = request.body
+    val fileName    = (xml \ "fileName").text.trim
+    val fileSizeOpt = (xml \ "fileSize").headOption.map(_.text).map(_.toLong)
 
-  def submitDisclosure: Action[JsValue] = authenticate.async(parse.json) { implicit request =>
-    request.body
-      .validate[SubmissionDetails]
-      .fold(
-        invalid = _ => Future.successful(InternalServerError),
-        valid = submission => {
-          val xml = xmlHandler.load(submission.documentUrl)
-          submissionService.processSubmission(xml, submission.enrolmentId, submission.fileName, submission.fileSize)
-        }
-      )
+    submissionService.processSubmission(xml, request.subscriptionId, fileName, fileSizeOpt)
   }
-
 }

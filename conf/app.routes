@@ -8,7 +8,6 @@ POST    /upscan/upload                              controllers.upscan.UploadFor
 POST    /validate-submission                        controllers.validation.SubmissionValidationController.validateSubmission
 
 POST    /submit                                     controllers.SubmissionController.submitDisclosure
-POST    /submitxml                                  controllers.SubmissionController.submitDisclosureXML
 
 POST    /subscription/read-subscription             controllers.SubscriptionController.readSubscription
 
