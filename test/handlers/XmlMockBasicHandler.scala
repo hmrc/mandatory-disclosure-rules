@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package config
+package handlers
+import controllers.submission.SubmissionFixture
 
-import com.google.inject.AbstractModule
-import handlers.{XmlHandler, XmlHandlerImpl}
-import services.upscan.{MongoBackedUploadProgressTracker, UploadProgressTracker}
+import scala.xml.Elem
 
-class Module() extends AbstractModule {
-
-  override def configure(): Unit = {
-    bind(classOf[UploadProgressTracker]).to(classOf[MongoBackedUploadProgressTracker])
-    bind(classOf[XmlHandler]).to(classOf[XmlHandlerImpl]).asEagerSingleton()
-    ()
-  }
+class XmlMockBasicHandler extends XmlHandler {
+  override def load(url: String): Elem = SubmissionFixture.basicXml
 }

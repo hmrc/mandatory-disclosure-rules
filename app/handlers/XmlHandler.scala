@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-package config
+package handlers
 
-import com.google.inject.AbstractModule
-import handlers.{XmlHandler, XmlHandlerImpl}
-import services.upscan.{MongoBackedUploadProgressTracker, UploadProgressTracker}
+import java.net.URL
+import scala.xml.Elem
 
-class Module() extends AbstractModule {
+trait XmlHandler {
+  def load(url: String): Elem
+}
 
-  override def configure(): Unit = {
-    bind(classOf[UploadProgressTracker]).to(classOf[MongoBackedUploadProgressTracker])
-    bind(classOf[XmlHandler]).to(classOf[XmlHandlerImpl]).asEagerSingleton()
-    ()
-  }
+class XmlHandlerImpl extends XmlHandler {
+
+  override def load(url: String): Elem =
+    new scala.xml.factory.XMLLoader[scala.xml.Elem] {
+      override def adapter = new scala.xml.parsing.NoBindingFactoryAdapter
+    }.load(new URL(url))
 }

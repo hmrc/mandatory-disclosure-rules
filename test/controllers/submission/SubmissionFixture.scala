@@ -20,11 +20,7 @@ import models.subscription.{ContactInformation, IndividualDetails, OrganisationD
 
 object SubmissionFixture {
   val basicXml =
-    <submission>
-      <fileName>my-file.xml</fileName>
-      <enrolmentID>enrolmentID</enrolmentID>
-      <file>
-        <MDR_OECD xmlns="urn:oecd:ties:mdr:v1" >
+    <MDR_OECD xmlns="urn:oecd:ties:mdr:v1" >
           <MessageSpec>
             <TransmittingCountry>AF</TransmittingCountry>
             <ReceivingCountry>AF</ReceivingCountry>
@@ -292,8 +288,6 @@ object SubmissionFixture {
             </MdrReport>
           </MdrBody>
         </MDR_OECD>
-      </file>
-    </submission>
 
   val responseDetail =
     ResponseDetail(

@@ -11,3 +11,5 @@
 
 # Add all the application routes to the prod.routes file
 ->         /                          prod.Routes
+
+POST    /mandatory-disclosure-rules/test-only/submitxml                                  controllers.testOnlyDoNotUseInAppConf.TestSubmissionController.submitDisclosureXML

@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package config
+package models.submissions
 
-import com.google.inject.AbstractModule
-import handlers.{XmlHandler, XmlHandlerImpl}
-import services.upscan.{MongoBackedUploadProgressTracker, UploadProgressTracker}
+import play.api.libs.json.Json
 
-class Module() extends AbstractModule {
+case class SubmissionDetails(fileName: String, enrolmentId: String, fileSize: Option[Long], documentUrl: String)
 
-  override def configure(): Unit = {
-    bind(classOf[UploadProgressTracker]).to(classOf[MongoBackedUploadProgressTracker])
-    bind(classOf[XmlHandler]).to(classOf[XmlHandlerImpl]).asEagerSingleton()
-    ()
-  }
+object SubmissionDetails {
+  implicit val format = Json.format[SubmissionDetails]
 }
