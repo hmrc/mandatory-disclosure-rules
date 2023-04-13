@@ -18,6 +18,42 @@ package models.submission
 
 import play.api.libs.json._
 
+sealed trait ReportType
+
+case object MultipleNewInformation extends ReportType
+case object MultipleCorrectionsDeletions extends ReportType
+case object SingleNewInformation extends ReportType
+case object SingleCorrection extends ReportType
+case object SingleDeletion extends ReportType
+
+object ReportType {
+  def fromString(ReportType: String): ReportType = ReportType.toUpperCase match {
+    case "MULTIPLENEWINFORMATION"       => MultipleNewInformation
+    case "MULTIPLECORRECTIONSDELETIONS" => MultipleCorrectionsDeletions
+    case "SINGLENEWINFORMATION"         => SingleNewInformation
+    case "SINGLECORRECTION"             => SingleCorrection
+    case "SINGLEDELETION"               => SingleDeletion
+    case _                              => throw new NoSuchElementException
+  }
+
+  implicit val writes: Writes[ReportType] = Writes[ReportType] {
+    case MultipleNewInformation       => JsString("MultipleNewInformation")
+    case MultipleCorrectionsDeletions => JsString("MultipleCorrectionsDeletions")
+    case SingleNewInformation         => JsString("SingleNewInformation")
+    case SingleCorrection             => JsString("SingleCorrection")
+    case SingleDeletion               => JsString("SingleDeletion")
+  }
+
+  implicit val reads: Reads[ReportType] = Reads[ReportType] {
+    case JsString("MultipleNewInformation")       => JsSuccess(MultipleNewInformation)
+    case JsString("MultipleCorrectionsDeletions") => JsSuccess(MultipleCorrectionsDeletions)
+    case JsString("SingleNewInformation")         => JsSuccess(SingleNewInformation)
+    case JsString("SingleCorrection")             => JsSuccess(SingleCorrection)
+    case JsString("SingleDeletion")               => JsSuccess(SingleDeletion)
+    case value                                    => JsError(s"Unexpected value of _type: $value")
+  }
+}
+
 sealed trait MessageTypeIndic
 case object MDR401 extends MessageTypeIndic
 case object MDR402 extends MessageTypeIndic
@@ -41,7 +77,7 @@ object MessageTypeIndic {
   }
 }
 
-case class MessageSpecData(messageRefId: String, messageTypeIndic: MessageTypeIndic)
+case class MessageSpecData(messageRefId: String, messageTypeIndic: MessageTypeIndic, mdrBodyCount: Int, reportType: ReportType)
 
 object MessageSpecData {
   implicit val format: OFormat[MessageSpecData] = Json.format[MessageSpecData]

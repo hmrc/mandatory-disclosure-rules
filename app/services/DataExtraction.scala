@@ -16,18 +16,30 @@
 
 package services
 
-import models.submission.{MessageSpecData, MessageTypeIndic}
+import models.submission._
 
 import javax.inject.Inject
 import scala.xml.Elem
+import cats.syntax.option._
 
 @Inject
 class DataExtraction()() {
 
   def messageSpecData(xml: Elem): Option[MessageSpecData] =
     for {
-      messageID <- (xml \\ "MessageRefId").headOption
-      typeIndic <- (xml \\ "MessageTypeIndic").headOption.map(node => MessageTypeIndic.fromString(node.text))
-    } yield MessageSpecData(messageID.text, typeIndic)
+      messageID    <- (xml \\ "MessageRefId").headOption
+      typeIndic    <- (xml \\ "MessageTypeIndic").headOption.map(node => MessageTypeIndic.fromString(node.text))
+      mdrBodyCount <- (xml \\ "MdrBody").length.some
+      docType      <- (xml \\ "DocTypeIndic").headOption.map(_.text)
+      reportType   <- getReportType(mdrBodyCount, typeIndic, docType).some
+    } yield MessageSpecData(messageID.text, typeIndic, mdrBodyCount, reportType)
 
+  private def getReportType(bodyCount: Int, typeIndic: MessageTypeIndic, docTypeIndic: String): ReportType =
+    (bodyCount, typeIndic, docTypeIndic) match {
+      case (count, MDR401, _) if count > 1 => MultipleNewInformation
+      case (count, _, _) if count > 1      => MultipleCorrectionsDeletions
+      case (_, _, "OECD1")                 => SingleNewInformation
+      case (_, _, "OECD3")                 => SingleDeletion
+      case _                               => SingleCorrection
+    }
 }

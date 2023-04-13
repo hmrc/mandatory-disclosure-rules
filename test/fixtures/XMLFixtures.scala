@@ -20,11 +20,60 @@ import scala.xml.Elem
 
 object XMLFixtures {
 
-  val validMessageSpec: Elem = <MDR_OECD >
+  val validMessageMulitpleNewSpec: Elem = <MDR_OECD >
     <MessageSpec>
       <MessageRefId>GBXAMDR1234567</MessageRefId>
       <MessageTypeIndic>MDR401</MessageTypeIndic>
     </MessageSpec>
+    <MdrBody>
+      <DocTypeIndic>OECD0</DocTypeIndic>
+    </MdrBody>
+    <MdrBody>
+      <DocTypeIndic>OECD0</DocTypeIndic>
+    </MdrBody>
+  </MDR_OECD>
+
+  val validMessageMultipleCorrectionSpec: Elem = <MDR_OECD >
+    <MessageSpec>
+      <MessageRefId>GBXAMDR1234567</MessageRefId>
+      <MessageTypeIndic>MDR402</MessageTypeIndic>
+    </MessageSpec>
+    <MdrBody>
+      <DocTypeIndic>OECD0</DocTypeIndic>
+    </MdrBody>
+    <MdrBody>
+      <DocTypeIndic>OECD0</DocTypeIndic>
+    </MdrBody>
+  </MDR_OECD>
+
+  val validMessageSingleNewSpec: Elem = <MDR_OECD >
+    <MessageSpec>
+      <MessageRefId>GBXAMDR1234567</MessageRefId>
+      <MessageTypeIndic>MDR401</MessageTypeIndic>
+    </MessageSpec>
+    <MdrBody>
+      <DocTypeIndic>OECD1</DocTypeIndic>
+    </MdrBody>
+  </MDR_OECD>
+
+  val validMessageSingleDeletionSpec: Elem = <MDR_OECD>
+    <MessageSpec>
+      <MessageRefId>GBXAMDR1234567</MessageRefId>
+      <MessageTypeIndic>MDR401</MessageTypeIndic>
+    </MessageSpec>
+    <MdrBody>
+      <DocTypeIndic>OECD3</DocTypeIndic>
+    </MdrBody>
+  </MDR_OECD>
+
+  val validMessageSingleCorrectionSpec: Elem = <MDR_OECD>
+    <MessageSpec>
+      <MessageRefId>GBXAMDR1234567</MessageRefId>
+      <MessageTypeIndic>MDR402</MessageTypeIndic>
+    </MessageSpec>
+    <MdrBody>
+      <DocTypeIndic>OECD2</DocTypeIndic>
+    </MdrBody>
   </MDR_OECD>
 
   val missingMessageRefId: Elem = <MDR_OECD >
