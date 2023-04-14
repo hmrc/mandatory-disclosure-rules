@@ -39,7 +39,8 @@ class DataExtraction()() {
       case (count, MDR401, _) if count > 1 => MultipleNewInformation
       case (count, _, _) if count > 1      => MultipleCorrectionsDeletions
       case (_, _, "OECD1")                 => SingleNewInformation
+      case (_, _, "OECD2")                 => SingleCorrection
       case (_, _, "OECD3")                 => SingleDeletion
-      case _                               => SingleCorrection
+      case _                               => SingleOther
     }
 }

@@ -76,6 +76,16 @@ object XMLFixtures {
     </MdrBody>
   </MDR_OECD>
 
+  val validMessageSingleOtherSpec: Elem = <MDR_OECD>
+    <MessageSpec>
+      <MessageRefId>GBXAMDR1234567</MessageRefId>
+      <MessageTypeIndic>MDR402</MessageTypeIndic>
+    </MessageSpec>
+    <MdrBody>
+      <DocTypeIndic>OECD5</DocTypeIndic>
+    </MdrBody>
+  </MDR_OECD>
+
   val missingMessageRefId: Elem = <MDR_OECD >
     <MessageSpec>
       <ID>GBXAMDR1234567</ID>

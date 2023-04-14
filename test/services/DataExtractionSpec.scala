@@ -26,7 +26,8 @@ import models.submission.{
   MultipleNewInformation,
   SingleCorrection,
   SingleDeletion,
-  SingleNewInformation
+  SingleNewInformation,
+  SingleOther
 }
 
 class DataExtractionSpec extends SpecBase {
@@ -58,6 +59,12 @@ class DataExtractionSpec extends SpecBase {
     "messageSpecData must return messageSpec SingleCorrection data from a valid XML file" in {
       extractor.messageSpecData(XMLFixtures.validMessageSingleCorrectionSpec) mustBe Some(
         MessageSpecData("GBXAMDR1234567", MDR402, 1, SingleCorrection)
+      )
+    }
+
+    "messageSpecData must return messageSpec SingleOther data from a valid XML file" in {
+      extractor.messageSpecData(XMLFixtures.validMessageSingleOtherSpec) mustBe Some(
+        MessageSpecData("GBXAMDR1234567", MDR402, 1, SingleOther)
       )
     }
 
