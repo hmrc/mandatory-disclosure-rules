@@ -221,20 +221,21 @@ class UploadSessionDetailsSpec extends SpecBase {
           |     "_type": "UploadedSuccessfully",
           |     "name": "name",
           |     "mimeType": "xml",
-          |     "downloadUrl": "downloadUrl"
+          |     "downloadUrl": "downloadUrl",
+          |     "size": 100,
+          |     "checkSum":"checksum"
           |   },
           |"lastUpdated": {
           |     "$date": {
           |           "$numberLong":"1682406843785"
           |         }
-          |   }
           |}""".stripMargin
 
       val uploadSessionDetails = UploadSessionDetails(
         objectId,
         UploadId("121"),
         Reference("ref"),
-        UploadedSuccessfully("name", "xml", "downloadUrl", None),
+        UploadedSuccessfully("name", "xml", "downloadUrl", 100L, "checksum"),
         Instant.ofEpochMilli(1682406843785L)
       )
 
@@ -253,7 +254,9 @@ class UploadSessionDetailsSpec extends SpecBase {
           |     "_type": "UploadedSuccessfully",
           |     "name": "name",
           |     "mimeType": "xml",
-          |     "downloadUrl": "downloadUrl"
+          |     "downloadUrl": "downloadUrl",
+          |     "size": 100,
+          |     "checkSum":"checksum"
           |   },
           |"lastUpdated": {
           |     "$date": {
@@ -266,7 +269,7 @@ class UploadSessionDetailsSpec extends SpecBase {
         objectId,
         UploadId("121"),
         Reference("ref"),
-        UploadedSuccessfully("name", "xml", "downloadUrl", None),
+        UploadedSuccessfully("name", "xml", "downloadUrl", 100L, "checksum"),
         Instant.ofEpochMilli(1682406843785L)
       )
 

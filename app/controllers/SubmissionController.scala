@@ -16,12 +16,14 @@
 
 package controllers
 
+import config.AppConfig
 import controllers.auth.IdentifierAuthAction
 import handlers.XmlHandler
 import models.submissions.SubmissionDetails
 import play.api.Logging
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
+import services.SDESService
 import services.submission.SubmissionService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -32,6 +34,8 @@ class SubmissionController @Inject() (
   authenticate: IdentifierAuthAction,
   cc: ControllerComponents,
   submissionService: SubmissionService,
+  sdesService: SDESService,
+  appConfig: AppConfig,
   xmlHandler: XmlHandler
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
@@ -42,10 +46,18 @@ class SubmissionController @Inject() (
       .validate[SubmissionDetails]
       .fold(
         invalid = _ => Future.successful(InternalServerError),
-        valid = submission => {
-          val xml = xmlHandler.load(submission.documentUrl)
-          submissionService.processSubmission(xml, submission.enrolmentId, submission.fileName, submission.fileSize, submission.messageSpecData)
-        }
+        valid = submission =>
+          if (submission.fileSize > appConfig.maxNormalFileSize) {
+            sdesService.fileNotify(submission) map {
+              case Right(conversationId) => Ok(Json.toJson(conversationId))
+              case Left(e) =>
+                logger.warn(s"SDES notify ready error ${e.getMessage}")
+                InternalServerError(s"SDES notify error")
+            }
+          } else {
+            val xml = xmlHandler.load(submission.documentUrl)
+            submissionService.processSubmission(xml, submission.enrolmentId, submission.fileName, submission.fileSize, submission.messageSpecData)
+          }
       )
   }
 

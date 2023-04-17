@@ -64,7 +64,8 @@ class UpScanCallbackDispatcherSpec extends SpecBase {
         uploadDetails.fileName,
         uploadDetails.fileMimeType,
         readyCallbackBody.downloadUrl,
-        Some(uploadDetails.size)
+        uploadDetails.size,
+        "1234"
       )
 
       when(

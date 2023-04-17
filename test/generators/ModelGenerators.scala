@@ -17,10 +17,12 @@
 package generators
 
 import models.email.EmailRequest
+import models.sdes.{Algorithm, Audit, Checksum, File, FileTransferNotification, Property}
 import models.subscription._
 import models.xml.{FileErrorCode, FileErrors, RecordError, RecordErrorCode, ValidationErrors}
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck.{Arbitrary, Gen}
+import sun.security.util.ArrayUtil
 
 import java.time.LocalDate
 
@@ -174,4 +176,50 @@ trait ModelGenerators {
 
     } yield EmailRequest(to, id, params)
   }
+
+  implicit val arbitraryProperty: Arbitrary[Property] = Arbitrary {
+    for {
+      name  <- arbitrary[String]
+      value <- arbitrary[String]
+    } yield Property(name, value)
+  }
+
+  implicit val arbitraryAlgorithm: Arbitrary[Algorithm] = Arbitrary {
+    for {
+      algo <- checkSumAlgorithm
+    } yield algo
+  }
+
+  implicit val arbitraryCheckSum: Arbitrary[Checksum] = Arbitrary {
+    for {
+      algorithm <- arbitrary[Algorithm]
+      value     <- arbitrary[String]
+    } yield Checksum(algorithm, value)
+  }
+
+  implicit val arbitraryFile: Arbitrary[models.sdes.File] = Arbitrary {
+    for {
+      recipientOrSender <- arbitrary[Option[String]]
+      name              <- arbitrary[String]
+      location          <- arbitrary[Option[String]]
+      checksum          <- arbitrary[Checksum]
+      size              <- arbitrary[Int]
+      properties        <- arbitrary[List[Property]]
+    } yield models.sdes.File(recipientOrSender, name, location, checksum, size, properties)
+  }
+
+  implicit val arbitraryAudit: Arbitrary[Audit] = Arbitrary {
+    for {
+      correlationID <- arbitrary[String]
+    } yield Audit(correlationID)
+  }
+
+  implicit val arbitraryFileTransferNotification: Arbitrary[FileTransferNotification] = Arbitrary {
+    for {
+      informationType <- arbitrary[String]
+      file            <- arbitrary[models.sdes.File]
+      audit           <- arbitrary[Audit]
+    } yield FileTransferNotification(informationType, file, audit)
+  }
+
 }

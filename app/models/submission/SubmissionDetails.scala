@@ -19,7 +19,7 @@ package models.submissions
 import models.submission.MessageSpecData
 import play.api.libs.json.Json
 
-case class SubmissionDetails(fileName: String, enrolmentId: String, fileSize: Option[Long], documentUrl: String, messageSpecData: MessageSpecData)
+case class SubmissionDetails(fileName: String, enrolmentId: String, fileSize: Long, documentUrl: String, checkSum: String, messageSpecData: MessageSpecData)
 
 object SubmissionDetails {
   implicit val format = Json.format[SubmissionDetails]
