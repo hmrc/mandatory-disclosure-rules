@@ -55,7 +55,13 @@ class AppConfig @Inject() (
 
   lazy val sendEmailUrl: String = servicesConfig.baseUrl("email")
 
-  lazy val sdesUrl: String = servicesConfig.baseUrl("sdes")
+  lazy val apiLocation: Option[String] = Some(config.get[String]("services.sdes.location")).filter(_.nonEmpty)
+
+  lazy val sdesclientId: String = config.get[String]("services.sdes.client-id")
+
+  lazy val sdesUrl: String =
+    List(Some(servicesConfig.baseUrl("sdes")), apiLocation, Some("notification"), Some("fileready")).flatten.mkString("/")
+
 
   lazy val emailSuccessfulTemplate: String   = config.get[String]("emailTemplates.fileUploadSuccessful")
   lazy val emailUnsuccessfulTemplate: String = config.get[String]("emailTemplates.fileUploadUnsuccessful")

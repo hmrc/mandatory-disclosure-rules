@@ -49,4 +49,16 @@ class SubmissionController @Inject() (
       )
   }
 
+  def submitSDESDisclosure: Action[JsValue] = authenticate.async(parse.json) { implicit request =>
+    request.body
+      .validate[SubmissionDetails]
+      .fold(
+        invalid = _ => Future.successful(InternalServerError),
+        valid = submission => {
+
+          //ToDo Create File Transfer Request and send url to service
+          ???
+        }
+      )
+  }
 }
