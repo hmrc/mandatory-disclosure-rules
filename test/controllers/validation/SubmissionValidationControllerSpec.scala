@@ -18,7 +18,7 @@ package controllers.validation
 
 import base.SpecBase
 import controllers.auth.{FakeIdentifierAuthAction, IdentifierAuthAction}
-import models.submission.{MDR401, MessageSpecData}
+import models.submission.{MDR401, MessageSpecData, MultipleNewInformation}
 import models.upscan.UpscanURL
 import models.validation._
 import org.mockito.ArgumentMatchers.any
@@ -35,7 +35,7 @@ import scala.concurrent.Future
 class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEach {
 
   val mockUploadSubmissionValidationEngine: UploadedXmlValidationEngine = mock[UploadedXmlValidationEngine]
-  val messageSpecData: MessageSpecData                                  = MessageSpecData("XBC99999999999", MDR401)
+  val messageSpecData: MessageSpecData                                  = MessageSpecData("XBC99999999999", MDR401, 2, MultipleNewInformation)
 
   val application: Application =
     applicationBuilder()
