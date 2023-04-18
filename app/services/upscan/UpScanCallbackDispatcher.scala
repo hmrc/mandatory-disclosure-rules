@@ -31,7 +31,8 @@ class UpScanCallbackDispatcher @Inject() (sessionStorage: UploadProgressTracker)
           s.uploadDetails.fileName,
           s.uploadDetails.fileMimeType,
           s.downloadUrl,
-          Some(s.uploadDetails.size)
+          Some(s.uploadDetails.size),
+          s.uploadDetails.checksum
         )
       case s: FailedCallbackBody if s.failureDetails.failureReason == "QUARANTINE" =>
         logger.warn(s"FailedCallbackBody, QUARANTINE: $s")

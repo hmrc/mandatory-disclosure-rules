@@ -16,14 +16,12 @@
 
 package services
 
-import com.google.inject.ImplementedBy
 import connectors.SDESConnector
 import models.sdes.FileTransferNotification
-import play.api.{Configuration, Logging}
+import play.api.Logging
 import play.api.http.Status.NO_CONTENT
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import uk.gov.hmrc.http.HeaderCarrier
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}

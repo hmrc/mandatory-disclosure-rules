@@ -183,7 +183,8 @@ class UploadSessionDetailsSpec extends SpecBase {
           |     "_type": "UploadedSuccessfully",
           |     "name": "name",
           |     "mimeType": "xml",
-          |     "downloadUrl": "downloadUrl"
+          |     "downloadUrl": "downloadUrl",
+          |     "checkSum":"checksum"
           |   }
           |}""".stripMargin
 
@@ -191,7 +192,7 @@ class UploadSessionDetailsSpec extends SpecBase {
         objectId,
         UploadId("121"),
         Reference("ref"),
-        UploadedSuccessfully("name", "xml", "downloadUrl", None)
+        UploadedSuccessfully("name", "xml", "downloadUrl", None, "checksum")
       )
 
       Json.toJson(uploadSessionDetails) mustBe Json.parse(
@@ -209,7 +210,8 @@ class UploadSessionDetailsSpec extends SpecBase {
           |     "_type": "UploadedSuccessfully",
           |     "name": "name",
           |     "mimeType": "xml",
-          |     "downloadUrl": "downloadUrl"
+          |     "downloadUrl": "downloadUrl",
+          |     "checkSum":"checksum"
           |   }
           |}""".stripMargin
 
@@ -217,7 +219,7 @@ class UploadSessionDetailsSpec extends SpecBase {
         objectId,
         UploadId("121"),
         Reference("ref"),
-        UploadedSuccessfully("name", "xml", "downloadUrl", None)
+        UploadedSuccessfully("name", "xml", "downloadUrl", None, "checksum")
       )
 
       Json

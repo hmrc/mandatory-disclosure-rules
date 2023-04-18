@@ -19,10 +19,12 @@ package connectors
 import config.AppConfig
 import models.sdes._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
-
 import com.google.inject.Inject
+
+import javax.inject.Singleton
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class SDESConnector @Inject() (
   val config: AppConfig,
   val http: HttpClient
