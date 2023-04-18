@@ -56,8 +56,14 @@ class DataExtractionSpec extends SpecBase {
       )
     }
 
-    "messageSpecData must return messageSpec SingleCorrection data from a valid XML file" in {
+    "messageSpecData must return messageSpec SingleCorrection data from a valid XML file with OECD2 DocTypeIndic" in {
       extractor.messageSpecData(XMLFixtures.validMessageSingleCorrectionSpec) mustBe Some(
+        MessageSpecData("GBXAMDR1234567", MDR402, 1, SingleCorrection)
+      )
+    }
+
+    "messageSpecData must return messageSpec SingleCorrection data from a valid XML file with OECD0 DocTypeIndic" in {
+      extractor.messageSpecData(XMLFixtures.validMessageSingleOECD0CorrectionSpec) mustBe Some(
         MessageSpecData("GBXAMDR1234567", MDR402, 1, SingleCorrection)
       )
     }

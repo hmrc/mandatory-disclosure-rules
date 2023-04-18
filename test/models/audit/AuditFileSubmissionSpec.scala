@@ -77,6 +77,22 @@ class AuditFileSubmissionSpec extends SpecBase {
         )
       }
 
+      "if DocTypeIndic is `OECD0` must have a ReportType of 'SingleReport' and a SubmissionType of 'Correction'" in {
+        val mdrBodyCount = 1
+        val docTypeIndic = Some("OECD0")
+        val result = AuditFileSubmission("subscriptionId", ConversationId("id"), "Filename.xml", "1000", "application/xml", mdrBodyCount, MDR401, docTypeIndic)
+
+        result mustBe AuditFileSubmission("MDR",
+                                          "subscriptionId",
+                                          ConversationId("id"),
+                                          "Filename.xml",
+                                          "1000",
+                                          "application/xml",
+                                          "SingleReport",
+                                          "Correction"
+        )
+      }
+
       "if DocTypeIndic is `OECD2` must have a ReportType of 'SingleReport' and a SubmissionType of 'Correction'" in {
         val mdrBodyCount = 1
         val docTypeIndic = Some("OECD2")
