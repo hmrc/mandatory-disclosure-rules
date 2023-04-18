@@ -20,13 +20,14 @@ import config.AppConfig
 import models.sdes._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 
-import javax.inject.Inject
+import com.google.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class SDESConnector @Inject()(
-                               val config: AppConfig,
-                               val http: HttpClient
-                             ) {
+class SDESConnector @Inject() (
+  val config: AppConfig,
+  val http: HttpClient
+)(implicit ec: ExecutionContext) {
+
   private val extraHeaders: Seq[(String, String)] = Seq("x-client-id" -> config.sdesclientId)
 
   def fileReady(fileTransferNotification: FileTransferNotification)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =

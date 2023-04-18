@@ -18,6 +18,7 @@ package config
 
 import com.google.inject.AbstractModule
 import handlers.{XmlHandler, XmlHandlerImpl}
+import services.{SDESService, SDESServiceImpl}
 import services.upscan.{MongoBackedUploadProgressTracker, UploadProgressTracker}
 
 class Module() extends AbstractModule {
@@ -25,6 +26,7 @@ class Module() extends AbstractModule {
   override def configure(): Unit = {
     bind(classOf[UploadProgressTracker]).to(classOf[MongoBackedUploadProgressTracker])
     bind(classOf[XmlHandler]).to(classOf[XmlHandlerImpl]).asEagerSingleton()
+    bind(classOf[SDESService]).to(classOf[SDESServiceImpl]).asEagerSingleton()
     ()
   }
 }

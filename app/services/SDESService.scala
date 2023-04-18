@@ -28,16 +28,14 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-@ImplementedBy(classOf[SDESServiceImpl])
 trait SDESService {
   def fileNotify(fileNotifyRequest: FileTransferNotification)(implicit hc: HeaderCarrier): Future[Unit]
 }
 
-@Singleton
-class SDESServiceImpl @Inject()(http: HttpClient, servicesConfig: ServicesConfig, sdesConnector: SDESConnector, config: Configuration)(implicit
-                                                                                                                                       ec: ExecutionContext
+class SDESServiceImpl @Inject() (sdesConnector: SDESConnector)(implicit
+  ec: ExecutionContext
 ) extends SDESService
-  with Logging {
+    with Logging {
 
   override def fileNotify(fileNotifyRequest: FileTransferNotification)(implicit hc: HeaderCarrier): Future[Unit] = {
     logger.debug(s"SDES notification request: ${Json.stringify(Json.toJson(fileNotifyRequest))}")

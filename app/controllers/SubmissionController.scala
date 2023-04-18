@@ -54,11 +54,9 @@ class SubmissionController @Inject() (
       .validate[SubmissionDetails]
       .fold(
         invalid = _ => Future.successful(InternalServerError),
-        valid = submission => {
-
+        valid = submission =>
           //ToDo Create File Transfer Request and send url to service
           ???
-        }
       )
   }
 }
