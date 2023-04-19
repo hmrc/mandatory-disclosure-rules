@@ -29,26 +29,18 @@ class TransformService @Inject() () {
     subscriptionDetails: ResponseDetail,
     metaData: SubmissionMetaData
   ): NodeSeq =
-    <cadx:MDRSubmissionRequest xmlns:mdr="urn:oecd:ties:mdr:v1"
-                          xmlns:cadx="http://www.hmrc.gsi.gov.uk/mdr/cadx"
-                          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                          xsi:schemaLocation="http://www.hmrc.gsi.gov.uk/mdr/cadx DCT72a_MDRSubmissionRequest_v0.1.xsd">
-
-      <requestCommon>
-        <receiptDate>
-          {metaData.submissionTime}
-        </receiptDate>
-        <regime>MDR</regime>
-        <conversationID>{metaData.conversationId.value}</conversationID>
-        <schemaVersion>1.0.0</schemaVersion>
-      </requestCommon>
-      <requestDetail>
-        {addNameSpaces(addNameSpaceDefinitions(uploadedFile), Seq(NamespaceForNode("MDR_OECD", "mdr")))}
-      </requestDetail>
-      <requestAdditionalDetail>
-        {transformSubscriptionDetails(subscriptionDetails, metaData.fileName)}
-      </requestAdditionalDetail>
-    </cadx:MDRSubmissionRequest>
+    scala.xml.Utility.trim(
+      <cadx:MDRSubmissionRequest xmlns:mdr="urn:oecd:ties:mdr:v1" xmlns:cadx="http://www.hmrc.gsi.gov.uk/mdr/cadx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.hmrc.gsi.gov.uk/mdr/cadx DCT72a_MDRSubmissionRequest_v0.1.xsd">
+        <requestCommon>
+          <receiptDate>{metaData.submissionTime}</receiptDate>
+          <regime>MDR</regime>
+          <conversationID>{metaData.conversationId.value}</conversationID>
+          <schemaVersion>1.0.0</schemaVersion>
+        </requestCommon>
+        <requestDetail>{addNameSpaces(addNameSpaceDefinitions(uploadedFile), Seq(NamespaceForNode("MDR_OECD", "mdr")))}</requestDetail>
+        <requestAdditionalDetail>{transformSubscriptionDetails(subscriptionDetails, metaData.fileName)}</requestAdditionalDetail>
+      </cadx:MDRSubmissionRequest>
+    )
 
   def addNameSpaceDefinitions(submissionFile: NodeSeq): NodeSeq =
     for (node <- submissionFile) yield node match {
@@ -62,20 +54,12 @@ class TransformService @Inject() () {
     fileName: Option[String]
   ): NodeSeq =
     Seq(
-      fileName.map(name => <fileName>
-        {name}
-      </fileName>),
+      fileName.map(name => <fileName>{name}</fileName>),
       Some(<subscriptionID>{subscriptionDetails.subscriptionID}</subscriptionID>),
       subscriptionDetails.tradingName.filter(_.trim.nonEmpty).map(tradingName => <tradingName>{tradingName}</tradingName>),
-      Some(<isGBUser>
-        {subscriptionDetails.isGBUser}
-      </isGBUser>),
-      Some(<primaryContact>
-        {transformContactInformation(subscriptionDetails.primaryContact)}
-      </primaryContact>),
-      subscriptionDetails.secondaryContact.map(sc => <secondaryContact>
-        {transformContactInformation(sc)}
-      </secondaryContact>)
+      Some(<isGBUser>{subscriptionDetails.isGBUser}</isGBUser>),
+      Some(<primaryContact>{transformContactInformation(subscriptionDetails.primaryContact)}</primaryContact>),
+      subscriptionDetails.secondaryContact.map(sc => <secondaryContact>{transformContactInformation(sc)}</secondaryContact>)
     ).filter(_.isDefined).map(_.get)
 
   def transformContactInformation(
@@ -84,9 +68,8 @@ class TransformService @Inject() () {
 
     val contactType = contactInformation.contactType match {
       case individual: IndividualDetails => Some(<individualDetails>{transformIndividual(individual)}</individualDetails>)
-      case organisation: OrganisationDetails => Some(<organisationDetails>
-        <organisationName>{organisation.organisationName}</organisationName>
-      </organisationDetails>)
+      case organisation: OrganisationDetails =>
+        Some(<organisationDetails><organisationName>{organisation.organisationName}</organisationName></organisationDetails>)
     }
     val nodes =
       Seq(
