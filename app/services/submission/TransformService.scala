@@ -29,8 +29,7 @@ class TransformService @Inject() () {
     subscriptionDetails: ResponseDetail,
     metaData: SubmissionMetaData
   ): NodeSeq =
-    scala.xml.Utility.trim(
-      <cadx:MDRSubmissionRequest xmlns:mdr="urn:oecd:ties:mdr:v1" xmlns:cadx="http://www.hmrc.gsi.gov.uk/mdr/cadx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.hmrc.gsi.gov.uk/mdr/cadx DCT72a_MDRSubmissionRequest_v0.1.xsd">
+    <cadx:MDRSubmissionRequest xmlns:mdr="urn:oecd:ties:mdr:v1" xmlns:cadx="http://www.hmrc.gsi.gov.uk/mdr/cadx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.hmrc.gsi.gov.uk/mdr/cadx DCT72a_MDRSubmissionRequest_v0.1.xsd">
         <requestCommon>
           <receiptDate>{metaData.submissionTime}</receiptDate>
           <regime>MDR</regime>
@@ -40,7 +39,6 @@ class TransformService @Inject() () {
         <requestDetail>{addNameSpaces(addNameSpaceDefinitions(uploadedFile), Seq(NamespaceForNode("MDR_OECD", "mdr")))}</requestDetail>
         <requestAdditionalDetail>{transformSubscriptionDetails(subscriptionDetails, metaData.fileName)}</requestAdditionalDetail>
       </cadx:MDRSubmissionRequest>
-    )
 
   def addNameSpaceDefinitions(submissionFile: NodeSeq): NodeSeq =
     for (node <- submissionFile) yield node match {

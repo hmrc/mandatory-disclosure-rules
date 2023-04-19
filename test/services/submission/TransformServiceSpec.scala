@@ -179,7 +179,16 @@ class TransformServiceSpec extends SpecBase with StreamlinedXmlEquality {
     val uploadedFile = <MDR_OECD version="1.0.0"><submission>Submitted Data</submission></MDR_OECD>
 
     val expected =
-      <cadx:MDRSubmissionRequest xmlns:mdr="urn:oecd:ties:mdr:v1" xmlns:cadx="http://www.hmrc.gsi.gov.uk/mdr/cadx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.hmrc.gsi.gov.uk/mdr/cadx DCT72a_MDRSubmissionRequest_v0.1.xsd"><requestCommon><receiptDate>time</receiptDate><regime>MDR</regime><conversationID>conversationId</conversationID><schemaVersion>1.0.0</schemaVersion></requestCommon><requestDetail><mdr:MDR_OECD version="1.0.0" xmlns:mdr="urn:oecd:ties:mdr:v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><mdr:submission>Submitted Data</mdr:submission></mdr:MDR_OECD></requestDetail><requestAdditionalDetail><fileName>Filename.xml</fileName><subscriptionID>subscriptionID</subscriptionID><tradingName>tradingName</tradingName><isGBUser>true</isGBUser><primaryContact><phoneNumber>bbb</phoneNumber><emailAddress>aaa</emailAddress><organisationDetails><organisationName>Example</organisationName></organisationDetails></primaryContact><secondaryContact><phoneNumber>eee</phoneNumber><mobileNumber>fff</mobileNumber><emailAddress>ddd</emailAddress><organisationDetails><organisationName>AnotherExample</organisationName></organisationDetails></secondaryContact></requestAdditionalDetail></cadx:MDRSubmissionRequest>
+      <cadx:MDRSubmissionRequest xmlns:mdr="urn:oecd:ties:mdr:v1" xmlns:cadx="http://www.hmrc.gsi.gov.uk/mdr/cadx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.hmrc.gsi.gov.uk/mdr/cadx DCT72a_MDRSubmissionRequest_v0.1.xsd">
+        <requestCommon>
+          <receiptDate>time</receiptDate>
+          <regime>MDR</regime>
+          <conversationID>conversationId</conversationID>
+          <schemaVersion>1.0.0</schemaVersion>
+        </requestCommon>
+        <requestDetail><mdr:MDR_OECD version="1.0.0" xmlns:mdr="urn:oecd:ties:mdr:v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><mdr:submission>Submitted Data</mdr:submission></mdr:MDR_OECD></requestDetail>
+        <requestAdditionalDetail><fileName>Filename.xml</fileName><subscriptionID>subscriptionID</subscriptionID><tradingName>tradingName</tradingName><isGBUser>true</isGBUser><primaryContact><phoneNumber>bbb</phoneNumber><emailAddress>aaa</emailAddress><organisationDetails><organisationName>Example</organisationName></organisationDetails></primaryContact><secondaryContact><phoneNumber>eee</phoneNumber><mobileNumber>fff</mobileNumber><emailAddress>ddd</emailAddress><organisationDetails><organisationName>AnotherExample</organisationName></organisationDetails></secondaryContact></requestAdditionalDetail>
+      </cadx:MDRSubmissionRequest>
 
     val incorrectlyFormatted =
       <cadx:MDRSubmissionRequest xmlns:mdr="urn:oecd:ties:mdr:v1" xmlns:cadx="http://www.hmrc.gsi.gov.uk/mdr/cadx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.hmrc.gsi.gov.uk/mdr/cadx DCT72a_MDRSubmissionRequest_v0.1.xsd">
@@ -224,7 +233,6 @@ class TransformServiceSpec extends SpecBase with StreamlinedXmlEquality {
 
     assert(expected.toString == result.toString)
     assert(incorrectlyFormatted.toString != result.toString)
-    assert(scala.xml.Utility.trim(incorrectlyFormatted).toString == result.toString)
   }
 
 }
