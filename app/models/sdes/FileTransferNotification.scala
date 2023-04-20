@@ -18,7 +18,7 @@ package models.sdes
 
 import models.WithName
 import models.submissions.SubmissionDetails
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{JsError, JsString, JsSuccess, Json, OFormat, Reads, Writes}
 
 import java.util.UUID
 
@@ -32,12 +32,25 @@ object Property {
 }
 
 sealed trait Algorithm
-case object MD5 extends WithName("md5") with Algorithm
-case object SHA512 extends WithName("SHA-512") with Algorithm
-case object SHA256 extends WithName("SHA-256") with Algorithm
+case object MD5 extends Algorithm
+case object SHA512 extends Algorithm
+case object SHA256 extends Algorithm
 
+object Algorithm {
+  implicit val writes: Writes[Algorithm] = Writes[Algorithm] {
+    case MD5    => JsString("md5")
+    case SHA512 => JsString("SHA-512")
+    case SHA256 => JsString("SHA-256")
+  }
+  implicit val reads: Reads[Algorithm] = Reads[Algorithm] {
+    case JsString("md5")     => JsSuccess(MD5)
+    case JsString("SHA-512") => JsSuccess(SHA512)
+    case JsString("SHA-256") => JsSuccess(SHA256)
+    case value               => JsError(s"Unexpected value of _type: $value")
+  }
+}
 case class Checksum(
-  algorithm: String,
+  algorithm: Algorithm,
   value: String
 )
 
@@ -82,7 +95,7 @@ object FileTransferNotification {
         Some(recipientOrSender),
         submissionDetails.fileName,
         Some(submissionDetails.documentUrl),
-        Checksum(SHA256.toString, submissionDetails.checkSum),
+        Checksum(SHA256, submissionDetails.checkSum),
         submissionDetails.fileSize.toInt,
         List.empty[Property] //ToDo metaData will be transferred here ?
       ),

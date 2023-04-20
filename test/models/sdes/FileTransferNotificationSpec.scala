@@ -36,7 +36,7 @@ class FileTransferNotificationSpec extends SpecBase {
         Some(recipientOrSender),
         submissionDetails.fileName,
         Some(submissionDetails.documentUrl),
-        Checksum("SHA-256", submissionDetails.checkSum),
+        Checksum(SHA256, submissionDetails.checkSum),
         submissionDetails.fileSize.toInt,
         List.empty[Property]
       ),

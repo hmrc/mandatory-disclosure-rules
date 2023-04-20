@@ -17,7 +17,7 @@
 package generators
 
 import models.email.EmailRequest
-import models.sdes.{Audit, Checksum, File, FileTransferNotification, Property}
+import models.sdes.{Algorithm, Audit, Checksum, File, FileTransferNotification, Property}
 import models.subscription._
 import models.xml.{FileErrorCode, FileErrors, RecordError, RecordErrorCode, ValidationErrors}
 import org.scalacheck.Arbitrary.arbitrary
@@ -184,9 +184,15 @@ trait ModelGenerators {
     } yield Property(name, value)
   }
 
+  implicit val arbitraryAlgorithm: Arbitrary[Algorithm] = Arbitrary {
+    for {
+      algo <- checkSumAlgorithm
+    } yield algo
+  }
+
   implicit val arbitraryCheckSum: Arbitrary[Checksum] = Arbitrary {
     for {
-      algorithm <- arbitrary[String]
+      algorithm <- arbitrary[Algorithm]
       value     <- arbitrary[String]
     } yield Checksum(algorithm, value)
   }
