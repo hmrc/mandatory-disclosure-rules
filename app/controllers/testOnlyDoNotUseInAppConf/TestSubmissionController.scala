@@ -34,10 +34,10 @@ class TestSubmissionController @Inject() (
     extends BackendController(cc)
     with Logging {
   def submitDisclosureXML: Action[NodeSeq] = authenticate.async(parse.xml) { implicit request =>
-    val xml         = request.body
-    val fileName    = (xml \ "fileName").text.trim
-    val fileSizeOpt = (xml \ "fileSize").headOption.map(_.text).map(_.toLong)
+    val xml      = request.body
+    val fileName = (xml \ "fileName").text.trim
+    val fileSize = (xml \ "fileSize").text.toLong
 
-    submissionService.processSubmission(xml, request.subscriptionId, fileName, fileSizeOpt)
+    submissionService.processSubmission(xml, request.subscriptionId, fileName, fileSize)
   }
 }

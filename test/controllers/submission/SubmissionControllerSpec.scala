@@ -97,7 +97,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
       when(mockXMLValidationService.validate(any[NodeSeq], any[String]))
         .thenReturn(Right(basicXml))
 
-      val jsonPost = Json.toJson(SubmissionDetails("fileName", "enrolmentId", Some(1000L), "dummyUrl"))
+      val jsonPost = Json.toJson(SubmissionDetails("fileName", "enrolmentId", 1000L, "dummyUrl", "1234"))
 
       val request                = FakeRequest(POST, SubmissionController.submitDisclosure.url).withJsonBody(jsonPost)
       val result: Future[Result] = route(application, request).value
@@ -122,7 +122,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
       when(mockXMLValidationService.validate(any[NodeSeq], any[String]))
         .thenReturn(Right(basicXml))
 
-      val jsonPost = Json.toJson(SubmissionDetails("fileName", "enrolmentId", Some(1000L), "dummyUrl"))
+      val jsonPost = Json.toJson(SubmissionDetails("fileName", "enrolmentId", 1000L, "dummyUrl", "1234"))
 
       val request                = FakeRequest(POST, SubmissionController.submitDisclosure.url).withJsonBody(jsonPost)
       val result: Future[Result] = route(application, request).value
@@ -145,7 +145,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
       when(mockSubmissionConnector.submitDisclosure(any[NodeSeq](), any[ConversationId])(any[HeaderCarrier]()))
         .thenReturn(Future.successful(HttpResponse(INTERNAL_SERVER_ERROR, "")))
 
-      val jsonPost = Json.toJson(SubmissionDetails("fileName", "enrolmentId", Some(1000L), "dummyUrl"))
+      val jsonPost = Json.toJson(SubmissionDetails("fileName", "enrolmentId", 1000L, "dummyUrl", "1234"))
 
       val request                = FakeRequest(POST, SubmissionController.submitDisclosure.url).withJsonBody(jsonPost)
       val result: Future[Result] = route(application, request).value
@@ -168,7 +168,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
       when(mockSubmissionConnector.submitDisclosure(any[NodeSeq](), any[ConversationId])(any[HeaderCarrier]()))
         .thenReturn(Future.successful(HttpResponse(INTERNAL_SERVER_ERROR, "")))
 
-      val jsonPost = Json.toJson(SubmissionDetails("fileName", "enrolmentId", Some(1000L), "dummyUrl"))
+      val jsonPost = Json.toJson(SubmissionDetails("fileName", "enrolmentId", 1000L, "dummyUrl", "1234"))
 
       when(mockXMLValidationService.validate(any[NodeSeq], any[String]))
         .thenReturn(Left(ListBuffer(SaxParseError(1, "Invalid Node at line 1"))))
@@ -212,7 +212,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
       when(mockXMLValidationService.validate(any[NodeSeq], any[String]))
         .thenReturn(Right(basicXml))
 
-      val jsonPost = Json.toJson(SubmissionDetails("fileName", "enrolmentId", Some(1000L), "dummyUrl"))
+      val jsonPost = Json.toJson(SubmissionDetails("fileName", "enrolmentId", 1000L, "dummyUrl", "1234"))
 
       val request                = FakeRequest(POST, SubmissionController.submitDisclosure.url).withJsonBody(jsonPost)
       val result: Future[Result] = route(application, request).value
@@ -247,7 +247,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
       when(mockXMLValidationService.validate(any[NodeSeq], any[String]))
         .thenReturn(Right(basicXml))
 
-      val jsonPost = Json.toJson(SubmissionDetails("fileName", "enrolmentId", Some(1000L), "http://localhost/"))
+      val jsonPost = Json.toJson(SubmissionDetails("fileName", "enrolmentId", 1000L, "http://localhost/", "1234"))
 
       val request                = FakeRequest(POST, SubmissionController.submitDisclosure.url).withJsonBody(jsonPost)
       val result: Future[Result] = route(application, request).value

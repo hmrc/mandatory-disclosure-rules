@@ -51,7 +51,7 @@ class SubmissionService @Inject() (
     extends BackendController(cc)
     with Logging {
 
-  def processSubmission(xml: NodeSeq, enrolmentId: String, fileName: String, fileSizeOpt: Option[Long])(implicit request: UserRequest[_]) = {
+  def processSubmission(xml: NodeSeq, enrolmentId: String, fileName: String, fileSize: Long)(implicit request: UserRequest[_]) = {
 
     val messageRefId             = (xml \\ "MessageRefId").text
     val subscriptionId           = enrolmentId
@@ -64,8 +64,7 @@ class SubmissionService @Inject() (
 
     val docTypeIndic = (xml \\ "DocTypeIndic").headOption.map(_.text)
 
-    val mimeType         = "application/xml"
-    val fileSize: String = fileSizeOpt.getOrElse(0L).toString //ToDo redirect to large file journey if fileSize missing possibly
+    val mimeType = "application/xml"
 
     val submissionMetaData = SubmissionMetaData.build(submissionTime, conversationId, fileName)
     readSubscriptionService.getContactInformation(subscriptionId).flatMap {
@@ -87,7 +86,7 @@ class SubmissionService @Inject() (
                     AuditFileSubmission(request.subscriptionId,
                                         conversationId,
                                         fileName,
-                                        fileSize,
+                                        fileSize.toString,
                                         mimeType,
                                         mdrBodyCount,
                                         MessageTypeIndic.fromString(messageTypeIndic),

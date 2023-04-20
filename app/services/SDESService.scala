@@ -60,7 +60,7 @@ class SDESServiceImpl @Inject() (sdesConnector: SDESConnector, appConfig: AppCon
     }
   }
 
-  private def createFileTransferNotification(submissionDetails: SubmissionDetails, appConfig: AppConfig): FileTransferNotification = {
+  private def createFileTransferNotification(submissionDetails: SubmissionDetails, appConfig: AppConfig): FileTransferNotification =
     FileTransferNotification(
       appConfig.sdesInformationType,
       File(
@@ -68,12 +68,11 @@ class SDESServiceImpl @Inject() (sdesConnector: SDESConnector, appConfig: AppCon
         submissionDetails.fileName,
         Some(submissionDetails.documentUrl),
         Checksum("SHA-256", submissionDetails.checkSum), //ToDo use enum instead of string for algorithm
-        submissionDetails.fileSize.getOrElse(0).toInt, //ToDo explore implications of truncation
+        submissionDetails.fileSize.toInt, //ToDo explore implications of truncation
         List.empty[Property] //ToDo metaData will be transferred here ?
       ),
       Audit(
         UUID.randomUUID().toString
       )
     )
-  }
 }
