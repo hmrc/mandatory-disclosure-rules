@@ -59,6 +59,12 @@ class AppConfig @Inject() (
 
   lazy val sdesclientId: String = config.get[String]("sdes.client-id")
 
+  lazy val sdesRecipientOrSender: String =
+    config.get[String]("sdes.recipient-or-sender")
+
+  lazy val sdesInformationType: String =
+    config.get[String]("sdes.information-type")
+
   lazy val sdesUrl: String =
     List(Some(servicesConfig.baseUrl("sdes")), apiLocation, Some("notification"), Some("fileready")).flatten.mkString("/")
 

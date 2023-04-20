@@ -16,26 +16,30 @@
 
 package services
 
+import config.AppConfig
 import connectors.SDESConnector
-import models.sdes.FileTransferNotification
+import models.sdes._
+import models.submissions.SubmissionDetails
 import play.api.Logging
 import play.api.http.Status.NO_CONTENT
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.HeaderCarrier
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 trait SDESService {
-  def fileNotify(fileNotifyRequest: FileTransferNotification)(implicit hc: HeaderCarrier): Future[Unit]
+  def fileNotify(submissionDetails: SubmissionDetails)(implicit hc: HeaderCarrier): Future[Unit]
 }
 
-class SDESServiceImpl @Inject() (sdesConnector: SDESConnector)(implicit
+class SDESServiceImpl @Inject() (sdesConnector: SDESConnector, appConfig: AppConfig)(implicit
   ec: ExecutionContext
 ) extends SDESService
     with Logging {
 
-  override def fileNotify(fileNotifyRequest: FileTransferNotification)(implicit hc: HeaderCarrier): Future[Unit] = {
+  override def fileNotify(submissionDetails: SubmissionDetails)(implicit hc: HeaderCarrier): Future[Unit] = {
+    val fileNotifyRequest = createFileTransferNotification(submissionDetails, appConfig)
     logger.debug(s"SDES notification request: ${Json.stringify(Json.toJson(fileNotifyRequest))}")
     sdesConnector.fileReady(fileNotifyRequest).flatMap { response =>
       response.status match {
@@ -43,6 +47,7 @@ class SDESServiceImpl @Inject() (sdesConnector: SDESConnector)(implicit
           logger.info(
             s"SDES has been notified of file :: ${fileNotifyRequest.file.name}  with correlationId::${fileNotifyRequest.audit.correlationID}"
           )
+          //ToDo add correlation id record to mongo tracker for callback
           Future.successful(())
         case status =>
           val e = new Exception(s"Exception in notifying SDES. Received http status: $status body: ${response.body}")
@@ -55,4 +60,20 @@ class SDESServiceImpl @Inject() (sdesConnector: SDESConnector)(implicit
     }
   }
 
+  private def createFileTransferNotification(submissionDetails: SubmissionDetails, appConfig: AppConfig): FileTransferNotification = {
+    FileTransferNotification(
+      appConfig.sdesInformationType,
+      File(
+        Some(appConfig.sdesRecipientOrSender),
+        submissionDetails.fileName,
+        Some(submissionDetails.documentUrl),
+        Checksum("SHA-256", submissionDetails.checkSum), //ToDo use enum instead of string for algorithm
+        submissionDetails.fileSize.getOrElse(0).toInt, //ToDo explore implications of truncation
+        List.empty[Property] //ToDo metaData will be transferred here ?
+      ),
+      Audit(
+        UUID.randomUUID().toString
+      )
+    )
+  }
 }

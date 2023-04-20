@@ -18,7 +18,7 @@ package models.submissions
 
 import play.api.libs.json.Json
 
-case class SubmissionDetails(fileName: String, enrolmentId: String, fileSize: Option[Long], documentUrl: String)
+case class SubmissionDetails(fileName: String, enrolmentId: String, fileSize: Option[Long], documentUrl: String, checkSum: String)
 
 object SubmissionDetails {
   implicit val format = Json.format[SubmissionDetails]
