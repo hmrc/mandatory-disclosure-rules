@@ -16,7 +16,11 @@
 
 package models.sdes
 
+import models.WithName
+import models.submissions.SubmissionDetails
 import play.api.libs.json.{Json, OFormat}
+
+import java.util.UUID
 
 case class Property(
   name: String,
@@ -26,6 +30,11 @@ case class Property(
 object Property {
   implicit val format: OFormat[Property] = Json.format[Property]
 }
+
+sealed trait Algorithm
+case object MD5 extends WithName("md5") with Algorithm
+case object SHA512 extends WithName("SHA-512") with Algorithm
+case object SHA256 extends WithName("SHA-256") with Algorithm
 
 case class Checksum(
   algorithm: String,
@@ -65,4 +74,20 @@ case class FileTransferNotification(
 
 object FileTransferNotification {
   implicit val format: OFormat[FileTransferNotification] = Json.format[FileTransferNotification]
+
+  def apply(submissionDetails: SubmissionDetails, informationType: String, recipientOrSender: String, correlationId: String): FileTransferNotification =
+    FileTransferNotification(
+      informationType,
+      File(
+        Some(recipientOrSender),
+        submissionDetails.fileName,
+        Some(submissionDetails.documentUrl),
+        Checksum(SHA256.toString, submissionDetails.checkSum),
+        submissionDetails.fileSize.toInt,
+        List.empty[Property] //ToDo metaData will be transferred here ?
+      ),
+      Audit(
+        correlationId
+      )
+    )
 }

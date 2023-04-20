@@ -39,7 +39,8 @@ class SDESServiceImpl @Inject() (sdesConnector: SDESConnector, appConfig: AppCon
     with Logging {
 
   override def fileNotify(submissionDetails: SubmissionDetails)(implicit hc: HeaderCarrier): Future[Unit] = {
-    val fileNotifyRequest = createFileTransferNotification(submissionDetails, appConfig)
+    val fileNotifyRequest =
+      FileTransferNotification(submissionDetails, appConfig.sdesInformationType, appConfig.sdesRecipientOrSender, UUID.randomUUID().toString)
     logger.debug(s"SDES notification request: ${Json.stringify(Json.toJson(fileNotifyRequest))}")
     sdesConnector.fileReady(fileNotifyRequest).flatMap { response =>
       response.status match {
@@ -59,20 +60,4 @@ class SDESServiceImpl @Inject() (sdesConnector: SDESConnector, appConfig: AppCon
       }
     }
   }
-
-  private def createFileTransferNotification(submissionDetails: SubmissionDetails, appConfig: AppConfig): FileTransferNotification =
-    FileTransferNotification(
-      appConfig.sdesInformationType,
-      File(
-        Some(appConfig.sdesRecipientOrSender),
-        submissionDetails.fileName,
-        Some(submissionDetails.documentUrl),
-        Checksum("SHA-256", submissionDetails.checkSum), //ToDo use enum instead of string for algorithm
-        submissionDetails.fileSize.toInt, //ToDo explore implications of truncation
-        List.empty[Property] //ToDo metaData will be transferred here ?
-      ),
-      Audit(
-        UUID.randomUUID().toString
-      )
-    )
 }
