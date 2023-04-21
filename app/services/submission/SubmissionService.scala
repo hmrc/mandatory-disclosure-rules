@@ -51,18 +51,15 @@ class SubmissionService @Inject() (
     extends BackendController(cc)
     with Logging {
 
-  def processSubmission(xml: NodeSeq, enrolmentId: String, fileName: String, fileSize: Long)(implicit request: UserRequest[_]) = {
+  def processSubmission(xml: NodeSeq, enrolmentId: String, fileName: String, fileSize: Long, messageSpecData: MessageSpecData)(implicit
+    request: UserRequest[_]
+  ) = {
 
-    val messageRefId             = (xml \\ "MessageRefId").text
     val subscriptionId           = enrolmentId
     val submissionTime           = DateTimeFormatUtil.zonedDateTimeNow.toLocalDateTime
     val conversationId           = ConversationId()
     val uploadedXmlNode: NodeSeq = xml \\ "MDR_OECD"
-    val submissionDetails        = FileDetails(conversationId, subscriptionId, messageRefId, Pending, fileName, submissionTime, submissionTime)
-    val mdrBodyCount             = (xml \\ "MdrBody").length
-    val messageTypeIndic         = (xml \\ "MessageTypeIndic").text
-
-    val docTypeIndic = (xml \\ "DocTypeIndic").headOption.map(_.text)
+    val submissionDetails        = FileDetails(conversationId, subscriptionId, messageSpecData.messageRefId, Pending, fileName, submissionTime, submissionTime)
 
     val mimeType = "application/xml"
 
@@ -83,14 +80,15 @@ class SubmissionService @Inject() (
                 auditService.sendAuditEvent(
                   AuditType.fileSubmission,
                   Json.toJson(
-                    AuditFileSubmission(request.subscriptionId,
-                                        conversationId,
-                                        fileName,
-                                        fileSize.toString,
-                                        mimeType,
-                                        mdrBodyCount,
-                                        MessageTypeIndic.fromString(messageTypeIndic),
-                                        docTypeIndic
+                    AuditFileSubmission(
+                      request.subscriptionId,
+                      conversationId,
+                      fileName,
+                      fileSize.toString,
+                      mimeType,
+                      messageSpecData.mdrBodyCount,
+                      messageSpecData.messageTypeIndic,
+                      Some(messageSpecData.docTypeIndic)
                     )
                   )
                 )
