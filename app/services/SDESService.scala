@@ -19,6 +19,7 @@ package services
 import config.AppConfig
 import connectors.SDESConnector
 import models.sdes._
+import models.submission.ConversationId
 import models.submissions.SubmissionDetails
 import play.api.Logging
 import play.api.http.Status.NO_CONTENT
@@ -39,8 +40,8 @@ class SDESServiceImpl @Inject() (sdesConnector: SDESConnector, appConfig: AppCon
     with Logging {
 
   override def fileNotify(submissionDetails: SubmissionDetails)(implicit hc: HeaderCarrier): Future[Unit] = {
-    val fileNotifyRequest =
-      FileTransferNotification(submissionDetails, appConfig.sdesInformationType, appConfig.sdesRecipientOrSender, UUID.randomUUID().toString)
+    val conversationId    = ConversationId()
+    val fileNotifyRequest = FileTransferNotification(submissionDetails, appConfig.sdesInformationType, appConfig.sdesRecipientOrSender, conversationId.value)
     logger.debug(s"SDES notification request: ${Json.stringify(Json.toJson(fileNotifyRequest))}")
     sdesConnector.fileReady(fileNotifyRequest).flatMap { response =>
       response.status match {

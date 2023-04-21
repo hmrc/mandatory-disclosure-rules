@@ -32,7 +32,7 @@ class DataExtraction()() {
       mdrBodyCount <- (xml \\ "MdrBody").length.some
       docType      <- (xml \\ "DocTypeIndic").headOption.map(_.text)
       reportType   <- getReportType(mdrBodyCount, typeIndic, docType).some
-    } yield MessageSpecData(messageID.text, typeIndic, mdrBodyCount, reportType)
+    } yield MessageSpecData(messageID.text, typeIndic, mdrBodyCount, docType, reportType)
 
   private def getReportType(bodyCount: Int, typeIndic: MessageTypeIndic, docTypeIndic: String): ReportType =
     (bodyCount, typeIndic, docTypeIndic) match {
