@@ -20,6 +20,7 @@ import config.AppConfig
 import models.sdes._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
 import com.google.inject.Inject
+import play.api.http.Status.NO_CONTENT
 
 import javax.inject.Singleton
 import scala.concurrent.{ExecutionContext, Future}
@@ -32,6 +33,11 @@ class SDESConnector @Inject() (
 
   private val extraHeaders: Seq[(String, String)] = Seq("x-client-id" -> config.sdesclientId)
 
-  def fileReady(fileTransferNotification: FileTransferNotification)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =
-    http.POST[FileTransferNotification, HttpResponse](s"${config.sdesUrl}", fileTransferNotification, extraHeaders)
+  def fileReady(fileTransferNotification: FileTransferNotification)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Either[HttpResponse, Int]] =
+    http.POST[FileTransferNotification, HttpResponse](s"${config.sdesUrl}", fileTransferNotification, extraHeaders) map { response =>
+      response.status match {
+        case NO_CONTENT => Right(response.status)
+        case _          => Left(response)
+      }
+    }
 }

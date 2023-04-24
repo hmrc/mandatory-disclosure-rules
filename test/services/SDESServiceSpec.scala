@@ -61,7 +61,7 @@ class SDESServiceSpec extends SpecBase with MockitoSugar with ScalaCheckDrivenPr
     "filenotify" - {
       "must call sdes connector then create file details record and return a valid correlationID for a response of NO_CONTENT(204)" in {
         when(mockSDESConnector.fileReady(any[FileTransferNotification])(any[HeaderCarrier], any[ExecutionContext]))
-          .thenReturn(Future.successful(HttpResponse.apply(NO_CONTENT, "")))
+          .thenReturn(Future.successful(Right(NO_CONTENT)))
 
         when(mockFileDetailsRepository.insert(any[FileDetails])).thenReturn(Future.successful(true))
 
@@ -80,7 +80,7 @@ class SDESServiceSpec extends SpecBase with MockitoSugar with ScalaCheckDrivenPr
       }
       "must return a Left with an Exception for response statues other than 204" in {
         when(mockSDESConnector.fileReady(any[FileTransferNotification])(any[HeaderCarrier], any[ExecutionContext]))
-          .thenReturn(Future.successful(HttpResponse.apply(INTERNAL_SERVER_ERROR, "")))
+          .thenReturn(Future.successful(Left(HttpResponse.apply(INTERNAL_SERVER_ERROR, ""))))
 
         val result = sdesService.fileNotify(submissionDetails)
 

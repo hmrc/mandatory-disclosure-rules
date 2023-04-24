@@ -47,7 +47,7 @@ class SDESConnectorSpec extends SpecBase with WireMockServerHandler with Generat
       forAll(arbitrary[FileTransferNotification]) { ftn =>
         val result = connector.fileReady(ftn)
 
-        result.futureValue.status mustBe NO_CONTENT
+        result.futureValue mustBe Right(NO_CONTENT)
 
       }
     }
@@ -61,7 +61,7 @@ class SDESConnectorSpec extends SpecBase with WireMockServerHandler with Generat
       forAll(arbitrary[FileTransferNotification]) { ftn =>
         val result = connector.fileReady(ftn)
 
-        result.futureValue.status mustBe BAD_REQUEST
+        result.futureValue.isLeft mustBe true
 
       }
     }
@@ -75,7 +75,7 @@ class SDESConnectorSpec extends SpecBase with WireMockServerHandler with Generat
       forAll(arbitrary[FileTransferNotification]) { ftn =>
         val result = connector.fileReady(ftn)
 
-        result.futureValue.status mustBe INTERNAL_SERVER_ERROR
+        result.futureValue.isLeft mustBe true
 
       }
     }

@@ -22,7 +22,6 @@ import models.sdes._
 import models.submission.{ConversationId, FileDetails, Pending}
 import models.submissions.SubmissionDetails
 import play.api.Logging
-import play.api.http.Status.NO_CONTENT
 import play.api.libs.json.Json
 import repositories.submission.FileDetailsRepository
 import uk.gov.hmrc.http.HeaderCarrier
@@ -44,31 +43,29 @@ class SDESServiceImpl @Inject() (sdesConnector: SDESConnector, fileDetailsReposi
     val correlationID     = ConversationId() //CorrelationID is also a UUID so using ConversationId for compatibility with FileDetailsRepository
     val fileNotifyRequest = FileTransferNotification(submissionDetails, appConfig.sdesInformationType, appConfig.sdesRecipientOrSender, correlationID.value)
     logger.debug(s"SDES notification request: ${Json.stringify(Json.toJson(fileNotifyRequest))}")
-    sdesConnector.fileReady(fileNotifyRequest).flatMap { response =>
-      response.status match {
-        case NO_CONTENT =>
-          logger.info(
-            s"SDES has been notified of file :: ${fileNotifyRequest.file.name}  with correlationId::${fileNotifyRequest.audit.correlationID}"
-          )
-          val submissionTime = DateTimeFormatUtil.zonedDateTimeNow.toLocalDateTime
-          val fileDetails: FileDetails = FileDetails(
-            correlationID,
-            submissionDetails.enrolmentId,
-            submissionDetails.messageSpecData.messageRefId,
-            Pending,
-            submissionDetails.fileName,
-            submissionTime,
-            submissionTime
-          )
-          fileDetailsRepository.insert(fileDetails).map(_ => Right(correlationID))
-        case status =>
-          val e = new Exception(s"Exception in notifying SDES. Received http status: $status body: ${response.body}")
-          logger.error(
-            s"Received a non 204 status from SDES when notified about file :: ${fileNotifyRequest.file.name}  with correlationId::${fileNotifyRequest.audit.correlationID}.",
-            e
-          )
-          Future.successful(Left(e))
-      }
+    sdesConnector.fileReady(fileNotifyRequest).flatMap {
+      case Right(_) =>
+        logger.info(
+          s"SDES has been notified of file :: ${fileNotifyRequest.file.name}  with correlationId::${fileNotifyRequest.audit.correlationID}"
+        )
+        val submissionTime = DateTimeFormatUtil.zonedDateTimeNow.toLocalDateTime
+        val fileDetails: FileDetails = FileDetails(
+          correlationID,
+          submissionDetails.enrolmentId,
+          submissionDetails.messageSpecData.messageRefId,
+          Pending,
+          submissionDetails.fileName,
+          submissionTime,
+          submissionTime
+        )
+        fileDetailsRepository.insert(fileDetails).map(_ => Right(correlationID))
+      case Left(response) =>
+        val e = new Exception(s"Exception in notifying SDES. Received http status: ${response.status} body: ${response.body}")
+        logger.error(
+          s"Received a non 204 status from SDES when notified about file :: ${fileNotifyRequest.file.name}  with correlationId::${fileNotifyRequest.audit.correlationID}.",
+          e
+        )
+        Future.successful(Left(e))
     }
   }
 }
