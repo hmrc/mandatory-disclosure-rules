@@ -66,7 +66,9 @@ class AppConfig @Inject() (
     config.get[String]("sdes.information-type")
 
   lazy val sdesUrl: String =
-    List(Some(servicesConfig.baseUrl("sdes")), apiLocation, Some("notification"), Some("fileready")).flatten.mkString("/")
+    List(Some(servicesConfig.baseUrl("sdes")), Some("notification"), Some("fileready")).flatten.mkString("/")
+
+  lazy val maxNormalFileSize = config.get[String]("max-normal-file-size").toInt
 
   lazy val emailSuccessfulTemplate: String   = config.get[String]("emailTemplates.fileUploadSuccessful")
   lazy val emailUnsuccessfulTemplate: String = config.get[String]("emailTemplates.fileUploadUnsuccessful")

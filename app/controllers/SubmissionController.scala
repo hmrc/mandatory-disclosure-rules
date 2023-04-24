@@ -16,12 +16,14 @@
 
 package controllers
 
+import config.AppConfig
 import controllers.auth.IdentifierAuthAction
 import handlers.XmlHandler
 import models.submissions.SubmissionDetails
 import play.api.Logging
-import play.api.libs.json.JsValue
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
+import services.SDESService
 import services.submission.SubmissionService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -32,10 +34,13 @@ class SubmissionController @Inject() (
   authenticate: IdentifierAuthAction,
   cc: ControllerComponents,
   submissionService: SubmissionService,
+  sdesService: SDESService,
   xmlHandler: XmlHandler
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
+
+  val maxNormalFileSize = 3072L
 
   def submitDisclosure: Action[JsValue] = authenticate.async(parse.json) { implicit request =>
     request.body
@@ -43,21 +48,17 @@ class SubmissionController @Inject() (
       .fold(
         invalid = _ => Future.successful(InternalServerError),
         valid = submission => {
-          val xml = xmlHandler.load(submission.documentUrl)
-          submissionService.processSubmission(xml, submission.enrolmentId, submission.fileName, submission.fileSize, submission.messageSpecData)
-          //ToDo sdes if file to big
+          println(s"\n\n$submission\n\n")
+          if (submission.fileSize > maxNormalFileSize) {
+            sdesService.fileNotify(submission) map { conversationId =>
+              Ok(Json.toJson(conversationId))
+            }
+          } else {
+            val xml = xmlHandler.load(submission.documentUrl)
+            submissionService.processSubmission(xml, submission.enrolmentId, submission.fileName, submission.fileSize, submission.messageSpecData)
+          }
         }
       )
   }
 
-  def submitSDESDisclosure: Action[JsValue] = authenticate.async(parse.json) { implicit request =>
-    request.body
-      .validate[SubmissionDetails]
-      .fold(
-        invalid = _ => Future.successful(InternalServerError),
-        valid = submission =>
-          //ToDo Create File Transfer Request and send url to service
-          ???
-      )
-  }
 }

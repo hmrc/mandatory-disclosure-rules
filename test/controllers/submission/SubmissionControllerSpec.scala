@@ -37,6 +37,7 @@ import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.submission.FileDetailsRepository
+import services.SDESService
 import services.audit.AuditService
 import services.submission.TransformService
 import services.subscription.SubscriptionService
@@ -57,6 +58,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
   val mockReadSubscriptionService: SubscriptionService = mock[SubscriptionService]
   val mockFileDetailsRepository: FileDetailsRepository = mock[FileDetailsRepository]
   val mockXMLValidationService: XMLValidationService   = mock[XMLValidationService]
+  val mockSDESService: SDESService                     = mock[SDESService]
   val mockAppConf: AppConfig                           = mock[AppConfig]
 
   val messageSpec                = MessageSpecData("x9999", MDR401, 2, "OECD1", MultipleNewInformation)
@@ -70,7 +72,8 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
       mockReadSubscriptionService,
       mockSubscriptionConnector,
       mockSubmissionConnector,
-      mockFileDetailsRepository
+      mockFileDetailsRepository,
+      mockSDESService
     )
 
   "submission controller" - {
@@ -82,6 +85,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
         bind[SubscriptionService].toInstance(mockReadSubscriptionService),
         bind[FileDetailsRepository].toInstance(mockFileDetailsRepository),
         bind[XMLValidationService].toInstance(mockXMLValidationService),
+        bind[SDESService].toInstance(mockSDESService),
         bind[AppConfig].toInstance(mockAppConf),
         bind[XmlHandler].toInstance(new XmlMockBasicHandler),
         bind[IdentifierAuthAction].to[FakeIdentifierAuthAction]
@@ -136,6 +140,19 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
 
       verify(mockFileDetailsRepository, times(1)).insert(argumentCaptorSubmissionDetails.capture())
       verify(mockSubmissionConnector, times(1)).submitDisclosure(argumentCaptor.capture(), argumentCaptorConversationId.capture())(any[HeaderCarrier]())
+    }
+
+    "when a file is larger than 3mb we use the SDES journey" in {
+      val conversationId = ConversationId("1234")
+      when(mockSDESService.fileNotify(any[SubmissionDetails])(any[HeaderCarrier])).thenReturn(Future.successful(conversationId))
+
+      val jsonPost = Json.toJson(SubmissionDetails("fileName", "enrolmentId", 4000L, "dummyUrl", "1234", messageSpec))
+
+      val request                = FakeRequest(POST, SubmissionController.submitDisclosure.url).withJsonBody(jsonPost)
+      val result: Future[Result] = route(application, request).value
+
+      status(result) mustBe OK
+      verify(mockSDESService, times(1)).fileNotify(any[SubmissionDetails])(any[HeaderCarrier])
     }
 
     "when a read subscription returns not OK response INTERNAL_SERVER_ERROR" in {
