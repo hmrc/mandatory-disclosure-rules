@@ -40,7 +40,7 @@ class SubmissionController @Inject() (
     extends BackendController(cc)
     with Logging {
 
-  val maxNormalFileSize = 3072L
+  val maxNormalFileSize = 3145728L
 
   def submitDisclosure: Action[JsValue] = authenticate.async(parse.json) { implicit request =>
     request.body
