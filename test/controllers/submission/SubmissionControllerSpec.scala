@@ -144,9 +144,9 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
 
     "when a file is larger than 3mb we use the SDES journey" in {
       val conversationId = ConversationId("1234")
-      when(mockSDESService.fileNotify(any[SubmissionDetails])(any[HeaderCarrier])).thenReturn(Future.successful(conversationId))
+      when(mockSDESService.fileNotify(any[SubmissionDetails])(any[HeaderCarrier])).thenReturn(Future.successful(Right(conversationId)))
 
-      val jsonPost = Json.toJson(SubmissionDetails("fileName", "enrolmentId", 4000L, "dummyUrl", "1234", messageSpec))
+      val jsonPost = Json.toJson(SubmissionDetails("fileName", "enrolmentId", 4000000L, "dummyUrl", "1234", messageSpec))
 
       val request                = FakeRequest(POST, SubmissionController.submitDisclosure.url).withJsonBody(jsonPost)
       val result: Future[Result] = route(application, request).value

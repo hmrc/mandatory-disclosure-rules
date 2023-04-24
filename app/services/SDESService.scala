@@ -32,7 +32,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 trait SDESService {
-  def fileNotify(submissionDetails: SubmissionDetails)(implicit hc: HeaderCarrier): Future[ConversationId]
+  def fileNotify(submissionDetails: SubmissionDetails)(implicit hc: HeaderCarrier): Future[Either[Exception, ConversationId]]
 }
 
 class SDESServiceImpl @Inject() (sdesConnector: SDESConnector, fileDetailsRepository: FileDetailsRepository, appConfig: AppConfig)(implicit
@@ -40,7 +40,7 @@ class SDESServiceImpl @Inject() (sdesConnector: SDESConnector, fileDetailsReposi
 ) extends SDESService
     with Logging {
 
-  override def fileNotify(submissionDetails: SubmissionDetails)(implicit hc: HeaderCarrier): Future[ConversationId] = {
+  override def fileNotify(submissionDetails: SubmissionDetails)(implicit hc: HeaderCarrier): Future[Either[Exception, ConversationId]] = {
     val correlationID     = ConversationId() //CorrelationID is also a UUID so using ConversationId for compatibility with FileDetailsRepository
     val fileNotifyRequest = FileTransferNotification(submissionDetails, appConfig.sdesInformationType, appConfig.sdesRecipientOrSender, correlationID.value)
     logger.debug(s"SDES notification request: ${Json.stringify(Json.toJson(fileNotifyRequest))}")
@@ -50,7 +50,6 @@ class SDESServiceImpl @Inject() (sdesConnector: SDESConnector, fileDetailsReposi
           logger.info(
             s"SDES has been notified of file :: ${fileNotifyRequest.file.name}  with correlationId::${fileNotifyRequest.audit.correlationID}"
           )
-          //ToDo add conversation id record to mongo tracker for callback
           val submissionTime = DateTimeFormatUtil.zonedDateTimeNow.toLocalDateTime
           val fileDetails: FileDetails = FileDetails(
             correlationID,
@@ -61,14 +60,14 @@ class SDESServiceImpl @Inject() (sdesConnector: SDESConnector, fileDetailsReposi
             submissionTime,
             submissionTime
           )
-          fileDetailsRepository.insert(fileDetails).map(_ => correlationID)
+          fileDetailsRepository.insert(fileDetails).map(_ => Right(correlationID))
         case status =>
           val e = new Exception(s"Exception in notifying SDES. Received http status: $status body: ${response.body}")
           logger.error(
             s"Received a non 204 status from SDES when notified about file :: ${fileNotifyRequest.file.name}  with correlationId::${fileNotifyRequest.audit.correlationID}.",
             e
           )
-          Future.failed(e)
+          Future.successful(Left(e))
       }
     }
   }

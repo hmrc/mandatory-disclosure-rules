@@ -21,17 +21,15 @@ import connectors.SDESConnector
 import models.sdes._
 import models.submission.{FileDetails, MDR401, MessageSpecData, MultipleNewInformation}
 import models.submissions.SubmissionDetails
+import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
+import play.api.http.Status.{INTERNAL_SERVER_ERROR, NO_CONTENT}
 import play.api.inject.bind
 import repositories.submission.FileDetailsRepository
-import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentCaptor, ArgumentMatchers, MockitoSugar}
-import play.api.http.Status.NO_CONTENT
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
-import java.util.concurrent.FutureTask
 import scala.concurrent.{ExecutionContext, Future}
 
 class SDESServiceSpec extends SpecBase with MockitoSugar with ScalaCheckDrivenPropertyChecks with BeforeAndAfterEach {
@@ -70,13 +68,30 @@ class SDESServiceSpec extends SpecBase with MockitoSugar with ScalaCheckDrivenPr
         val result = sdesService.fileNotify(submissionDetails)
 
         whenReady(result) { result =>
-          result.value.matches(correlationIdRegex) mustBe true
+          result.isRight mustBe true
+          result match {
+            case Right(convID) => convID.value.matches(correlationIdRegex) mustBe true
+            case _             => fail("Invalid Result")
+          }
 
           verify(mockSDESConnector, times(1)).fileReady(any[FileTransferNotification])(any[HeaderCarrier], any[ExecutionContext])
           verify(mockFileDetailsRepository, times(1)).insert(any[FileDetails])
         }
       }
-    }
-  }
+      "must return a Left with an Exception for response statues other than 204" in {
+        when(mockSDESConnector.fileReady(any[FileTransferNotification])(any[HeaderCarrier], any[ExecutionContext]))
+          .thenReturn(Future.successful(HttpResponse.apply(INTERNAL_SERVER_ERROR, "")))
 
+        val result = sdesService.fileNotify(submissionDetails)
+
+        whenReady(result) { result =>
+          result.isRight mustBe false
+
+          verify(mockSDESConnector, times(1)).fileReady(any[FileTransferNotification])(any[HeaderCarrier], any[ExecutionContext])
+          verify(mockFileDetailsRepository, times(0)).insert(any[FileDetails])
+        }
+      }
+    }
+
+  }
 }

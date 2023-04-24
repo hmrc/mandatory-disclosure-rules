@@ -47,17 +47,18 @@ class SubmissionController @Inject() (
       .validate[SubmissionDetails]
       .fold(
         invalid = _ => Future.successful(InternalServerError),
-        valid = submission => {
-          println(s"\n\n$submission\n\n")
+        valid = submission =>
           if (submission.fileSize > maxNormalFileSize) {
-            sdesService.fileNotify(submission) map { conversationId =>
-              Ok(Json.toJson(conversationId))
+            sdesService.fileNotify(submission) map {
+              case Right(conversationId) => Ok(Json.toJson(conversationId))
+              case Left(e) =>
+                logger.warn(s"SDES notify ready error ${e.getMessage}")
+                InternalServerError(s"SDES notify error")
             }
           } else {
             val xml = xmlHandler.load(submission.documentUrl)
             submissionService.processSubmission(xml, submission.enrolmentId, submission.fileName, submission.fileSize, submission.messageSpecData)
           }
-        }
       )
   }
 
