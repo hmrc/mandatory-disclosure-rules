@@ -19,29 +19,30 @@ package services
 import config.AppConfig
 import connectors.SDESConnector
 import models.sdes._
-import models.submission.ConversationId
+import models.submission.{ConversationId, FileDetails, Pending}
 import models.submissions.SubmissionDetails
 import play.api.Logging
 import play.api.http.Status.NO_CONTENT
 import play.api.libs.json.Json
+import repositories.submission.FileDetailsRepository
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.DateTimeFormatUtil
 
-import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 trait SDESService {
-  def fileNotify(submissionDetails: SubmissionDetails)(implicit hc: HeaderCarrier): Future[Unit]
+  def fileNotify(submissionDetails: SubmissionDetails)(implicit hc: HeaderCarrier): Future[ConversationId]
 }
 
-class SDESServiceImpl @Inject() (sdesConnector: SDESConnector, appConfig: AppConfig)(implicit
+class SDESServiceImpl @Inject() (sdesConnector: SDESConnector, fileDetailsRepository: FileDetailsRepository, appConfig: AppConfig)(implicit
   ec: ExecutionContext
 ) extends SDESService
     with Logging {
 
-  override def fileNotify(submissionDetails: SubmissionDetails)(implicit hc: HeaderCarrier): Future[Unit] = {
-    val conversationId    = ConversationId()
-    val fileNotifyRequest = FileTransferNotification(submissionDetails, appConfig.sdesInformationType, appConfig.sdesRecipientOrSender, conversationId.value)
+  override def fileNotify(submissionDetails: SubmissionDetails)(implicit hc: HeaderCarrier): Future[ConversationId] = {
+    val correlationID     = ConversationId() //CorrelationID is also a UUID so using ConversationId for compatibility with FileDetailsRepository
+    val fileNotifyRequest = FileTransferNotification(submissionDetails, appConfig.sdesInformationType, appConfig.sdesRecipientOrSender, correlationID.value)
     logger.debug(s"SDES notification request: ${Json.stringify(Json.toJson(fileNotifyRequest))}")
     sdesConnector.fileReady(fileNotifyRequest).flatMap { response =>
       response.status match {
@@ -49,8 +50,18 @@ class SDESServiceImpl @Inject() (sdesConnector: SDESConnector, appConfig: AppCon
           logger.info(
             s"SDES has been notified of file :: ${fileNotifyRequest.file.name}  with correlationId::${fileNotifyRequest.audit.correlationID}"
           )
-          //ToDo add correlation id record to mongo tracker for callback
-          Future.successful(())
+          //ToDo add conversation id record to mongo tracker for callback
+          val submissionTime = DateTimeFormatUtil.zonedDateTimeNow.toLocalDateTime
+          val fileDetails: FileDetails = FileDetails(
+            correlationID,
+            submissionDetails.enrolmentId,
+            submissionDetails.messageSpecData.messageRefId,
+            Pending,
+            submissionDetails.fileName,
+            submissionTime,
+            submissionTime
+          )
+          fileDetailsRepository.insert(fileDetails).map(_ => correlationID)
         case status =>
           val e = new Exception(s"Exception in notifying SDES. Received http status: $status body: ${response.body}")
           logger.error(
