@@ -30,17 +30,16 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class SubmissionController @Inject() (
-  authenticate: IdentifierAuthAction,
-  cc: ControllerComponents,
-  submissionService: SubmissionService,
-  sdesService: SDESService,
-  xmlHandler: XmlHandler
-)(implicit ec: ExecutionContext)
-    extends BackendController(cc)
+class SubmissionController @Inject()(
+                                      authenticate: IdentifierAuthAction,
+                                      cc: ControllerComponents,
+                                      submissionService: SubmissionService,
+                                      sdesService: SDESService,
+                                      appConfig: AppConfig,
+                                      xmlHandler: XmlHandler
+                                    )(implicit ec: ExecutionContext)
+  extends BackendController(cc)
     with Logging {
-
-  val maxNormalFileSize = 3145728L
 
   def submitDisclosure: Action[JsValue] = authenticate.async(parse.json) { implicit request =>
     request.body
@@ -48,7 +47,7 @@ class SubmissionController @Inject() (
       .fold(
         invalid = _ => Future.successful(InternalServerError),
         valid = submission =>
-          if (submission.fileSize > maxNormalFileSize) {
+          if (submission.fileSize > appConfig.maxNormalFileSize) {
             sdesService.fileNotify(submission) map {
               case Right(conversationId) => Ok(Json.toJson(conversationId))
               case Left(e) =>
@@ -59,6 +58,7 @@ class SubmissionController @Inject() (
             val xml = xmlHandler.load(submission.documentUrl)
             submissionService.processSubmission(xml, submission.enrolmentId, submission.fileName, submission.fileSize, submission.messageSpecData)
           }
+
       )
   }
 

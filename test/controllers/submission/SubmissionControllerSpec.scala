@@ -31,6 +31,7 @@ import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentCaptor, ArgumentMatchers, MockitoSugar}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
+import play.api.Configuration
 import play.api.inject.bind
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
@@ -66,7 +67,6 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
 
   override def beforeEach(): Unit =
     reset(
-      mockAppConf,
       mockAuditService,
       mockXMLValidationService,
       mockReadSubscriptionService,
@@ -91,6 +91,8 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
         bind[IdentifierAuthAction].to[FakeIdentifierAuthAction]
       )
       .build()
+
+    when(mockAppConf.maxNormalFileSize).thenReturn(3145728)
 
     "when a file is posted we transform it, send it to the HOD and return OK" in {
       when(mockFileDetailsRepository.insert(any[FileDetails]()))
