@@ -24,14 +24,13 @@ import controllers.routes._
 import controllers.submission.SubmissionFixture._
 import handlers.{XmlHandler, XmlMockBasicHandler}
 import models.error.ReadSubscriptionError
-import models.submission.{ConversationId, FileDetails, MDR401, MessageSpecData, MultipleNewInformation}
+import models.submission._
 import models.submissions.SubmissionDetails
 import models.validation.SaxParseError
 import org.mockito.ArgumentMatchers.any
 import org.mockito.{ArgumentCaptor, ArgumentMatchers, MockitoSugar}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
-import play.api.Configuration
 import play.api.inject.bind
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result

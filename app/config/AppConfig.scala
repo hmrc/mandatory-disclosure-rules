@@ -55,8 +55,6 @@ class AppConfig @Inject() (
 
   lazy val sendEmailUrl: String = servicesConfig.baseUrl("email")
 
-  lazy val apiLocation: Option[String] = Some(config.get[String]("sdes.location")).filter(_.nonEmpty)
-
   lazy val sdesclientId: String = config.get[String]("sdes.client-id")
 
   lazy val sdesRecipientOrSender: String =
