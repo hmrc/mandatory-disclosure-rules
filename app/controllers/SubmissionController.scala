@@ -30,15 +30,15 @@ import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class SubmissionController @Inject()(
-                                      authenticate: IdentifierAuthAction,
-                                      cc: ControllerComponents,
-                                      submissionService: SubmissionService,
-                                      sdesService: SDESService,
-                                      appConfig: AppConfig,
-                                      xmlHandler: XmlHandler
-                                    )(implicit ec: ExecutionContext)
-  extends BackendController(cc)
+class SubmissionController @Inject() (
+  authenticate: IdentifierAuthAction,
+  cc: ControllerComponents,
+  submissionService: SubmissionService,
+  sdesService: SDESService,
+  appConfig: AppConfig,
+  xmlHandler: XmlHandler
+)(implicit ec: ExecutionContext)
+    extends BackendController(cc)
     with Logging {
 
   def submitDisclosure: Action[JsValue] = authenticate.async(parse.json) { implicit request =>
@@ -58,7 +58,6 @@ class SubmissionController @Inject()(
             val xml = xmlHandler.load(submission.documentUrl)
             submissionService.processSubmission(xml, submission.enrolmentId, submission.fileName, submission.fileSize, submission.messageSpecData)
           }
-
       )
   }
 

@@ -41,7 +41,7 @@ class TestSubmissionController @Inject() (
   def submitDisclosureXML: Action[NodeSeq] = authenticate.async(parse.xml) { implicit request =>
     val xml      = request.body
     val fileName = (xml \ "fileName").text.trim
-    val fileSize = (xml \ "fileSize").text.toLong
+    val fileSize = (xml \ "fileSize").text.trim.toLong
 
     val msd = dataExtraction.messageSpecData(xml.asInstanceOf[Elem])
 
