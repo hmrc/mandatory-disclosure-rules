@@ -57,4 +57,10 @@ class AppConfig @Inject() (
 
   lazy val emailSuccessfulTemplate: String   = config.get[String]("emailTemplates.fileUploadSuccessful")
   lazy val emailUnsuccessfulTemplate: String = config.get[String]("emailTemplates.fileUploadUnsuccessful")
+
+  lazy val cacheTtl: Int      = config.get[Int]("mongodb.timeToLiveInSeconds")
+  lazy val submissionTtl: Int = config.get[Int]("mongodb.submission.timeToLiveInDays")
+
+  //TODO: Remove this after a successful production deployment
+  lazy val dropUpscanSessionCollection: Boolean = config.get[Boolean]("mongodb.upScanSessionRepository.dropCollection")
 }

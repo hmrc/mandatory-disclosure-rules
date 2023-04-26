@@ -18,17 +18,22 @@ package models.upscan
 
 import org.bson.types.ObjectId
 import play.api.libs.json._
-import uk.gov.hmrc.mongo.play.json.formats.MongoFormats
+import uk.gov.hmrc.mongo.play.json.formats.{MongoFormats, MongoJavatimeFormats}
+
+import java.time.Instant
 
 case class UploadSessionDetails(
   _id: ObjectId,
   uploadId: UploadId,
   reference: Reference,
-  status: UploadStatus
+  status: UploadStatus,
+  lastUpdated: Instant = Instant.now
 )
 
 object UploadSessionDetails {
   val status = "status"
+
+  implicit val mongoDateTimeWrites: Format[Instant] = MongoJavatimeFormats.instantFormat
 
   implicit val objectIdFormats: Format[ObjectId] = MongoFormats.objectIdFormat
 

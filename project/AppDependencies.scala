@@ -15,15 +15,15 @@ object AppDependencies {
   )
 
   val test = Seq(
-    "org.scalatestplus"      %% "scalatestplus-scalacheck" % "3.1.0.0-RC2"       % Test,
-    "wolfendale"             %% "scalacheck-gen-regexp"    % "0.1.2"             % Test,
-    "uk.gov.hmrc"            %% "bootstrap-test-play-28"   % bootstrap_ver            % Test,
-    "uk.gov.hmrc.mongo"      %% "hmrc-mongo-test-play-28"  % mongo_ver            % Test,
-    "org.mockito"            %% "mockito-scala"            % "1.17.12"           % Test,
-    "com.vladsch.flexmark"    % "flexmark-all"             % "0.36.8"            % "test, it",
-    "org.scalatest"          %% "scalatest"                % "3.1.0"             % Test,
-    "org.scalatestplus.play" %% "scalatestplus-play"       % "5.1.0"             % Test,
-    "com.github.tomakehurst"  % "wiremock-standalone"      % "2.23.2"            % Test,
-    "com.typesafe.play"      %% "play-test"                % PlayVersion.current % Test
-  )
+    "org.scalatestplus"      %% "scalatestplus-scalacheck" % "3.1.0.0-RC2",
+    "wolfendale"             %% "scalacheck-gen-regexp"    % "0.1.2",
+    "uk.gov.hmrc"            %% "bootstrap-test-play-28"   % bootstrap_ver,
+    "uk.gov.hmrc.mongo"      %% "hmrc-mongo-test-play-28"  % mongo_ver,
+    "org.mockito"            %% "mockito-scala"            % "1.17.12",
+    "com.vladsch.flexmark"    % "flexmark-all"             % "0.36.8",
+    "org.scalatest"          %% "scalatest"                % "3.1.0",
+    "org.scalatestplus.play" %% "scalatestplus-play"       % "5.1.0",
+    "com.github.tomakehurst"  % "wiremock-standalone"      % "2.23.2",
+    "com.typesafe.play"      %% "play-test"                % PlayVersion.current
+  ).map(_ % "test, it")
 }

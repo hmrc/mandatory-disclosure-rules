@@ -20,11 +20,14 @@ import com.google.inject.AbstractModule
 import handlers.{XmlHandler, XmlHandlerImpl}
 import services.upscan.{MongoBackedUploadProgressTracker, UploadProgressTracker}
 
+import java.time.{Clock, ZoneOffset}
+
 class Module() extends AbstractModule {
 
   override def configure(): Unit = {
     bind(classOf[UploadProgressTracker]).to(classOf[MongoBackedUploadProgressTracker])
     bind(classOf[XmlHandler]).to(classOf[XmlHandlerImpl]).asEagerSingleton()
-    ()
+    bind(classOf[Clock]).toInstance(Clock.systemDefaultZone.withZone(ZoneOffset.UTC))
+    bind(classOf[ApplicationStart]).asEagerSingleton() //TODO: Remove this line after a successful production deployment
   }
 }

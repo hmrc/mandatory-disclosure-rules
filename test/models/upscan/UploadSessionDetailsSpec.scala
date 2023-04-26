@@ -20,6 +20,8 @@ import base.SpecBase
 import org.bson.types.ObjectId
 import play.api.libs.json.Json
 
+import java.time.Instant
+
 class UploadSessionDetailsSpec extends SpecBase {
 
   def str2Hex(str: String): Array[Byte] = {
@@ -43,6 +45,11 @@ class UploadSessionDetailsSpec extends SpecBase {
           |"reference": { "value": "ref" },
           |"status": {
           |     "_type": "NotStarted"
+          |   },
+          |"lastUpdated": {
+          |     "$date": {
+          |           "$numberLong":"1682406843785"
+          |         }
           |   }
           |}""".stripMargin
 
@@ -50,7 +57,8 @@ class UploadSessionDetailsSpec extends SpecBase {
         objectId,
         UploadId("121"),
         Reference("ref"),
-        NotStarted
+        NotStarted,
+        Instant.ofEpochMilli(1682406843785L)
       )
 
       Json
@@ -63,7 +71,8 @@ class UploadSessionDetailsSpec extends SpecBase {
         objectId,
         UploadId("121"),
         Reference("ref"),
-        NotStarted
+        NotStarted,
+        Instant.ofEpochMilli(1682406843785L)
       )
 
       val expectedUploadSessionDetails =
@@ -73,6 +82,11 @@ class UploadSessionDetailsSpec extends SpecBase {
           |"reference": { "value": "ref" },
           |"status": {
           |     "_type": "NotStarted"
+          |   },
+          |"lastUpdated": {
+          |     "$date": {
+          |           "$numberLong":"1682406843785"
+          |         }
           |   }
           |}""".stripMargin
 
@@ -89,6 +103,11 @@ class UploadSessionDetailsSpec extends SpecBase {
           |"reference": { "value": "ref" },
           |"status": {
           |     "_type": "InProgress"
+          |   },
+          |"lastUpdated": {
+          |     "$date": {
+          |           "$numberLong":"1682406843785"
+          |         }
           |   }
           |}""".stripMargin
 
@@ -96,7 +115,8 @@ class UploadSessionDetailsSpec extends SpecBase {
         objectId,
         UploadId("121"),
         Reference("ref"),
-        InProgress
+        InProgress,
+        Instant.ofEpochMilli(1682406843785L)
       )
 
       Json
@@ -112,6 +132,11 @@ class UploadSessionDetailsSpec extends SpecBase {
           |"reference": { "value": "ref" },
           |"status": {
           |     "_type": "InProgress"
+          |   },
+          |"lastUpdated": {
+          |     "$date": {
+          |           "$numberLong":"1682406843785"
+          |         }
           |   }
           |}""".stripMargin
 
@@ -119,7 +144,8 @@ class UploadSessionDetailsSpec extends SpecBase {
         objectId,
         UploadId("121"),
         Reference("ref"),
-        InProgress
+        InProgress,
+        Instant.ofEpochMilli(1682406843785L)
       )
 
       Json.toJson(uploadSessionDetails) mustBe Json.parse(
@@ -135,6 +161,11 @@ class UploadSessionDetailsSpec extends SpecBase {
           |"reference": { "value": "ref" },
           |"status": {
           |     "_type": "Failed"
+          |   },
+          |"lastUpdated": {
+          |     "$date": {
+          |           "$numberLong":"1682406843785"
+          |         }
           |   }
           |}""".stripMargin
 
@@ -142,7 +173,8 @@ class UploadSessionDetailsSpec extends SpecBase {
         objectId,
         UploadId("121"),
         Reference("ref"),
-        Failed
+        Failed,
+        Instant.ofEpochMilli(1682406843785L)
       )
 
       Json
@@ -158,6 +190,11 @@ class UploadSessionDetailsSpec extends SpecBase {
           |"reference": { "value": "ref" },
           |"status": {
           |     "_type": "Failed"
+          |   },
+          |"lastUpdated": {
+          |     "$date": {
+          |           "$numberLong":"1682406843785"
+          |         }
           |   }
           |}""".stripMargin
 
@@ -165,7 +202,8 @@ class UploadSessionDetailsSpec extends SpecBase {
         objectId,
         UploadId("121"),
         Reference("ref"),
-        Failed
+        Failed,
+        Instant.ofEpochMilli(1682406843785L)
       )
 
       Json.toJson(uploadSessionDetails) mustBe Json.parse(
@@ -184,6 +222,11 @@ class UploadSessionDetailsSpec extends SpecBase {
           |     "name": "name",
           |     "mimeType": "xml",
           |     "downloadUrl": "downloadUrl"
+          |   },
+          |"lastUpdated": {
+          |     "$date": {
+          |           "$numberLong":"1682406843785"
+          |         }
           |   }
           |}""".stripMargin
 
@@ -191,7 +234,8 @@ class UploadSessionDetailsSpec extends SpecBase {
         objectId,
         UploadId("121"),
         Reference("ref"),
-        UploadedSuccessfully("name", "xml", "downloadUrl", None)
+        UploadedSuccessfully("name", "xml", "downloadUrl", None),
+        Instant.ofEpochMilli(1682406843785L)
       )
 
       Json.toJson(uploadSessionDetails) mustBe Json.parse(
@@ -210,6 +254,11 @@ class UploadSessionDetailsSpec extends SpecBase {
           |     "name": "name",
           |     "mimeType": "xml",
           |     "downloadUrl": "downloadUrl"
+          |   },
+          |"lastUpdated": {
+          |     "$date": {
+          |           "$numberLong":"1682406843785"
+          |         }
           |   }
           |}""".stripMargin
 
@@ -217,7 +266,8 @@ class UploadSessionDetailsSpec extends SpecBase {
         objectId,
         UploadId("121"),
         Reference("ref"),
-        UploadedSuccessfully("name", "xml", "downloadUrl", None)
+        UploadedSuccessfully("name", "xml", "downloadUrl", None),
+        Instant.ofEpochMilli(1682406843785L)
       )
 
       Json
@@ -233,6 +283,11 @@ class UploadSessionDetailsSpec extends SpecBase {
           |"reference": { "value": "ref" },
           |"status": {
           |     "_type": "nope"
+          |   },
+          |"lastUpdated": {
+          |     "$date": {
+          |           "$numberLong":"1682406843785"
+          |         }
           |   }
           |}""".stripMargin
 
@@ -248,6 +303,11 @@ class UploadSessionDetailsSpec extends SpecBase {
           |"uploadId": { "value": "121" },
           |"reference": { "value": "ref" },
           |"status": {
+          |   },
+          |"lastUpdated": {
+          |     "$date": {
+          |           "$numberLong":"1682406843785"
+          |         }
           |   }
           |}""".stripMargin
 
