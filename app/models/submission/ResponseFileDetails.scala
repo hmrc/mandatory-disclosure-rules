@@ -24,6 +24,7 @@ import java.time.LocalDateTime
 case class ResponseFileDetails(conversationId: ConversationId,
                                subscriptionId: String,
                                messageRefId: String,
+                               reportType: Option[ReportType],
                                status: FileStatus,
                                name: String,
                                submitted: LocalDateTime,
@@ -37,6 +38,7 @@ object ResponseFileDetails {
     (__ \ "_id").read[ConversationId] and
       (__ \ "subscriptionId").read[String] and
       (__ \ "messageRefId").read[String] and
+      (__ \ "reportType").readNullable[ReportType] and
       (__ \ "status").read[FileStatus] and
       (__ \ "name").read[String] and
       (__ \ "created").read[LocalDateTime](MongoJavatimeFormats.localDateTimeReads) and
@@ -49,6 +51,7 @@ object ResponseFileDetails {
     fileDetails._id,
     fileDetails.subscriptionId,
     fileDetails.messageRefId,
+    fileDetails.reportType,
     fileDetails.status,
     fileDetails.name,
     fileDetails.submitted,
