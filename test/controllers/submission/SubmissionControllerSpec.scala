@@ -75,21 +75,21 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
       mockSDESService
     )
 
-  "submission controller" - {
+  val application = applicationBuilder()
+    .overrides(
+      bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
+      bind[SubmissionConnector].toInstance(mockSubmissionConnector),
+      bind[SubscriptionService].toInstance(mockReadSubscriptionService),
+      bind[FileDetailsRepository].toInstance(mockFileDetailsRepository),
+      bind[XMLValidationService].toInstance(mockXMLValidationService),
+      bind[SDESService].toInstance(mockSDESService),
+      bind[AppConfig].toInstance(mockAppConf),
+      bind[XmlHandler].toInstance(new XmlMockBasicHandler),
+      bind[IdentifierAuthAction].to[FakeIdentifierAuthAction]
+    )
+    .build()
 
-    val application = applicationBuilder()
-      .overrides(
-        bind[SubscriptionConnector].toInstance(mockSubscriptionConnector),
-        bind[SubmissionConnector].toInstance(mockSubmissionConnector),
-        bind[SubscriptionService].toInstance(mockReadSubscriptionService),
-        bind[FileDetailsRepository].toInstance(mockFileDetailsRepository),
-        bind[XMLValidationService].toInstance(mockXMLValidationService),
-        bind[SDESService].toInstance(mockSDESService),
-        bind[AppConfig].toInstance(mockAppConf),
-        bind[XmlHandler].toInstance(new XmlMockBasicHandler),
-        bind[IdentifierAuthAction].to[FakeIdentifierAuthAction]
-      )
-      .build()
+  "submission controller normal size file path" - {
 
     when(mockAppConf.maxNormalFileSize).thenReturn(3145728)
 
@@ -141,19 +141,6 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
 
       verify(mockFileDetailsRepository, times(1)).insert(argumentCaptorSubmissionDetails.capture())
       verify(mockSubmissionConnector, times(1)).submitDisclosure(argumentCaptor.capture(), argumentCaptorConversationId.capture())(any[HeaderCarrier]())
-    }
-
-    "when a file is larger than 3mb we use the SDES journey" in {
-      val conversationId = ConversationId("1234")
-      when(mockSDESService.fileNotify(any[SubmissionDetails])(any[HeaderCarrier])).thenReturn(Future.successful(Right(conversationId)))
-
-      val jsonPost = Json.toJson(SubmissionDetails("fileName", "enrolmentId", 4000000L, "dummyUrl", "1234", messageSpec))
-
-      val request                = FakeRequest(POST, SubmissionController.submitDisclosure.url).withJsonBody(jsonPost)
-      val result: Future[Result] = route(application, request).value
-
-      status(result) mustBe OK
-      verify(mockSDESService, times(1)).fileNotify(any[SubmissionDetails])(any[HeaderCarrier])
     }
 
     "when a read subscription returns not OK response INTERNAL_SERVER_ERROR" in {
@@ -274,5 +261,32 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
       status(result) mustBe OK
       verify(mockAuditService, times(0)).sendAuditEvent(ArgumentMatchers.eq("MandatoryDisclosureRulesFileSubmission"), any[JsValue])(any[HeaderCarrier])
     }
+  }
+  "submission controller large file path" - {
+
+    "when a file is larger than 3mb we use the SDES journey" in {
+      val conversationId = ConversationId("1234")
+      when(mockSDESService.fileNotify(any[SubmissionDetails])(any[HeaderCarrier])).thenReturn(Future.successful(Right(conversationId)))
+
+      val jsonPost = Json.toJson(SubmissionDetails("fileName", "enrolmentId", 4000000L, "dummyUrl", "1234", messageSpec))
+
+      val request                = FakeRequest(POST, SubmissionController.submitDisclosure.url).withJsonBody(jsonPost)
+      val result: Future[Result] = route(application, request).value
+
+      status(result) mustBe OK
+      verify(mockSDESService, times(1)).fileNotify(any[SubmissionDetails])(any[HeaderCarrier])
+    }
+    "when the sdesService returns an error we return an Internal Server Error" in {
+      when(mockSDESService.fileNotify(any[SubmissionDetails])(any[HeaderCarrier])).thenReturn(Future.successful(Left(new Exception("Error"))))
+
+      val jsonPost = Json.toJson(SubmissionDetails("fileName", "enrolmentId", 4000000L, "dummyUrl", "1234", messageSpec))
+
+      val request                = FakeRequest(POST, SubmissionController.submitDisclosure.url).withJsonBody(jsonPost)
+      val result: Future[Result] = route(application, request).value
+
+      status(result) mustBe INTERNAL_SERVER_ERROR
+      verify(mockSDESService, times(1)).fileNotify(any[SubmissionDetails])(any[HeaderCarrier])
+    }
+
   }
 }
