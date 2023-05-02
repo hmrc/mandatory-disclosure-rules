@@ -25,6 +25,7 @@ import java.time.LocalDateTime
 case class FileDetails(_id: ConversationId,
                        subscriptionId: String,
                        messageRefId: String,
+                       reportType: Option[ReportType],
                        status: FileStatus,
                        name: String,
                        submitted: LocalDateTime,
