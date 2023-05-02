@@ -17,9 +17,11 @@
 package controllers
 
 import controllers.auth.IdentifierAuthAction
+import models.sdes.NotificationType.{FileProcessed, FileProcessingFailure, FileReady, FileReceived}
 import models.sdes._
+import models.submission.TransferFailure
 import play.api.Logging
-import play.api.mvc.{Action, ControllerComponents}
+import play.api.mvc.ControllerComponents
 import repositories.submission.FileDetailsRepository
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -27,23 +29,38 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SDESCallbackController @Inject() (
-  authenticate: IdentifierAuthAction, //tax-frauds does not authenticate so might not be able to use this
+  //authenticate: IdentifierAuthAction, //tax-frauds does not authenticate so might not be able to use this
   fileDetailsRepository: FileDetailsRepository,
   cc: ControllerComponents
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
-  def callback: Action[CallBackNotification] = Action.async(parse.json[CallBackNotification]) { request =>
-    val CallBackNotification(status, filename, correlationID, failureReason) = request.body
-    logger.info(s"Received SDES callback for file: $filename, with correlationId : $correlationID and status : $status")
-    status match {
-      case FileReady => ???
-      case FileReceived => ???
-      case  FileProcessingFailure => Future.successful(Ok)
-      case FileProcessed =>
-        Future.successful(Ok)
-    }
+  def callback = Action.async(parse.json) { request =>
+    request.body
+      .validate[NotificationCallback]
+      .fold(
+        invalid = _ => Future.successful(InternalServerError),
+        valid = callBackNotification => {
+          logger.info(
+            s"Received SDES callback for file: ${callBackNotification.filename}, with correlationId : ${callBackNotification.correlationID} and status : ${callBackNotification.notification}"
+          )
+          callBackNotification.notification match {
+            case FileReady =>
+              logger.info(s"Processing FileReady") //ToDo update logging
+              Future.successful(Ok)
+            case FileReceived =>
+              logger.info(s"Processing FileReceived") //ToDo update logging
+              Future.successful(Ok)
+            case FileProcessingFailure =>
+              logger.warn(s"SDES transfer failed with message ${callBackNotification.failureReason}")
+              fileDetailsRepository.updateStatus(callBackNotification.correlationID, TransferFailure).map(_ => Ok)
+            case FileProcessed =>
+              logger.info(s"Processing FileProcessed") //ToDo update logging
+              Future.successful(Ok)
+          }
+        }
+      )
 
   }
 }

@@ -18,13 +18,13 @@ package models.sdes
 
 import play.api.libs.json.{Json, OFormat}
 
-final case class CallBackNotification(
-  notification: NotificationStatus,
+final case class NotificationCallback(
+  notification: NotificationType,
   filename: String,
   correlationID: String,
   failureReason: Option[String]
 )
 
-object CallBackNotification {
-  implicit val format: OFormat[CallBackNotification] = Json.format
+object NotificationCallback {
+  implicit val format: OFormat[NotificationCallback] = Json.format
 }
