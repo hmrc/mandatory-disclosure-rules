@@ -34,55 +34,55 @@ class DataExtractionSpec extends SpecBase {
 
   "DataExtraction" - {
     val extractor = app.injector.instanceOf[DataExtraction]
-    "messageSpecData must return messageSpec MultipleNewInformation data from a valid XML file" in {
+    "messageSpec must return messageSpec MultipleNewInformation data from a valid XML file" in {
       extractor.messageSpecData(XMLFixtures.validMessageMulitpleNewSpec) mustBe Some(MessageSpecData("GBXAMDR1234567", MDR401, 2, MultipleNewInformation))
     }
 
-    "messageSpecData must return messageSpec MultipleCorrectionsDeletions data from a valid XML file" in {
+    "messageSpec must return messageSpec MultipleCorrectionsDeletions data from a valid XML file" in {
       extractor.messageSpecData(XMLFixtures.validMessageMultipleCorrectionSpec) mustBe Some(
         MessageSpecData("GBXAMDR1234567", MDR402, 2, MultipleCorrectionsDeletions)
       )
     }
 
-    "messageSpecData must return messageSpec SingleNewInformation data from a valid XML file" in {
+    "messageSpec must return messageSpec SingleNewInformation data from a valid XML file" in {
       extractor.messageSpecData(XMLFixtures.validMessageSingleNewSpec) mustBe Some(
         MessageSpecData("GBXAMDR1234567", MDR401, 1, SingleNewInformation)
       )
     }
 
-    "messageSpecData must return messageSpec SingleDeletion data from a valid XML file" in {
+    "messageSpec must return messageSpec SingleDeletion data from a valid XML file" in {
       extractor.messageSpecData(XMLFixtures.validMessageSingleDeletionSpec) mustBe Some(
         MessageSpecData("GBXAMDR1234567", MDR401, 1, SingleDeletion)
       )
     }
 
-    "messageSpecData must return messageSpec SingleCorrection data from a valid XML file with OECD2 DocTypeIndic" in {
+    "messageSpec must return messageSpec SingleCorrection data from a valid XML file with OECD2 DocTypeIndic" in {
       extractor.messageSpecData(XMLFixtures.validMessageSingleCorrectionSpec) mustBe Some(
         MessageSpecData("GBXAMDR1234567", MDR402, 1, SingleCorrection)
       )
     }
 
-    "messageSpecData must return messageSpec SingleCorrection data from a valid XML file with OECD0 DocTypeIndic" in {
+    "messageSpec must return messageSpec SingleCorrection data from a valid XML file with OECD0 DocTypeIndic" in {
       extractor.messageSpecData(XMLFixtures.validMessageSingleOECD0CorrectionSpec) mustBe Some(
         MessageSpecData("GBXAMDR1234567", MDR402, 1, SingleCorrection)
       )
     }
 
-    "messageSpecData must return messageSpec SingleOther data from a valid XML file" in {
+    "messageSpec must return messageSpec SingleOther data from a valid XML file" in {
       extractor.messageSpecData(XMLFixtures.validMessageSingleOtherSpec) mustBe Some(
         MessageSpecData("GBXAMDR1234567", MDR402, 1, SingleOther)
       )
     }
 
-    "messageSpecData must return None when messageRefId is missing" in {
+    "messageSpec must return None when messageRefId is missing" in {
       extractor.messageSpecData(XMLFixtures.missingMessageRefId) mustBe None
     }
 
-    "messageSpecData must return None when messageTypeIndic is missing" in {
+    "messageSpec must return None when messageTypeIndic is missing" in {
       extractor.messageSpecData(XMLFixtures.missingMessageTypeIndic) mustBe None
     }
 
-    "messageSpecData must throw NoSuchElement when messageTypeIndic invalid " in {
+    "messageSpec must throw NoSuchElement when messageTypeIndic invalid " in {
       assertThrows[NoSuchElementException] {
         extractor.messageSpecData(XMLFixtures.invalidMessageTypeIndic) mustBe None
       }

@@ -44,7 +44,7 @@ class SubmissionController @Inject() (
         invalid = _ => Future.successful(InternalServerError),
         valid = submission => {
           val xml = xmlHandler.load(submission.documentUrl)
-          submissionService.processSubmission(xml, submission.enrolmentId, submission.fileName, submission.fileSize)
+          submissionService.processSubmission(xml, submission.enrolmentId, submission.fileName, submission.fileSize, submission.messageSpecData)
         }
       )
   }

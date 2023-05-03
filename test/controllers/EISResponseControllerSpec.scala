@@ -90,7 +90,16 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
   "EISResponseController" - {
     "must return NoContent when input xml is valid" in {
       val fileDetails =
-        FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Accepted, "file1.xml", LocalDateTime.now(), LocalDateTime.now())
+        FileDetails(
+          ConversationId("conversationId123456"),
+          "subscriptionId",
+          "messageRefId",
+          Some(SingleNewInformation),
+          Accepted,
+          "file1.xml",
+          LocalDateTime.now(),
+          LocalDateTime.now()
+        )
 
       when(mockFileDetailsRepository.updateStatus(any[String], any[FileStatus])).thenReturn(Future.successful(Some(fileDetails)))
       when(mockEmailService.sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier]))
@@ -123,7 +132,16 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
 
     "must send an email when on the fast journey and file upload is Accepted" in {
       val fileDetails =
-        FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Accepted, "file1.xml", LocalDateTime.now(), LocalDateTime.now())
+        FileDetails(
+          ConversationId("conversationId123456"),
+          "subscriptionId",
+          "messageRefId",
+          Some(SingleNewInformation),
+          Accepted,
+          "file1.xml",
+          LocalDateTime.now(),
+          LocalDateTime.now()
+        )
       when(mockAuditService.sendAuditEvent(any[String], any[JsValue])(any[HeaderCarrier])).thenReturn(Future.successful(Success))
       when(mockFileDetailsRepository.updateStatus(any[String], any[FileStatus])).thenReturn(Future.successful(Some(fileDetails)))
       when(mockEmailService.sendAndLogEmail(any[String], any[String], any[String], any[Boolean])(any[HeaderCarrier]))
@@ -146,6 +164,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
           ConversationId("conversationId123456"),
           "subscriptionId",
           "messageRefId",
+          Some(SingleNewInformation),
           Rejected(ValidationErrors(None, None)),
           "file1.xml",
           LocalDateTime.now(),
@@ -173,6 +192,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
           ConversationId("conversationId123456"),
           "subscriptionId",
           "messageRefId",
+          Some(SingleNewInformation),
           Pending,
           "file1.xml",
           LocalDateTime.now(),
@@ -196,13 +216,15 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
 
     "must send an email when on the slow journey and file upload is Accepted" in {
       val fileDetails =
-        FileDetails(ConversationId("conversationId123456"),
-                    "subscriptionId",
-                    "messageRefId",
-                    Accepted,
-                    "file1.xml",
-                    LocalDateTime.now().minusSeconds(11),
-                    LocalDateTime.now()
+        FileDetails(
+          ConversationId("conversationId123456"),
+          "subscriptionId",
+          "messageRefId",
+          Some(SingleNewInformation),
+          Accepted,
+          "file1.xml",
+          LocalDateTime.now().minusSeconds(11),
+          LocalDateTime.now()
         )
       when(mockAuditService.sendAuditEvent(any[String], any[JsValue])(any[HeaderCarrier])).thenReturn(Future.successful(Success))
       when(mockFileDetailsRepository.updateStatus(any[String], any[FileStatus])).thenReturn(Future.successful(Some(fileDetails)))
@@ -226,6 +248,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
           ConversationId("conversationId123456"),
           "subscriptionId",
           "messageRefId",
+          Some(SingleNewInformation),
           Rejected(ValidationErrors(None, None)),
           "file1.xml",
           LocalDateTime.now().minusSeconds(11),
@@ -253,6 +276,7 @@ class EISResponseControllerSpec extends SpecBase with BeforeAndAfterEach {
           ConversationId("conversationId123456"),
           "subscriptionId",
           "messageRefId",
+          Some(SingleNewInformation),
           Pending,
           "file1.xml",
           LocalDateTime.now().minusSeconds(11),

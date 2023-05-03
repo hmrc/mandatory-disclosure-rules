@@ -38,7 +38,15 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
 
   val dateTimeNow: LocalDateTime = LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.MILLIS)
   val fileDetails: FileDetails =
-    FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Pending, "file1.xml", dateTimeNow, dateTimeNow)
+    FileDetails(ConversationId("conversationId123456"),
+                "subscriptionId",
+                "messageRefId",
+                Some(SingleNewInformation),
+                Pending,
+                "file1.xml",
+                dateTimeNow,
+                dateTimeNow
+    )
 
   "Insert" - {
     "must insert FileDetails" in {
@@ -89,7 +97,9 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
       val res = repository.updateStatus("conversationId123456", Accepted)
       whenReady(res) { result =>
         result must matchPattern {
-          case Some(FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Accepted, "file1.xml", _, _)) =>
+          case Some(
+                FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Some(SingleNewInformation), Accepted, "file1.xml", _, _)
+              ) =>
         }
       }
     }
@@ -109,6 +119,7 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
                 FileDetails(ConversationId("conversationId123456"),
                             "subscriptionId",
                             "messageRefId",
+                            Some(SingleNewInformation),
                             Rejected(ValidationErrors(Some(Seq(FileErrors(FileErrorCode.FailedSchemaValidation, Some("details")))), None)),
                             "file1.xml",
                             _,
