@@ -15,6 +15,7 @@
  */
 
 package repositories.submission
+import config.AppConfig
 import metrics.MetricsService
 import models.submission.{ConversationId, FileDetails, FileStatus}
 import org.mongodb.scala.bson.conversions.Bson
@@ -22,28 +23,37 @@ import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.Updates.set
 import org.mongodb.scala.model._
-import play.api.Configuration
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
-import javax.inject.Singleton
 
 import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
-import scala.concurrent.duration.Duration
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class FileDetailsRepository @Inject() (
   val mongo: MongoComponent,
-  config: Configuration,
+  appConfig: AppConfig,
   metricsService: MetricsService
 )(implicit ec: ExecutionContext)
     extends PlayMongoRepository[FileDetails](
       mongoComponent = mongo,
       collectionName = "file-details",
       domainFormat = FileDetails.format,
-      indexes = FileDetailsRepository.indexes(config),
+      indexes = Seq(
+        IndexModel(
+          ascending("lastUpdated"),
+          IndexOptions()
+            .name("submission-last-updated-index")
+            .expireAfter(appConfig.submissionTtl, TimeUnit.DAYS)
+        ),
+        IndexModel(ascending("subscriptionId"),
+                   IndexOptions()
+                     .name("subscriptionId-index")
+                     .unique(false)
+        )
+      ),
       replaceIndexes = true
     ) {
 
@@ -100,24 +110,4 @@ class FileDetailsRepository @Inject() (
         true
       }
 
-}
-
-object FileDetailsRepository {
-
-  def cacheTtl(config: Configuration): Long =
-    Duration(config.get[Int]("mongodb.submission.timeToLiveInDays"), "days").toSeconds
-
-  def indexes(config: Configuration) = Seq(
-    IndexModel(
-      ascending("lastUpdated"),
-      IndexOptions()
-        .name("submission-last-updated-index")
-        .expireAfter(cacheTtl(config), TimeUnit.SECONDS)
-    ),
-    IndexModel(ascending("subscriptionId"),
-               IndexOptions()
-                 .name("subscriptionId-index")
-                 .unique(false)
-    )
-  )
 }

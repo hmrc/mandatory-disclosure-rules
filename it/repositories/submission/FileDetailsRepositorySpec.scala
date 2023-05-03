@@ -17,6 +17,7 @@
 package repositories.submission
 
 import base.SpecBase
+import config.AppConfig
 import metrics.MetricsService
 import models.submission._
 import models.xml.{FileErrorCode, FileErrors, ValidationErrors}
@@ -29,7 +30,11 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
 
   lazy val config              = app.injector.instanceOf[Configuration]
   lazy val metricsService      = app.injector.instanceOf[MetricsService]
-  override lazy val repository = new FileDetailsRepository(mongoComponent, config, metricsService)
+
+  private val mockAppConfig = mock[AppConfig]
+  when(mockAppConfig.cacheTtl) thenReturn 1
+
+  override lazy val repository = new FileDetailsRepository(mongoComponent, mockAppConfig, metricsService)
 
   val dateTimeNow: LocalDateTime = LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.MILLIS)
   val fileDetails: FileDetails =

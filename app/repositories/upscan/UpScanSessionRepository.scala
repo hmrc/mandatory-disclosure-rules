@@ -16,48 +16,55 @@
 
 package repositories.upscan
 
+import config.AppConfig
 import models.upscan._
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.Updates.set
-import org.mongodb.scala.model.{FindOneAndUpdateOptions, IndexModel, IndexOptions}
-import play.api.Configuration
+import org.mongodb.scala.model.{FindOneAndUpdateOptions, IndexModel, IndexOptions, Updates}
+import play.api.libs.json.Format
 import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
-import javax.inject.Singleton
 
+import java.time.{Clock, Instant}
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
-
-object UpScanSessionRepository {
-
-  def cacheTtl(config: Configuration): Int =
-    config.get[Int]("mongodb.timeToLiveInSeconds")
-
-  def indexes(config: Configuration) = Seq(
-    IndexModel(
-      ascending("lastUpdated"),
-      IndexOptions()
-        .name("up-scan-last-updated-index")
-        .expireAfter(cacheTtl(config), TimeUnit.SECONDS)
-    )
-  )
-}
 
 @Singleton
 class UpScanSessionRepository @Inject() (
-  val mongo: MongoComponent,
-  config: Configuration
+  mongoComponent: MongoComponent,
+  clock: Clock,
+  appConfig: AppConfig
 )(implicit ec: ExecutionContext)
     extends PlayMongoRepository[UploadSessionDetails](
-      mongoComponent = mongo,
+      mongoComponent = mongoComponent,
       collectionName = "upScanSessionRepository",
       domainFormat = UploadSessionDetails.format,
-      indexes = UpScanSessionRepository.indexes(config),
+      indexes = Seq(
+        IndexModel(
+          ascending("lastUpdated"),
+          IndexOptions()
+            .name("up-scan-last-updated-index")
+            .expireAfter(appConfig.cacheTtl, TimeUnit.SECONDS)
+        ),
+        IndexModel(ascending("uploadId"),
+                   IndexOptions()
+                     .name("uploadId-index")
+                     .unique(false)
+        ),
+        IndexModel(ascending("reference.value"),
+                   IndexOptions()
+                     .name("reference-index")
+                     .unique(false)
+        )
+      ),
       replaceIndexes = true
     ) {
+
+  implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 
   def findByUploadId(uploadId: UploadId): Future[Option[UploadSessionDetails]] =
     collection
@@ -70,8 +77,11 @@ class UpScanSessionRepository @Inject() (
     newStatus: UploadStatus
   ): Future[Boolean] = {
 
-    val filter: Bson   = equal("reference.value", Codecs.toBson(reference.value))
-    val modifier: Bson = set("status", Codecs.toBson(newStatus))
+    val filter: Bson = equal("reference.value", Codecs.toBson(reference.value))
+    val modifier: Bson = Updates.combine(
+      set("status", Codecs.toBson(newStatus)),
+      set("lastUpdated", Instant.now(clock))
+    )
     val options: FindOneAndUpdateOptions =
       FindOneAndUpdateOptions().upsert(true)
 
