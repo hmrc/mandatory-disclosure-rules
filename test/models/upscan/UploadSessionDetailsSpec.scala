@@ -229,6 +229,7 @@ class UploadSessionDetailsSpec extends SpecBase {
           |     "$date": {
           |           "$numberLong":"1682406843785"
           |         }
+          |   }
           |}""".stripMargin
 
       val uploadSessionDetails = UploadSessionDetails(

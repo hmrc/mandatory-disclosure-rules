@@ -59,7 +59,15 @@ class SubmissionService @Inject() (
     val submissionTime           = DateTimeFormatUtil.zonedDateTimeNow.toLocalDateTime
     val conversationId           = ConversationId()
     val uploadedXmlNode: NodeSeq = xml \\ "MDR_OECD"
-    val submissionDetails        = FileDetails(conversationId, subscriptionId, messageSpecData.messageRefId, Pending, fileName, submissionTime, submissionTime)
+    val submissionDetails = FileDetails(conversationId,
+                                        subscriptionId,
+                                        messageSpecData.messageRefId,
+                                        Some(messageSpecData.reportType),
+                                        Pending,
+                                        fileName,
+                                        submissionTime,
+                                        submissionTime
+    )
 
     val mimeType = "application/xml"
 

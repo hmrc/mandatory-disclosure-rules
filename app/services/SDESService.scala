@@ -53,6 +53,7 @@ class SDESServiceImpl @Inject() (sdesConnector: SDESConnector, fileDetailsReposi
           correlationID,
           submissionDetails.enrolmentId,
           submissionDetails.messageSpecData.messageRefId,
+          Some(submissionDetails.messageSpecData.reportType),
           Pending,
           submissionDetails.fileName,
           submissionTime,
