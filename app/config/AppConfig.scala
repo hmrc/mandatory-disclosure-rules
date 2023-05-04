@@ -63,4 +63,5 @@ class AppConfig @Inject() (
 
   //TODO: Remove this after a successful production deployment
   lazy val dropUpscanSessionCollection: Boolean = config.get[Boolean]("mongodb.upScanSessionRepository.dropCollection")
+  lazy val mongodbUri: String                   = config.get[String]("mongodb.uri")
 }

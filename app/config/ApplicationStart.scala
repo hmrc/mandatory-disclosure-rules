@@ -28,7 +28,7 @@ class ApplicationStart @Inject() (appConfig: AppConfig)(implicit ec: ExecutionCo
 
   def dropMongoCollection(db: String, collection: String): Unit = {
 
-    val mongoClient: MongoClient = MongoClient()
+    val mongoClient: MongoClient = MongoClient(appConfig.mongodbUri)
 
     val dropCollection = mongoClient
       .getDatabase(db)
