@@ -39,7 +39,7 @@ class FileTransferNotificationSpec extends SpecBase {
         Some(recipientOrSender),
         submissionDetails.fileName,
         Some(submissionDetails.documentUrl),
-        Checksum(SHA256, submissionDetails.checkSum),
+        Checksum(SHA2, submissionDetails.checkSum),
         submissionDetails.fileSize.toInt,
         List.empty[Property]
       ),
@@ -54,7 +54,7 @@ class FileTransferNotificationSpec extends SpecBase {
     "must serialise to json correctly" in {
       val expectedJson =
         """{"informationType":"0123456789","file":{"recipientOrSender":"mdr","name":"test.xml",
-          |"location":"http://localhost/","checksum":{"algorithm":"SHA-256","value":"1234"},
+          |"location":"http://localhost/","checksum":{"algorithm":"SHA2","value":"1234"},
           |"size":12345,"properties":[]},"audit":{"correlationID":"aa928"}}""".stripMargin
 
       Json.toJson(fileTransferNotification) mustBe Json.parse(expectedJson)
@@ -62,7 +62,7 @@ class FileTransferNotificationSpec extends SpecBase {
     "must deserialise from json" in {
       val jsonString =
         """{"informationType":"0123456789","file":{"recipientOrSender":"mdr","name":"test.xml",
-          |"location":"http://localhost/","checksum":{"algorithm":"SHA-256","value":"1234"},
+          |"location":"http://localhost/","checksum":{"algorithm":"SHA2","value":"1234"},
           |"size":12345,"properties":[]},"audit":{"correlationID":"aa928"}}""".stripMargin
       val fileTransferNotificationJson = Json.parse(jsonString)
 

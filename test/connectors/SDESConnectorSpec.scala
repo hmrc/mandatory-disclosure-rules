@@ -40,7 +40,7 @@ class SDESConnectorSpec extends SpecBase with WireMockServerHandler with Generat
   "SDESConnector" - {
     "fileready must return status as NO-CONTENT for success" in {
       stubResponse(
-        "/notification/fileready",
+        "/sdes-stub/notification/fileready",
         NO_CONTENT
       )
 
@@ -54,7 +54,7 @@ class SDESConnectorSpec extends SpecBase with WireMockServerHandler with Generat
 
     "fileready must BAD-REQUEST for an incorrect submission" in {
       stubResponse(
-        "/notification/fileready",
+        "/sdes-stub/notification/fileready",
         BAD_REQUEST
       )
 
@@ -68,7 +68,7 @@ class SDESConnectorSpec extends SpecBase with WireMockServerHandler with Generat
 
     "fileready must INTERNAL_SERVER_ERROR when a server error occurs" in {
       stubResponse(
-        "/notification/fileready",
+        "/sdes-stub/notification/fileready",
         INTERNAL_SERVER_ERROR
       )
 
