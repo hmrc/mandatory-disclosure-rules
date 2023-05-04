@@ -16,7 +16,6 @@
 
 package controllers
 
-import controllers.auth.IdentifierAuthAction
 import models.sdes.NotificationType.{FileProcessed, FileProcessingFailure, FileReady, FileReceived}
 import models.sdes._
 import models.submission.TransferFailure
@@ -29,7 +28,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SDESCallbackController @Inject() (
-  //authenticate: IdentifierAuthAction, //tax-frauds does not authenticate so might not be able to use this
+  //authenticate: IdentifierAuthAction, //ToDo tax-frauds does not authenticate can we use it
   fileDetailsRepository: FileDetailsRepository,
   cc: ControllerComponents
 )(implicit ec: ExecutionContext)

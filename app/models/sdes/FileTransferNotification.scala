@@ -39,7 +39,7 @@ case object SHA2 extends Algorithm
 object Algorithm {
   implicit val writes: Writes[Algorithm] = Writes[Algorithm] {
     case MD5  => JsString("md5")
-    case SHA1 => JsString("SHA1")
+    case SHA1 => JsString("SHA1") //Todo Stubs use these values but Swagger document states SHA-256 and SHA512 have to confim
     case SHA2 => JsString("SHA2")
   }
   implicit val reads: Reads[Algorithm] = Reads[Algorithm] {
@@ -88,7 +88,12 @@ case class FileTransferNotification(
 object FileTransferNotification {
   implicit val format: OFormat[FileTransferNotification] = Json.format[FileTransferNotification]
 
-  def apply(submissionDetails: SubmissionDetails, informationType: String, recipientOrSender: String, correlationId: String): FileTransferNotification =
+  def apply(submissionDetails: SubmissionDetails,
+            informationType: String,
+            recipientOrSender: String,
+            correlationId: String,
+            metaData: Option[Map[String, String]] = None
+  ): FileTransferNotification =
     FileTransferNotification(
       informationType,
       File(
@@ -97,10 +102,14 @@ object FileTransferNotification {
         Some(submissionDetails.documentUrl),
         Checksum(SHA2, submissionDetails.checkSum),
         submissionDetails.fileSize.toInt,
-        List.empty[Property] //ToDo metaData will be transferred here ?
+        if (metaData.isEmpty) {
+          List.empty[Property]
+        } else mapToProperty(metaData.get)
       ),
       Audit(
         correlationId
       )
     )
+
+  private def mapToProperty(metaData: Map[String, String]): List[Property] = metaData.toList map { md => Property(md._1, md._2) }
 }
