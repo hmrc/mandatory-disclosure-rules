@@ -63,8 +63,10 @@ class AppConfig @Inject() (
   lazy val sdesInformationType: String =
     config.get[String]("sdes.information-type")
 
+  private val apiLocation: Option[String] = Some(config.get[String]("sdes.location")).filter(_.nonEmpty)
+
   lazy val sdesUrl: String =
-    List(Some(servicesConfig.baseUrl("sdes")), Some("notification"), Some("fileready")).flatten.mkString("/")
+    List(Some(servicesConfig.baseUrl("sdes")), apiLocation, Some("notification"), Some("fileready")).flatten.mkString("/")
 
   lazy val maxNormalFileSize = config.get[String]("max-normal-file-size").toInt
 
