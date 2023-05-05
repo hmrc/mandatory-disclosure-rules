@@ -28,7 +28,7 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SDESCallbackController @Inject() (
-  //authenticate: IdentifierAuthAction, //ToDo tax-frauds does not authenticate can we use it
+  //authenticate: IdentifierAuthAction, //ToDo tax-frauds does not authenticate can we use it?
   fileDetailsRepository: FileDetailsRepository,
   cc: ControllerComponents
 )(implicit ec: ExecutionContext)
@@ -53,6 +53,7 @@ class SDESCallbackController @Inject() (
               Future.successful(Ok)
             case FileProcessingFailure =>
               logger.warn(s"SDES transfer failed with message ${callBackNotification.failureReason}")
+              //ToDo check that we are not overwriting and EIS response
               fileDetailsRepository.updateStatus(callBackNotification.correlationID, TransferFailure).map(_ => Ok)
             case FileProcessed =>
               logger.info(s"Processing FileProcessed") //ToDo update logging

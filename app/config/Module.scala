@@ -18,7 +18,7 @@ package config
 
 import com.google.inject.AbstractModule
 import handlers.{XmlHandler, XmlHandlerImpl}
-import services.{SDESService, SDESServiceImpl}
+import services.submission.{SDESService, SDESServiceImpl}
 import services.upscan.{MongoBackedUploadProgressTracker, UploadProgressTracker}
 
 import java.time.{Clock, ZoneOffset}

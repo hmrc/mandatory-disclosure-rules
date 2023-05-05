@@ -37,9 +37,8 @@ import play.api.mvc.Result
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import repositories.submission.FileDetailsRepository
-import services.SDESService
 import services.audit.AuditService
-import services.submission.TransformService
+import services.submission.{SDESService, TransformService}
 import services.subscription.SubscriptionService
 import services.validation.XMLValidationService
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}

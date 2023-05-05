@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package services
+package services.submission
 
 import config.AppConfig
 import connectors.SDESConnector
@@ -40,8 +40,12 @@ class SDESServiceImpl @Inject() (sdesConnector: SDESConnector, fileDetailsReposi
     with Logging {
 
   override def fileNotify(submissionDetails: SubmissionDetails)(implicit hc: HeaderCarrier): Future[Either[Exception, ConversationId]] = {
-    val correlationID     = ConversationId() //CorrelationID is also a UUID so using ConversationId for compatibility with FileDetailsRepository
-    val fileNotifyRequest = FileTransferNotification(submissionDetails, appConfig.sdesInformationType, appConfig.sdesRecipientOrSender, correlationID.value)
+    val correlationID = ConversationId() //CorrelationID is also a UUID so using ConversationId for compatibility with FileDetailsRepository
+    val fileNotifyRequest = FileNotificationHelper.createFileNotificationRequest(submissionDetails,
+                                                                                 appConfig.sdesInformationType,
+                                                                                 appConfig.sdesRecipientOrSender,
+                                                                                 correlationID.value
+    )
     logger.debug(s"SDES notification request: ${Json.stringify(Json.toJson(fileNotifyRequest))}")
     sdesConnector.fileReady(fileNotifyRequest).flatMap {
       case Right(_) =>

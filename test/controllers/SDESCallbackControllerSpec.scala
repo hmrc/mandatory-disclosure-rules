@@ -19,7 +19,7 @@ package controllers
 import base.SpecBase
 import models.sdes.NotificationCallback
 import models.sdes.NotificationType.{FileProcessed, FileProcessingFailure, FileReady, FileReceived}
-import models.submission.{ConversationId, FileDetails, TransferFailure}
+import models.submission.{ConversationId, FileDetails, ReportType, SingleNewInformation, TransferFailure}
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.http.Status.OK
@@ -51,7 +51,16 @@ class SDESCallbackControllerSpec extends SpecBase with BeforeAndAfterEach {
 
       val sdesResponse = NotificationCallback(FileProcessingFailure, "test.xml", "ci1234", Some("Error"))
       val fileDetails =
-        FileDetails(ConversationId("ci1234"), "subscriptionId", "messageRefId", TransferFailure, "file1.xml", LocalDateTime.now(), LocalDateTime.now())
+        FileDetails(
+          ConversationId("ci1234"),
+          "subscriptionId",
+          "messageRefId",
+          Some(SingleNewInformation),
+          TransferFailure,
+          "file1.xml",
+          LocalDateTime.now(),
+          LocalDateTime.now()
+        )
       when(mockFileDetailsRepository.updateStatus("ci1234", TransferFailure)).thenReturn(Future.successful(Some(fileDetails)))
 
       val request = FakeRequest(POST, routes.SDESCallbackController.callback.url)

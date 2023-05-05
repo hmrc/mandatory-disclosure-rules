@@ -19,11 +19,10 @@ package models.sdes
 import base.SpecBase
 import models.submission.{MDR401, MessageSpecData, MultipleNewInformation}
 import models.submissions.SubmissionDetails
-import play.api.libs.json.Json
 
-class FileTransferNotificationSpec extends SpecBase {
+class FileNotificationHelperSpec extends SpecBase {
 
-  "FileTransferNotification" - {
+  "FileNotificationHelper" - {
     val messageSpec       = MessageSpecData("x9999", MDR401, 2, "OECD1", MultipleNewInformation)
     val information       = "0123456789"
     val recipientOrSender = "mdr"
@@ -46,22 +45,8 @@ class FileTransferNotificationSpec extends SpecBase {
         correlationID
       )
     )
-    "must serialise to json correctly" in {
-      val expectedJson =
-        """{"informationType":"0123456789","file":{"recipientOrSender":"mdr","name":"test.xml",
-          |"location":"http://localhost/","checksum":{"algorithm":"SHA2","value":"1234"},
-          |"size":12345,"properties":[]},"audit":{"correlationID":"aa928"}}""".stripMargin
-
-      Json.toJson(fileTransferNotification) mustBe Json.parse(expectedJson)
-    }
-    "must deserialise from json" in {
-      val jsonString =
-        """{"informationType":"0123456789","file":{"recipientOrSender":"mdr","name":"test.xml",
-          |"location":"http://localhost/","checksum":{"algorithm":"SHA2","value":"1234"},
-          |"size":12345,"properties":[]},"audit":{"correlationID":"aa928"}}""".stripMargin
-      val fileTransferNotificationJson = Json.parse(jsonString)
-
-      fileTransferNotificationJson.as[FileTransferNotification] mustBe fileTransferNotification
+    "must correctly create a FileTransferNotification from submissionDetails and config" in {
+      FileNotificationHelper.createFileNotificationRequest(submissionDetails, information, recipientOrSender, correlationID) mustBe fileTransferNotification
     }
   }
 }

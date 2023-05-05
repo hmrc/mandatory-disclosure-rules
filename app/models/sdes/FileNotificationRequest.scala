@@ -87,29 +87,4 @@ case class FileTransferNotification(
 
 object FileTransferNotification {
   implicit val format: OFormat[FileTransferNotification] = Json.format[FileTransferNotification]
-
-  def apply(submissionDetails: SubmissionDetails,
-            informationType: String,
-            recipientOrSender: String,
-            correlationId: String,
-            metaData: Option[Map[String, String]] = None
-  ): FileTransferNotification =
-    FileTransferNotification(
-      informationType,
-      File(
-        Some(recipientOrSender),
-        submissionDetails.fileName,
-        Some(submissionDetails.documentUrl),
-        Checksum(SHA2, submissionDetails.checkSum),
-        submissionDetails.fileSize.toInt,
-        if (metaData.isEmpty) {
-          List.empty[Property]
-        } else mapToProperty(metaData.get)
-      ),
-      Audit(
-        correlationId
-      )
-    )
-
-  private def mapToProperty(metaData: Map[String, String]): List[Property] = metaData.toList map { md => Property(md._1, md._2) }
 }
