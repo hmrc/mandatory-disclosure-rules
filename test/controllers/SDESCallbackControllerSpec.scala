@@ -22,7 +22,7 @@ import models.sdes.NotificationType.{FileProcessed, FileProcessingFailure, FileR
 import models.submission.{ConversationId, FileDetails, ReportType, SingleNewInformation, TransferFailure}
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
-import play.api.http.Status.OK
+import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
@@ -100,6 +100,14 @@ class SDESCallbackControllerSpec extends SpecBase with BeforeAndAfterEach {
       val result = route(application, request).value
 
       status(result) mustEqual OK
+    }
+    "must return InternalServer error when receiving and invalid json request" in {
+      val request = FakeRequest(POST, routes.SDESCallbackController.callback.url)
+        .withJsonBody(Json.parse("""{"name":"value"}"""))
+
+      val result = route(application, request).value
+
+      status(result) mustEqual INTERNAL_SERVER_ERROR
     }
   }
 }

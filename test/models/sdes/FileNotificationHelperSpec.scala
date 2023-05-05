@@ -48,5 +48,18 @@ class FileNotificationHelperSpec extends SpecBase {
     "must correctly create a FileTransferNotification from submissionDetails and config" in {
       FileNotificationHelper.createFileNotificationRequest(submissionDetails, information, recipientOrSender, correlationID) mustBe fileTransferNotification
     }
+    "must correctly create a FileTransferNotification from submissionDetails and config with metadata" in {
+      val metaData     = Map[String, String]("filename" -> "test", "id" -> "123")
+      val propertyList = List(Property("filename", "test"), Property("id", "123"))
+      val fileInfo     = fileTransferNotification.file.copy(properties = propertyList)
+
+      val fileTransferNotificationWithProperties = fileTransferNotification.copy(file = fileInfo)
+      FileNotificationHelper.createFileNotificationRequest(submissionDetails,
+                                                           information,
+                                                           recipientOrSender,
+                                                           correlationID,
+                                                           Some(metaData)
+      ) mustBe fileTransferNotificationWithProperties
+    }
   }
 }
