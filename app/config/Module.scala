@@ -29,7 +29,6 @@ class Module() extends AbstractModule {
     bind(classOf[UploadProgressTracker]).to(classOf[MongoBackedUploadProgressTracker])
     bind(classOf[XmlHandler]).to(classOf[XmlHandlerImpl]).asEagerSingleton()
     bind(classOf[Clock]).toInstance(Clock.systemDefaultZone.withZone(ZoneOffset.UTC))
-    bind(classOf[ApplicationStart]).asEagerSingleton() //TODO: Remove this line after a successful production deployment
     bind(classOf[SDESService]).to(classOf[SDESServiceImpl]).asEagerSingleton()
   }
 }

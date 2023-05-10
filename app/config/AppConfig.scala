@@ -16,9 +16,10 @@
 
 package config
 
-import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class AppConfig @Inject() (
@@ -76,6 +77,4 @@ class AppConfig @Inject() (
   lazy val cacheTtl: Int      = config.get[Int]("mongodb.timeToLiveInSeconds")
   lazy val submissionTtl: Int = config.get[Int]("mongodb.submission.timeToLiveInDays")
 
-  //TODO: Remove this after a successful production deployment
-  lazy val dropUpscanSessionCollection: Boolean = config.get[Boolean]("mongodb.upScanSessionRepository.dropCollection")
 }
