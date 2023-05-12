@@ -17,17 +17,20 @@
 package helpers
 
 import models.validation.{GenericError, Message, SaxParseError}
+import play.api.Logging
 
 import java.time.format.{DateTimeFormatter, DateTimeParseException}
 import scala.collection.mutable.ListBuffer
 import scala.util.{Failure, Try}
 
-class XmlErrorMessageHelper extends SaxParseErrorRegExConstants {
+class XmlErrorMessageHelper extends SaxParseErrorRegExConstants with Logging {
 
   val defaultMessage = "xml.defaultMessage"
 
   def generateErrorMessages(errors: ListBuffer[SaxParseError]): List[GenericError] = {
     val errorsGroupedByLineNumber = errors.groupBy(saxParseError => saxParseError.lineNumber)
+
+    logger.warn(s"Schema validation failed: $errorsGroupedByLineNumber")
 
     errorsGroupedByLineNumber.map { groupedErrors =>
       if (groupedErrors._2.length <= 2) {
