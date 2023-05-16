@@ -47,7 +47,7 @@ class SubmissionController @Inject() (
       .fold(
         invalid = _ => Future.successful(InternalServerError),
         valid = submission =>
-          if (submission.fileSize > appConfig.maxNormalFileSize) {
+          if (submission.fileSize > appConfig.maxNormalFileSize && appConfig.sdesFileTransfer) {
             sdesService.fileNotify(submission) map {
               case Right(conversationId) => Ok(Json.toJson(conversationId))
               case Left(e) =>
