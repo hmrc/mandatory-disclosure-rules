@@ -56,10 +56,26 @@ class AppConfig @Inject() (
 
   lazy val sendEmailUrl: String = servicesConfig.baseUrl("email")
 
+  lazy val sdesclientId: String = config.get[String]("sdes.client-id")
+
+  lazy val sdesRecipientOrSender: String =
+    config.get[String]("sdes.recipient-or-sender")
+
+  lazy val sdesInformationType: String =
+    config.get[String]("sdes.information-type")
+
+  private val apiLocation: Option[String] = Some(config.get[String]("sdes.location")).filter(_.nonEmpty)
+
+  lazy val sdesUrl: String =
+    List(Some(servicesConfig.baseUrl("sdes")), apiLocation, Some("notification"), Some("fileready")).flatten.mkString("/")
+
+  lazy val maxNormalFileSize = config.get[String]("max-normal-file-size").toInt
+
   lazy val emailSuccessfulTemplate: String   = config.get[String]("emailTemplates.fileUploadSuccessful")
   lazy val emailUnsuccessfulTemplate: String = config.get[String]("emailTemplates.fileUploadUnsuccessful")
 
   lazy val cacheTtl: Int      = config.get[Int]("mongodb.timeToLiveInSeconds")
   lazy val submissionTtl: Int = config.get[Int]("mongodb.submission.timeToLiveInDays")
 
+  lazy val sdesFileTransfer: Boolean = config.get[Boolean]("features.sdesFileTransfer")
 }

@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-package models.submission
+package models.sdes
 
-import julienrf.json.derived
-import models.xml.ValidationErrors
-import play.api.libs.json.OFormat
+import play.api.libs.json.{Json, OFormat}
 
-sealed trait FileStatus
+final case class NotificationCallback(
+  notification: NotificationType,
+  filename: String,
+  correlationID: String,
+  failureReason: Option[String]
+)
 
-case object Pending extends FileStatus
-case object Accepted extends FileStatus
-case object TransferFailure extends FileStatus //ToDo this is a dummy value
-case class Rejected(error: ValidationErrors) extends FileStatus {
-  override def toString: String = "Rejected"
-}
-
-object FileStatus {
-  implicit val format: OFormat[FileStatus] = derived.oformat()
+object NotificationCallback {
+  implicit val format: OFormat[NotificationCallback] = Json.format
 }

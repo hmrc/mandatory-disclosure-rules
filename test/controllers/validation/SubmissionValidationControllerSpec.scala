@@ -35,7 +35,7 @@ import scala.concurrent.Future
 class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEach {
 
   val mockUploadSubmissionValidationEngine: UploadedXmlValidationEngine = mock[UploadedXmlValidationEngine]
-  val messageSpecData: MessageSpecData                                  = MessageSpecData("XBC99999999999", MDR401, 2, MultipleNewInformation)
+  val messageSpecData: MessageSpecData                                  = MessageSpecData("XBC99999999999", MDR401, 2, "OECD1", MultipleNewInformation)
 
   val application: Application =
     applicationBuilder()
