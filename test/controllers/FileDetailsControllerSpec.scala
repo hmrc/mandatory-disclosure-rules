@@ -173,5 +173,18 @@ class FileDetailsControllerSpec extends SpecBase with BeforeAndAfterEach {
       status(result) mustBe OK
       contentAsJson(result).as[FileStatus] mustBe Rejected(validationErrors)
     }
+
+    "must return Not Found FileStatus for the given 'conversationId'" in {
+      when(mockFileDetailsRepository.findStatusByConversationId(any[ConversationId]()))
+        .thenReturn(Future.successful(None))
+
+      val request =
+        FakeRequest(GET, routes.FileDetailsController.getStatus(conversationId).url)
+
+      val result = route(application, request).value
+
+      status(result) mustBe 404
+    }
+
   }
 }
