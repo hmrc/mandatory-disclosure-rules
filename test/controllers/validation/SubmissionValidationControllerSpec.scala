@@ -27,7 +27,7 @@ import play.api.Application
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{status, POST, _}
+import play.api.test.Helpers.{POST, status, _}
 import services.validation.UploadedXmlValidationEngine
 
 import scala.concurrent.Future
@@ -77,6 +77,14 @@ class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEac
       val result  = route(application, request).value
 
       status(result) mustBe BAD_REQUEST
+    }
+
+    "return 500 and an internal server error when upscan URL is missing" in {
+      val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission.url).withJsonBody(Json.obj())
+      val result  = route(application, request).value
+
+      status(result) mustBe INTERNAL_SERVER_ERROR
+      contentAsString(result) mustBe "Missing upscan URL"
     }
 
   }
