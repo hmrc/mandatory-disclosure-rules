@@ -17,7 +17,7 @@
 package models.xml
 
 import base.SpecBase
-import com.lucidchart.open.xtract.{ParseFailure, ParseSuccess, XmlReader}
+import com.lucidchart.open.xtract.{ParseFailure, ParseSuccess}
 import models.xml.RecordErrorCode.UnknownRecordErrorCode
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import play.api.libs.json.{JsNull, JsString, Json, Writes}
@@ -57,24 +57,6 @@ class RecordErrorCodeSpec extends SpecBase {
       val errorCode = Json.fromJson[RecordErrorCode](json).asOpt
       errorCode mustBe Some(RecordErrorCode.UnknownRecordErrorCode("99998"))
     }
-
-//    "serialize to JSON correctly" in {
-//      val errorCode = RecordErrorCode.CorrDocRefIdUnknown
-//      val json = Json.toJson(errorCode)
-//      json shouldBe JsString(errorCode.code)
-//    }
-//
-//    "serialize to JSON for unknown error code correctly" in {
-//      val errorCode = RecordErrorCode.UnknownRecordErrorCode("90000")
-//      val json = Json.toJson(errorCode)
-//      json shouldBe JsString(errorCode.code)
-//    }
-
-//    "deserialize from JSON with missing code should return None" in {
-//      val json      = JsString("")
-//      val errorCode = Json.fromJson[RecordErrorCode](json).asOpt
-//      errorCode shouldBe None
-//    }
 
     "deserialize from JSON with null value should return None" in {
       val json      = JsNull
