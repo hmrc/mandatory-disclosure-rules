@@ -14,44 +14,57 @@
  * limitations under the License.
  */
 
-package models.validation
-
 import base.SpecBase
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import models.validation.{GenericError, Message}
 import play.api.libs.json.Json
 
 class GenericErrorSpec extends SpecBase {
 
   "GenericError" - {
-
     "serialize to JSON" in {
-      val error = GenericError(1, Message("error.key", Seq("arg1", "arg2")))
-      val expectedJson = Json.obj(
-        "lineNumber" -> 1,
-        "message" -> Json.obj(
-          "messageKey" -> "error.key",
-          "args"       -> Seq("arg1", "arg2")
-        )
-      )
+      val message      = Message("error.message", Seq("param1", "param2"))
+      val genericError = GenericError(123, message)
+      val expectedJson = Json.parse("""
+                                      |{
+                                      |  "lineNumber": 123,
+                                      |  "message": {
+                                      |    "messageKey": "error.message",
+                                      |    "args": ["param1", "param2"]
+                                      |  }
+                                      |}
+                                      |""".stripMargin)
 
-      val json = Json.toJson(error)
+      val json = Json.toJson(genericError)
 
       json mustBe expectedJson
     }
 
     "deserialize from JSON" in {
-      val json = Json.obj(
-        "lineNumber" -> 1,
-        "message" -> Json.obj(
-          "messageKey" -> "error.key",
-          "args"       -> Seq("arg1", "arg2")
-        )
-      )
-      val expectedError = GenericError(1, Message("error.key", Seq("arg1", "arg2")))
+      val json = Json.parse("""
+                              |{
+                              |  "lineNumber": 456,
+                              |  "message": {
+                              |    "messageKey": "another.error",
+                              |    "args": []
+                              |  }
+                              |}
+                              |""".stripMargin)
+      val expectedGenericError = GenericError(456, Message("another.error"))
 
-      val error = Json.fromJson[GenericError](json).get
+      val genericError = json.as[GenericError]
 
-      error mustBe expectedError
+      genericError mustBe expectedGenericError
+    }
+
+    "order by lineNumber and messageKey" in {
+      val genericError1 = GenericError(123, Message("error.message", Seq("param1", "param2")))
+      val genericError2 = GenericError(456, Message("another.error"))
+      val genericError3 = GenericError(123, Message("another.error"))
+
+      val orderedErrors = List(genericError1, genericError2, genericError3).sorted
+
+      orderedErrors mustBe List(genericError3, genericError1, genericError2)
     }
   }
+
 }
