@@ -13,7 +13,6 @@ object ScoverageSettings {
     "testOnly.*",
     ".*testOnlyDoNotUseInAppConf.*",
     ".*repositories.*",
-    ".*handlers.*",
     ".*validation.GenericError"
   )
 
