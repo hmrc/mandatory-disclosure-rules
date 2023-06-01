@@ -18,8 +18,10 @@ package models.xml
 
 import base.SpecBase
 import com.lucidchart.open.xtract.{ParseFailure, ParseSuccess}
-import models.xml.FileErrorCode.UnknownFileErrorCode
+import models.xml.FileErrorCode.{MessageRefIDHasAlreadyBeenUsed, UnknownFileErrorCode}
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
+import play.api.libs.json.{JsString, Json}
 
 class FileErrorCodeSpec extends SpecBase with ScalaCheckPropertyChecks {
 
@@ -39,6 +41,28 @@ class FileErrorCodeSpec extends SpecBase with ScalaCheckPropertyChecks {
     "return ParseFailureError for invalid value" in {
       val xml = <Code>Invalid</Code>
       FileErrorCode.xmlReads.read(xml) mustBe an[ParseFailure]
+    }
+
+    "deserialize from JSON correctly" in {
+      val json      = JsString("50009")
+      val errorCode = Json.fromJson[FileErrorCode](json).asOpt
+      errorCode shouldBe Some(MessageRefIDHasAlreadyBeenUsed)
+    }
+
+    "deserialize from JSON with unknown code correctly" in {
+      val json      = JsString("99998")
+      val errorCode = Json.fromJson[FileErrorCode](json).asOpt
+      errorCode shouldBe Some(UnknownFileErrorCode("99998"))
+    }
+
+    "read unknown errorCode from XML" in {
+      val xml = <Code>50000</Code>
+      FileErrorCode.xmlReads.read(xml) shouldBe ParseSuccess(UnknownFileErrorCode("50000"))
+    }
+
+    "return ParseFailure for invalid value from XML" in {
+      val xml = <Code>Invalid</Code>
+      FileErrorCode.xmlReads.read(xml) shouldBe an[ParseFailure]
     }
   }
 }

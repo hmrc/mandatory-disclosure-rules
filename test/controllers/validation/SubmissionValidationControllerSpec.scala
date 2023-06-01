@@ -79,6 +79,14 @@ class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEac
       status(result) mustBe BAD_REQUEST
     }
 
+    "return 500 and an internal server error when upscan URL is missing" in {
+      val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission.url).withJsonBody(Json.obj())
+      val result  = route(application, request).value
+
+      status(result) mustBe INTERNAL_SERVER_ERROR
+      contentAsString(result) mustBe "Missing upscan URL"
+    }
+
   }
 
 }

@@ -19,8 +19,14 @@ package models.xml
 import base.SpecBase
 import com.lucidchart.open.xtract.{ParseFailure, ParseSuccess}
 import models.xml.RecordErrorCode.UnknownRecordErrorCode
+import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import play.api.libs.json.{JsNull, JsString, Json, Writes}
 
 class RecordErrorCodeSpec extends SpecBase {
+
+  implicit val errorCodeWrites: Writes[RecordErrorCode] = Writes[RecordErrorCode] { errorCode =>
+    JsString(errorCode.code)
+  }
 
   "RecordErrorCode" - {
     "read errorCode" in {
@@ -39,5 +45,24 @@ class RecordErrorCodeSpec extends SpecBase {
       val xml = <Code>Invalid</Code>
       RecordErrorCode.xmlReads.read(xml) mustBe an[ParseFailure]
     }
+
+    "deserialize from JSON correctly" in {
+      val json      = JsString("80005")
+      val errorCode = Json.fromJson[RecordErrorCode](json).asOpt
+      errorCode mustBe Some(RecordErrorCode.MissingCorrDocRefId)
+    }
+
+    "deserialize from JSON with unknown code correctly" in {
+      val json      = JsString("99998")
+      val errorCode = Json.fromJson[RecordErrorCode](json).asOpt
+      errorCode mustBe Some(RecordErrorCode.UnknownRecordErrorCode("99998"))
+    }
+
+    "deserialize from JSON with null value should return None" in {
+      val json      = JsNull
+      val errorCode = Json.fromJson[RecordErrorCode](json).asOpt
+      errorCode shouldBe None
+    }
+
   }
 }
