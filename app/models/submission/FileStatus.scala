@@ -24,7 +24,8 @@ sealed trait FileStatus
 
 case object Pending extends FileStatus
 case object Accepted extends FileStatus
-case object TransferFailure extends FileStatus //ToDo this is a dummy value
+case object RejectedSDES extends FileStatus
+case object RejectedSDESVirus extends FileStatus
 case class Rejected(error: ValidationErrors) extends FileStatus {
   override def toString: String = "Rejected"
 }
