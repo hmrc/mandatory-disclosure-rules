@@ -16,11 +16,7 @@
 
 package models.sdes
 
-import models.WithName
-import models.submissions.SubmissionDetails
-import play.api.libs.json.{JsError, JsString, JsSuccess, Json, OFormat, Reads, Writes}
-
-import java.util.UUID
+import play.api.libs.json._
 
 case class Property(
   name: String,

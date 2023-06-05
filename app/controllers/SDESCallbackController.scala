@@ -18,7 +18,7 @@ package controllers
 
 import models.sdes.NotificationType.{FileProcessed, FileProcessingFailure, FileReady, FileReceived}
 import models.sdes._
-import models.submission.{Accepted, ConversationId, Pending, Rejected, RejectedSDES, RejectedSDESVirus}
+import models.submission.{ConversationId, Pending, RejectedSDES, RejectedSDESVirus}
 import play.api.Logging
 import play.api.mvc.ControllerComponents
 import repositories.submission.FileDetailsRepository
@@ -54,17 +54,21 @@ class SDESCallbackController @Inject() (
             case FileProcessingFailure =>
               logger.warn(s"SDES transfer failed with message ${callBackNotification.failureReason}")
               //ToDo check that we are not overwriting and EIS response
-              fileDetailsRepository.findByConversationId(ConversationId(callBackNotification.correlationID)) flatMap { case Some(fileDetails) =>
-                if (fileDetails.status == Pending) {
-                  if (callBackNotification.failureReason.getOrElse("").matches(".*virus.*")) {
-                    fileDetailsRepository.updateStatus(callBackNotification.correlationID, RejectedSDESVirus).map(_ => Ok)
+              fileDetailsRepository.findByConversationId(ConversationId(callBackNotification.correlationID)) flatMap {
+                case Some(fileDetails) =>
+                  if (fileDetails.status == Pending) {
+                    if (callBackNotification.failureReason.getOrElse("").matches(".*virus.*")) {
+                      fileDetailsRepository.updateStatus(callBackNotification.correlationID, RejectedSDESVirus).map(_ => Ok)
+                    } else {
+                      fileDetailsRepository.updateStatus(callBackNotification.correlationID, RejectedSDES).map(_ => Ok)
+                    }
                   } else {
-                    fileDetailsRepository.updateStatus(callBackNotification.correlationID, RejectedSDES).map(_ => Ok)
+                    logger.warn("SDESCallbackController: EIS has already responded") //ToDo confirm how we handle this case
+                    Future.successful(Ok)
                   }
-                } else {
-                  logger.warn("SDESCallbackController: EIS has already responded") //ToDo confirm how we handle this case
-                  Future.successful(Ok)
-                }
+                case None =>
+                  logger.warn(s"Cannot file correlation ID for callback: ${callBackNotification.correlationID}")
+                  Future.successful(Ok) //ToDo confirm error handling
               }
             case FileProcessed =>
               logger.info(s"Processing FileProcessed: ${callBackNotification.correlationID} awaiting EIS response")
