@@ -33,10 +33,10 @@ class EmailService @Inject() (emailConnector: EmailConnector, emailTemplate: Ema
   executionContext: ExecutionContext
 ) extends Logging {
 
-  def sendAndLogEmail(subscriptionId: String, submissionTime: String, messageRefId: String, isUploadSuccessful: Boolean)(implicit
+  def sendAndLogEmail(subscriptionId: String, submissionTime: String, messageRefId: String, isUploadSuccessful: Boolean, reportTypeMessage: String)(implicit
     hc: HeaderCarrier
   ): Future[Int] =
-    sendEmail(subscriptionId, submissionTime, messageRefId, isUploadSuccessful) map {
+    sendEmail(subscriptionId, submissionTime, messageRefId, isUploadSuccessful, reportTypeMessage) map {
       case Some(resp) =>
         resp.status match {
           case NOT_FOUND   => logger.warn("The template cannot be found within the email service")
@@ -56,7 +56,7 @@ class EmailService @Inject() (emailConnector: EmailConnector, emailTemplate: Ema
       case IndividualDetails(firstName, _, lastName) => s"$firstName $lastName"
     }
 
-  def sendEmail(subscriptionId: String, submissionTime: String, messageRefId: String, isUploadSuccessful: Boolean)(implicit
+  def sendEmail(subscriptionId: String, submissionTime: String, messageRefId: String, isUploadSuccessful: Boolean, reportTypeMessage: String)(implicit
     hc: HeaderCarrier
   ): Future[Option[HttpResponse]] =
     subscriptionService.getContactInformation(subscriptionId).flatMap {
@@ -72,7 +72,8 @@ class EmailService @Inject() (emailConnector: EmailConnector, emailTemplate: Ema
             .fold(Future.successful(Option.empty[HttpResponse])) { email =>
               emailConnector
                 .sendEmail(
-                  EmailRequest.fileUploadSubmission(email, contactName, emailTemplate.getTemplate(isUploadSuccessful), submissionTime, messageRefId)
+                  EmailRequest
+                    .fileUploadSubmission(email, contactName, emailTemplate.getTemplate(isUploadSuccessful), submissionTime, messageRefId, reportTypeMessage)
                 )
                 .map(Some.apply)
             }
@@ -83,7 +84,13 @@ class EmailService @Inject() (emailConnector: EmailConnector, emailTemplate: Ema
               emailConnector
                 .sendEmail(
                   EmailRequest
-                    .fileUploadSubmission(secondaryEmailAddress, secondaryName, emailTemplate.getTemplate(isUploadSuccessful), submissionTime, messageRefId)
+                    .fileUploadSubmission(secondaryEmailAddress,
+                                          secondaryName,
+                                          emailTemplate.getTemplate(isUploadSuccessful),
+                                          submissionTime,
+                                          messageRefId,
+                                          reportTypeMessage
+                    )
                 )
                 .map(Some.apply)
             }
