@@ -18,25 +18,21 @@ package controllers.testOnlyDoNotUseInAppConf
 
 import controllers.auth.IdentifierAuthAction
 import play.api.Logging
-import play.api.mvc.Action
-import play.api.mvc.ControllerComponents
+import play.api.mvc.{Action, ControllerComponents}
 import services.DataExtraction
 import services.submission.SubmissionService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
-import scala.xml.NodeSeq
-import controllers.auth.IdentifierAuthAction
-import scala.xml.Elem
+import scala.xml.{Elem, NodeSeq}
 
 class TestSubmissionController @Inject() (
   authenticate: IdentifierAuthAction,
   cc: ControllerComponents,
   dataExtraction: DataExtraction,
   submissionService: SubmissionService
-)(implicit ec: ExecutionContext)
-    extends BackendController(cc)
+)() extends BackendController(cc)
     with Logging {
 
   def submitDisclosureXML: Action[NodeSeq] = authenticate.async(parse.xml) { implicit request =>

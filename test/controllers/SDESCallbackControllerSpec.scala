@@ -19,7 +19,7 @@ package controllers
 import base.SpecBase
 import models.sdes.NotificationCallback
 import models.sdes.NotificationType.{FileProcessed, FileProcessingFailure, FileReady, FileReceived}
-import models.submission.{ConversationId, FileDetails, ReportType, SingleNewInformation, TransferFailure}
+import models.submission.{Accepted, ConversationId, FileDetails, Pending, RejectedSDES, RejectedSDESVirus, SingleNewInformation}
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
@@ -50,18 +50,32 @@ class SDESCallbackControllerSpec extends SpecBase with BeforeAndAfterEach {
     "must return Ok for a failure and update the fileRespositoryDatabase appropriately" in {
 
       val sdesResponse = NotificationCallback(FileProcessingFailure, "test.xml", "ci1234", Some("Error"))
+      val fileDetailsPending =
+        FileDetails(
+          ConversationId("ci1234"),
+          "subscriptionId",
+          "messageRefId",
+          Some(SingleNewInformation),
+          Pending,
+          "file1.xml",
+          LocalDateTime.now(),
+          LocalDateTime.now()
+        )
       val fileDetails =
         FileDetails(
           ConversationId("ci1234"),
           "subscriptionId",
           "messageRefId",
           Some(SingleNewInformation),
-          TransferFailure,
+          RejectedSDES,
           "file1.xml",
           LocalDateTime.now(),
           LocalDateTime.now()
         )
-      when(mockFileDetailsRepository.updateStatus("ci1234", TransferFailure)).thenReturn(Future.successful(Some(fileDetails)))
+
+      when(mockFileDetailsRepository.findByConversationId(ConversationId("ci1234"))).thenReturn(Future.successful(Some(fileDetailsPending)))
+
+      when(mockFileDetailsRepository.updateStatus("ci1234", RejectedSDES)).thenReturn(Future.successful(Some(fileDetails)))
 
       val request = FakeRequest(POST, routes.SDESCallbackController.callback.url)
         .withJsonBody(Json.toJson(sdesResponse))
@@ -69,7 +83,82 @@ class SDESCallbackControllerSpec extends SpecBase with BeforeAndAfterEach {
       val result = route(application, request).value
 
       status(result) mustEqual OK
-      verify(mockFileDetailsRepository, times(1)).updateStatus("ci1234", TransferFailure)
+      verify(mockFileDetailsRepository, times(1)).updateStatus("ci1234", RejectedSDES)
+    }
+    "must return Ok for a Virus failure and update the fileRespositoryDatabase appropriately" in {
+
+      val sdesResponse = NotificationCallback(FileProcessingFailure, "test.xml", "ci1234", Some("Error virus"))
+      val fileDetailsPending =
+        FileDetails(
+          ConversationId("ci1234"),
+          "subscriptionId",
+          "messageRefId",
+          Some(SingleNewInformation),
+          Pending,
+          "file1.xml",
+          LocalDateTime.now(),
+          LocalDateTime.now()
+        )
+      val fileDetails =
+        FileDetails(
+          ConversationId("ci1234"),
+          "subscriptionId",
+          "messageRefId",
+          Some(SingleNewInformation),
+          RejectedSDESVirus,
+          "file1.xml",
+          LocalDateTime.now(),
+          LocalDateTime.now()
+        )
+
+      when(mockFileDetailsRepository.findByConversationId(ConversationId("ci1234"))).thenReturn(Future.successful(Some(fileDetailsPending)))
+
+      when(mockFileDetailsRepository.updateStatus("ci1234", RejectedSDESVirus)).thenReturn(Future.successful(Some(fileDetails)))
+
+      val request = FakeRequest(POST, routes.SDESCallbackController.callback.url)
+        .withJsonBody(Json.toJson(sdesResponse))
+
+      val result = route(application, request).value
+
+      status(result) mustEqual OK
+      verify(mockFileDetailsRepository, times(1)).updateStatus("ci1234", RejectedSDESVirus)
+    }
+    "must return Ok for a when status returned form fileRespositoryDatabase is not pending" in {
+
+      val sdesResponse = NotificationCallback(FileProcessingFailure, "test.xml", "ci1234", Some("Error virus"))
+      val fileDetailsAccepted =
+        FileDetails(
+          ConversationId("ci1234"),
+          "subscriptionId",
+          "messageRefId",
+          Some(SingleNewInformation),
+          Accepted,
+          "file1.xml",
+          LocalDateTime.now(),
+          LocalDateTime.now()
+        )
+
+      when(mockFileDetailsRepository.findByConversationId(ConversationId("ci1234"))).thenReturn(Future.successful(Some(fileDetailsAccepted)))
+
+      val request = FakeRequest(POST, routes.SDESCallbackController.callback.url)
+        .withJsonBody(Json.toJson(sdesResponse))
+
+      val result = route(application, request).value
+
+      status(result) mustEqual OK
+    }
+    "must return Ok for when cannot find status from conversation ID" in {
+
+      val sdesResponse = NotificationCallback(FileProcessingFailure, "test.xml", "ci1234", Some("Error virus"))
+
+      when(mockFileDetailsRepository.findByConversationId(ConversationId("ci1234"))).thenReturn(Future.successful(None))
+
+      val request = FakeRequest(POST, routes.SDESCallbackController.callback.url)
+        .withJsonBody(Json.toJson(sdesResponse))
+
+      val result = route(application, request).value
+
+      status(result) mustEqual OK
     }
     "must return Ok for FileReady status" in {
       val sdesResponse = NotificationCallback(FileReady, "test.xml", "ci1234", Some("Error"))

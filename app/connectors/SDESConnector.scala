@@ -29,7 +29,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class SDESConnector @Inject() (
   val config: AppConfig,
   val http: HttpClient
-)(implicit ec: ExecutionContext) {
+)() {
 
   private val extraHeaders: Seq[(String, String)] = Seq("x-client-id" -> config.sdesclientId)
 
