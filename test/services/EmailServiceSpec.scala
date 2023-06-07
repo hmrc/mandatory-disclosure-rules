@@ -89,7 +89,7 @@ class EmailServiceSpec extends SpecBase with Generators with ScalaCheckPropertyC
             Future.successful(Right(ResponseDetail(subscriptionId, None, isGBUser = true, primaryContact, None)))
           )
 
-        val result = emailService.sendAndLogEmail(subscriptionId, submissionTime, messageRefId, isUploadSuccessful = true)
+        val result = emailService.sendAndLogEmail(subscriptionId, submissionTime, messageRefId, isUploadSuccessful = true, "test")
 
         whenReady(result) { result =>
           result mustBe ACCEPTED
@@ -109,7 +109,7 @@ class EmailServiceSpec extends SpecBase with Generators with ScalaCheckPropertyC
             Future.successful(Right(ResponseDetail(subscriptionId, None, isGBUser = true, primaryContact, None)))
           )
 
-        val result = emailService.sendAndLogEmail(subscriptionId, submissionTime, messageRefId, isUploadSuccessful = true)
+        val result = emailService.sendAndLogEmail(subscriptionId, submissionTime, messageRefId, isUploadSuccessful = true, "test")
 
         whenReady(result) { result =>
           result mustBe NOT_FOUND
@@ -129,7 +129,7 @@ class EmailServiceSpec extends SpecBase with Generators with ScalaCheckPropertyC
             Future.successful(Right(ResponseDetail(subscriptionId, None, isGBUser = true, primaryContact, None)))
           )
 
-        val result = emailService.sendAndLogEmail(subscriptionId, submissionTime, messageRefId, isUploadSuccessful = true)
+        val result = emailService.sendAndLogEmail(subscriptionId, submissionTime, messageRefId, isUploadSuccessful = true, "test")
 
         whenReady(result) { result =>
           result mustBe BAD_REQUEST
@@ -152,7 +152,7 @@ class EmailServiceSpec extends SpecBase with Generators with ScalaCheckPropertyC
             Future.successful(Right(ResponseDetail(subscriptionId, None, isGBUser = true, primaryContact, None)))
           )
 
-        val result = emailService.sendEmail(subscriptionId, submissionTime, messageRefId, isUploadSuccessful = true)
+        val result = emailService.sendEmail(subscriptionId, submissionTime, messageRefId, isUploadSuccessful = true, "test")
 
         whenReady(result) { result =>
           result.map(_.status) mustBe Some(OK)
@@ -173,7 +173,7 @@ class EmailServiceSpec extends SpecBase with Generators with ScalaCheckPropertyC
             Future.successful(Right(ResponseDetail(subscriptionId, None, isGBUser = true, primaryContact, Some(secondaryContact))))
           )
 
-        val result = emailService.sendEmail(subscriptionId, submissionTime, messageRefId, isUploadSuccessful = true)
+        val result = emailService.sendEmail(subscriptionId, submissionTime, messageRefId, isUploadSuccessful = true, "test")
 
         whenReady(result) { result =>
           result.map(_.status) mustBe Some(OK)
@@ -195,7 +195,7 @@ class EmailServiceSpec extends SpecBase with Generators with ScalaCheckPropertyC
           )
 
         val result =
-          emailService.sendEmail(subscriptionId, submissionTime, messageRefId, isUploadSuccessful = true)
+          emailService.sendEmail(subscriptionId, submissionTime, messageRefId, isUploadSuccessful = true, "test")
 
         whenReady(result) { result =>
           result.map(_.status) mustBe None
@@ -215,7 +215,7 @@ class EmailServiceSpec extends SpecBase with Generators with ScalaCheckPropertyC
           )
 
         val result =
-          emailService.sendEmail(subscriptionId, submissionTime, messageRefId, isUploadSuccessful = true)
+          emailService.sendEmail(subscriptionId, submissionTime, messageRefId, isUploadSuccessful = true, "test")
 
         whenReady(result) { result =>
           result.map(_.status) mustBe None
