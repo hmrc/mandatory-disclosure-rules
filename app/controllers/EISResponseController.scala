@@ -29,8 +29,7 @@ import models.submission.{
   ReportType,
   SingleCorrection,
   SingleDeletion,
-  SingleNewInformation,
-  SingleOther
+  SingleNewInformation
 }
 import models.xml.{BREResponse, ValidationStatus}
 import play.api.Logging
