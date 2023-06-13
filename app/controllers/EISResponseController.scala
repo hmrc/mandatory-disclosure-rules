@@ -20,18 +20,7 @@ import config.AppConfig
 import controllers.actions.EISResponsePreConditionCheckActionRefiner
 import controllers.auth.ValidateAuthTokenAction
 import models.audit.AuditType
-import models.submission.{
-  Accepted => FileStatusAccepted,
-  FileStatus,
-  MultipleCorrectionsDeletions,
-  MultipleNewInformation,
-  Rejected,
-  ReportType,
-  SingleCorrection,
-  SingleDeletion,
-  SingleNewInformation,
-  SingleOther
-}
+import models.submission.{Accepted => FileStatusAccepted, FileStatus, Rejected}
 import models.xml.{BREResponse, ValidationStatus}
 import play.api.Logging
 import play.api.libs.json.Json
@@ -81,8 +70,7 @@ class EISResponseController @Inject() (cc: ControllerComponents,
               updatedFileDetails.subscriptionId,
               DateTimeFormatUtil.displayFormattedDate(updatedFileDetails.submitted),
               updatedFileDetails.messageRefId,
-              updatedFileDetails.status == FileStatusAccepted,
-              reportTypeMessage(updatedFileDetails.reportType)
+              updatedFileDetails.status == FileStatusAccepted
             )
           case _ =>
             logger.warn("Upload file status is rejected on fast journey. No email has been sent")
@@ -93,14 +81,4 @@ class EISResponseController @Inject() (cc: ControllerComponents,
         InternalServerError
     }
   }
-
-  private def reportTypeMessage(reportType: Option[ReportType]): String =
-    reportType match {
-      case Some(MultipleNewInformation)       => "The file contains new information in multiple reports."
-      case Some(MultipleCorrectionsDeletions) => "The file contains corrections or deletions for multiple reports."
-      case Some(SingleNewInformation)         => "The file contains new information in one report."
-      case Some(SingleCorrection)             => "The file contains corrections in one report."
-      case Some(SingleDeletion)               => "The file contains a deletion of a previous report."
-      case _                                  => ""
-    }
 }
