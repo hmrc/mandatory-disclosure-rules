@@ -23,20 +23,14 @@ case class EmailRequest(to: List[String], templateId: String, parameters: Map[St
 object EmailRequest {
   implicit val format: OFormat[EmailRequest] = Json.format[EmailRequest]
 
-  def fileUploadSubmission(email: String,
-                           name: Option[String],
-                           emailTemplate: String,
-                           submissionTime: String,
-                           messageRefId: String,
-                           reportTypeMessage: String
-  ): EmailRequest = {
+  def fileUploadSubmission(email: String, name: Option[String], emailTemplate: String, submissionTime: String, messageRefId: String): EmailRequest = {
 
     val contactName = name.fold("Registrant")(name => name)
 
     EmailRequest(
       List(email),
       emailTemplate,
-      Map("dateAndTime" -> submissionTime, "messageRefId" -> messageRefId, "contactName" -> contactName, "reportTypeMessage" -> reportTypeMessage)
+      Map("dateAndTime" -> submissionTime, "messageRefId" -> messageRefId, "contactName" -> contactName)
     )
   }
 }
