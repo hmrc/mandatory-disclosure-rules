@@ -16,10 +16,9 @@
 
 package models.submission
 import play.api.libs.json._
-import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
-import javax.inject.Singleton
 
-import java.time.LocalDateTime
+import java.time.{Instant, LocalDateTime, ZoneOffset}
+import javax.inject.Singleton
 
 @Singleton
 case class FileDetails(_id: ConversationId,
@@ -32,6 +31,19 @@ case class FileDetails(_id: ConversationId,
                        lastUpdated: LocalDateTime
 )
 object FileDetails {
-  implicit val mongoDateTime: Format[LocalDateTime] = MongoJavatimeFormats.localDateTimeFormat
-  implicit val format: OFormat[FileDetails]         = Json.format[FileDetails]
+
+  implicit val localDateTimeReads: Reads[LocalDateTime] =
+    Reads
+      .at[String](__ \ "$date" \ "$numberLong")
+      .map(dateTime => Instant.ofEpochMilli(dateTime.toLong).atZone(ZoneOffset.UTC).toLocalDateTime)
+
+  implicit val localDateTimeWrites: Writes[LocalDateTime] =
+    Writes
+      .at[String](__ \ "$date" \ "$numberLong")
+      .contramap(_.toInstant(ZoneOffset.UTC).toEpochMilli.toString)
+
+  implicit val mongoDateTime: Format[LocalDateTime] =
+    Format(localDateTimeReads, localDateTimeWrites)
+
+  implicit val format: OFormat[FileDetails] = Json.format[FileDetails]
 }
