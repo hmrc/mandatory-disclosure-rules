@@ -17,7 +17,6 @@
 package models.submission
 
 import play.api.libs.json.{__, Json, OWrites, Reads}
-import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.LocalDateTime
 
@@ -41,8 +40,8 @@ object ResponseFileDetails {
       (__ \ "reportType").readNullable[ReportType] and
       (__ \ "status").read[FileStatus] and
       (__ \ "name").read[String] and
-      (__ \ "created").read[LocalDateTime](MongoJavatimeFormats.localDateTimeReads) and
-      (__ \ "updated").read[LocalDateTime](MongoJavatimeFormats.localDateTimeReads)
+      (__ \ "created").read[LocalDateTime](FileDetails.localDateTimeReads) and
+      (__ \ "updated").read[LocalDateTime](FileDetails.localDateTimeReads)
   )(ResponseFileDetails.apply _)
 
   implicit val writes: OWrites[ResponseFileDetails] = Json.writes[ResponseFileDetails]
