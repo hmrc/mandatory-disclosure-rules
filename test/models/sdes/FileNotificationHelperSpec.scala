@@ -30,6 +30,7 @@ class FileNotificationHelperSpec extends SpecBase {
     val fileSize          = 12345L
     val submissionDetails = SubmissionDetails("test.xml", "MDR1", fileSize, "http://localhost/", checksum, messageSpec)
     val correlationID     = "aa928"
+    val metaData          = Map[String, String]("filename" -> "test", "id" -> "123")
 
     val fileTransferNotification = FileTransferNotification(
       information,
@@ -45,9 +46,6 @@ class FileNotificationHelperSpec extends SpecBase {
         correlationID
       )
     )
-    "must correctly create a FileTransferNotification from submissionDetails and config" in {
-      FileNotificationHelper.createFileNotificationRequest(submissionDetails, information, recipientOrSender, correlationID) mustBe fileTransferNotification
-    }
     "must correctly create a FileTransferNotification from submissionDetails and config with metadata" in {
       val metaData     = Map[String, String]("filename" -> "test", "id" -> "123")
       val propertyList = List(Property("filename", "test"), Property("id", "123"))
@@ -58,7 +56,7 @@ class FileNotificationHelperSpec extends SpecBase {
                                                            information,
                                                            recipientOrSender,
                                                            correlationID,
-                                                           Some(metaData)
+                                                           metaData
       ) mustBe fileTransferNotificationWithProperties
     }
   }

@@ -24,7 +24,6 @@ import services.submission.SubmissionService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
 import scala.xml.{Elem, NodeSeq}
 
 class TestSubmissionController @Inject() (
