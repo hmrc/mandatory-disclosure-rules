@@ -19,8 +19,9 @@ package services.submission
 import config.AppConfig
 import connectors.SDESConnector
 import models.sdes._
-import models.submission.{ConversationId, FileDetails, Pending}
+import models.submission.{ConversationId, FileDetails, Pending, SubmissionMetaData}
 import models.submissions.SubmissionDetails
+import models.subscription.{IndividualDetails, ResponseDetail}
 import play.api.Logging
 import play.api.libs.json.Json
 import repositories.submission.FileDetailsRepository
@@ -71,6 +72,25 @@ class SDESServiceImpl @Inject() (sdesConnector: SDESConnector, fileDetailsReposi
           e
         )
         Future.successful(Left(e))
+    }
+  }
+  private def compileMetaData(subscriptionDetails: ResponseDetail, submissionMetaData: SubmissionMetaData, individual: IndividualDetails): Option[Map[String, String]] = {
+    for {
+      tradingName <- subscriptionDetails.tradingName
+
+    } yield {
+      Map(
+        "/properties/requestAdditionalDetail/tradingName" -> tradingName,
+        "/properties/requestAdditionalDetail/subscriptionID" -> subscriptionDetails.subscriptionID,
+        "/properties/requestAdditionalDetail/isGBUser" -> subscriptionDetails.isGBUser,
+        "/properties/requestAdditionalDetail/primaryContact/emailAddress" -> subscriptionDetails.primaryContact.email,
+        "/properties/requestAdditionalDetail/primaryContact/phoneNumber" -> subscriptionDetails.primaryContact.phone,
+        "/properties/requestAdditionalDetail/primaryContact/mobileNumber" -> subscriptionDetails.primaryContact.mobile,
+        "/properties/requestAdditionalDetail/primaryContact/individualDetails/firstName" -> individual.firstName,
+        "/properties/requestAdditionalDetail/primaryContact/individualDetails/middleName" -> individual.middleName,
+        "/properties/requestAdditionalDetail/primaryContact/individualDetails/lastName" -> individual.lastName,
+        "/properties/requestAdditionalDetail/primaryContact/mobileNumber" -> subscriptionDetails.secondaryContact
+      )
     }
   }
 }
