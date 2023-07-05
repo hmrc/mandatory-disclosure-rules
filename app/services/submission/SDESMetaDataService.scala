@@ -49,7 +49,7 @@ class SDESMetaDataService extends Logging {
       case organisation: OrganisationDetails =>
         Map(
           s"/properties/requestAdditionalDetail/$contactType/organisationDetails/organisationName" -> organisation.organisationName
-        ) //TODO: change this key once we know the actual value
+        )
     }
     val phoneNumber  = contactInformation.phone.map(phone => Map(s"/properties/requestAdditionalDetail/$contactType/phoneNumber" -> phone))
     val mobileNumber = contactInformation.mobile.map(mobile => Map(s"/properties/requestAdditionalDetail/$contactType/mobileNumber" -> mobile))
