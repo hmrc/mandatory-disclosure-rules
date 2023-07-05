@@ -125,36 +125,34 @@ class SDESMetaDataServiceSpec extends SpecBase with MockitoSugar with ScalaCheck
         )
       }
 
-      "Must provide metaData for an individual with 2 sets of contact details" in {
+      "Must provide metaData for an organisation with 2 sets of contact details" in {
         val responseDetail = ResponseDetail(
           "subscriptionID",
           Some("tradingName"),
           isGBUser = true,
-          ContactInformation(OrganisationDetails("firstName"), "email@test.com", Some("1234567"), Some("12345678")),
-          Some(ContactInformation(OrganisationDetails("firstName2"), "email2@test.com", Some("21234567"), Some("212345678")))
+          ContactInformation(OrganisationDetails("organisationName"), "email@test.com", Some("1234567"), Some("12345678")),
+          Some(ContactInformation(OrganisationDetails("organisationName2"), "email2@test.com", Some("21234567"), Some("212345678")))
         )
 
         val result = sdesMetaDataService.compileMetaData(responseDetail, conversationID, dateTime, fileName)
 
         result mustBe Map(
-          "/properties/requestCommon/conversationID" -> "conversationID",
-          "/properties/requestCommon/receiptDate" -> "2022-01-01T02:01",
-          "/properties/requestCommon/schemaVersion" -> "1.0.0",
-          "/properties/requestCommon/regime" -> "MDR",
-          "/properties/requestAdditionalDetail/primaryContact/phoneNumber" -> "1234567",
-          "/properties/requestAdditionalDetail/primaryContact/emailAddress" -> "email@test.com",
-          "/properties/requestAdditionalDetail/primaryContact/mobileNumber" -> "12345678",
-          "/properties/requestAdditionalDetail/primaryContact/organisationDetails/organisationName" -> "firstName2",
-          "/properties/requestAdditionalDetail/secondaryContact/phoneNumber" -> "21234567",
-          "/properties/requestAdditionalDetail/secondaryContact/emailAddress" -> "email2@test.com",
-          "/properties/requestAdditionalDetail/secondaryContact/mobileNumber" -> "212345678",
-          "/properties/requestAdditionalDetail/secondaryContact/individualDetails/firstName" -> "firstName2",
-          "/properties/requestAdditionalDetail/secondaryContact/individualDetails/middleName" -> "middleName2",
-          "/properties/requestAdditionalDetail/secondaryContact/individualDetails/lastName" -> "lastName2",
-          "/properties/requestAdditionalDetail/fileName" -> "fileName",
-          "/properties/requestAdditionalDetail/tradingName" -> "tradingName",
-          "/properties/requestAdditionalDetail/subscriptionID" -> "subscriptionID",
-          "/properties/requestAdditionalDetail/isGBUser" -> "true"
+          "/properties/requestCommon/conversationID"                                                  -> "conversationID",
+          "/properties/requestCommon/receiptDate"                                                     -> "2022-01-01T02:01",
+          "/properties/requestCommon/schemaVersion"                                                   -> "1.0.0",
+          "/properties/requestCommon/regime"                                                          -> "MDR",
+          "/properties/requestAdditionalDetail/primaryContact/phoneNumber"                            -> "1234567",
+          "/properties/requestAdditionalDetail/primaryContact/emailAddress"                           -> "email@test.com",
+          "/properties/requestAdditionalDetail/primaryContact/mobileNumber"                           -> "12345678",
+          "/properties/requestAdditionalDetail/primaryContact/organisationDetails/organisationName"   -> "organisationName",
+          "/properties/requestAdditionalDetail/secondaryContact/phoneNumber"                          -> "21234567",
+          "/properties/requestAdditionalDetail/secondaryContact/emailAddress"                         -> "email2@test.com",
+          "/properties/requestAdditionalDetail/secondaryContact/mobileNumber"                         -> "212345678",
+          "/properties/requestAdditionalDetail/secondaryContact/organisationDetails/organisationName" -> "organisationName2",
+          "/properties/requestAdditionalDetail/fileName"                                              -> "fileName",
+          "/properties/requestAdditionalDetail/tradingName"                                           -> "tradingName",
+          "/properties/requestAdditionalDetail/subscriptionID"                                        -> "subscriptionID",
+          "/properties/requestAdditionalDetail/isGBUser"                                              -> "true"
         )
       }
     }
