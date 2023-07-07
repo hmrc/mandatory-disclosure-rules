@@ -21,6 +21,7 @@ import connectors.SDESConnector
 import models.sdes._
 import models.submission.{FileDetails, MDR401, MessageSpecData, MultipleNewInformation}
 import models.submissions.SubmissionDetails
+import models.subscription.{ContactInformation, IndividualDetails, OrganisationDetails, ResponseDetail}
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar
 import org.scalatest.BeforeAndAfterEach
@@ -29,6 +30,8 @@ import play.api.http.Status.{INTERNAL_SERVER_ERROR, NO_CONTENT}
 import play.api.inject.bind
 import repositories.submission.FileDetailsRepository
 import services.submission.SDESService
+import services.subscription.SubscriptionService
+import uk.gov.hmrc.auth.core.AffinityGroup.{Individual, Organisation}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,20 +39,23 @@ import scala.concurrent.{ExecutionContext, Future}
 class SDESServiceSpec extends SpecBase with MockitoSugar with ScalaCheckDrivenPropertyChecks with BeforeAndAfterEach {
 
   val correlationIdRegex                               = """[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}"""
+  val mockSubscriptionService: SubscriptionService     = mock[SubscriptionService]
   val mockSDESConnector: SDESConnector                 = mock[SDESConnector]
   val mockFileDetailsRepository: FileDetailsRepository = mock[FileDetailsRepository]
 
   override def beforeEach(): Unit =
     reset(
       mockSDESConnector,
-      mockFileDetailsRepository
+      mockFileDetailsRepository,
+      mockSubscriptionService
     )
 
   "SDESService" - {
     val application = applicationBuilder()
       .overrides(
         bind[FileDetailsRepository].toInstance(mockFileDetailsRepository),
-        bind[SDESConnector].toInstance(mockSDESConnector)
+        bind[SDESConnector].toInstance(mockSDESConnector),
+        bind[SubscriptionService].toInstance(mockSubscriptionService)
       )
 
     val sdesService = application.injector().instanceOf[SDESService]
@@ -61,6 +67,14 @@ class SDESServiceSpec extends SpecBase with MockitoSugar with ScalaCheckDrivenPr
 
     "filenotify" - {
       "must call sdes connector then create file details record and return a valid correlationID for a response of NO_CONTENT(204)" in {
+        val responseDetail = ResponseDetail("subscriptionID",
+                                            Some("tradingName"),
+                                            isGBUser = true,
+                                            ContactInformation(OrganisationDetails("orgName"), "email@test.com", None, None),
+                                            None
+        )
+        when(mockSubscriptionService.getContactInformation(any[String])(any[HeaderCarrier], any[ExecutionContext]))
+          .thenReturn(Future.successful(Right(responseDetail)))
         when(mockSDESConnector.fileReady(any[FileTransferNotification])(any[HeaderCarrier], any[ExecutionContext]))
           .thenReturn(Future.successful(Right(NO_CONTENT)))
 
@@ -80,6 +94,14 @@ class SDESServiceSpec extends SpecBase with MockitoSugar with ScalaCheckDrivenPr
         }
       }
       "must return a Left with an Exception for response statues other than 204" in {
+        val responseDetail = ResponseDetail("subscriptionID",
+                                            Some("tradingName"),
+                                            isGBUser = true,
+                                            ContactInformation(OrganisationDetails("orgName"), "email@test.com", None, None),
+                                            None
+        )
+        when(mockSubscriptionService.getContactInformation(any[String])(any[HeaderCarrier], any[ExecutionContext]))
+          .thenReturn(Future.successful(Right(responseDetail)))
         when(mockSDESConnector.fileReady(any[FileTransferNotification])(any[HeaderCarrier], any[ExecutionContext]))
           .thenReturn(Future.successful(Left(HttpResponse.apply(INTERNAL_SERVER_ERROR, ""))))
 

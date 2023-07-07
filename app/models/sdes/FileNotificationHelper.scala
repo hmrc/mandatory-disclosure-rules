@@ -24,7 +24,7 @@ object FileNotificationHelper {
                                     informationType: String,
                                     recipientOrSender: String,
                                     correlationId: String,
-                                    metaData: Option[Map[String, String]] = None
+                                    metaData: Map[String, String]
   ): FileTransferNotification =
     FileTransferNotification(
       informationType,
@@ -34,9 +34,7 @@ object FileNotificationHelper {
         Some(submissionDetails.documentUrl),
         Checksum(SHA2, submissionDetails.checkSum),
         submissionDetails.fileSize.toInt,
-        if (metaData.isEmpty) {
-          List.empty[Property]
-        } else mapToProperty(metaData.get)
+        mapToProperty(metaData)
       ),
       Audit(
         correlationId
