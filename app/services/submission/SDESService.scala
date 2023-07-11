@@ -21,7 +21,7 @@ import connectors.SDESConnector
 import models.error.ReadSubscriptionError
 import models.sdes._
 import models.submission.{ConversationId, FileDetails, Pending}
-import models.submissions.SubmissionDetails
+import models.submission.SubmissionDetails
 import play.api.Logging
 import play.api.libs.json.Json
 import repositories.submission.FileDetailsRepository

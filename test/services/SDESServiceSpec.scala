@@ -19,9 +19,9 @@ package services
 import base.SpecBase
 import connectors.SDESConnector
 import models.sdes._
-import models.submission.{FileDetails, MDR401, MessageSpecData, MultipleNewInformation}
-import models.submissions.SubmissionDetails
-import models.subscription.{ContactInformation, IndividualDetails, OrganisationDetails, ResponseDetail}
+import models.submission.{FileDetails, MDR401, MessageSpecData, MultipleNewInformation, SubmissionDetails}
+import models.subscription.{ContactInformation, OrganisationDetails, ResponseDetail}
+import models.upscan.UploadId
 import org.mockito.ArgumentMatchers.any
 import org.mockito.MockitoSugar
 import org.scalatest.BeforeAndAfterEach
@@ -31,7 +31,6 @@ import play.api.inject.bind
 import repositories.submission.FileDetailsRepository
 import services.submission.SDESService
 import services.subscription.SubscriptionService
-import uk.gov.hmrc.auth.core.AffinityGroup.{Individual, Organisation}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -63,7 +62,8 @@ class SDESServiceSpec extends SpecBase with MockitoSugar with ScalaCheckDrivenPr
     val messageSpec       = MessageSpecData("x9999", MDR401, 2, "OECD1", MultipleNewInformation)
     val checksum          = "1234"
     val fileSize          = 12345L
-    val submissionDetails = SubmissionDetails("test.xml", "MDR1", fileSize, "http://localhost/", checksum, messageSpec)
+    val uploadId          = UploadId("uploadId")
+    val submissionDetails = SubmissionDetails("test.xml", uploadId, "MDR1", fileSize, "http://localhost/", checksum, messageSpec)
 
     "filenotify" - {
       "must call sdes connector then create file details record and return a valid correlationID for a response of NO_CONTENT(204)" in {

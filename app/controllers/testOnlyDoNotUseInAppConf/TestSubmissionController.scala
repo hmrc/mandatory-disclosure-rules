@@ -17,12 +17,14 @@
 package controllers.testOnlyDoNotUseInAppConf
 
 import controllers.auth.IdentifierAuthAction
+import models.upscan.UploadId
 import play.api.Logging
 import play.api.mvc.{Action, ControllerComponents}
 import services.DataExtraction
 import services.submission.SubmissionService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.xml.{Elem, NodeSeq}
 
@@ -38,9 +40,10 @@ class TestSubmissionController @Inject() (
     val xml      = request.body
     val fileName = (xml \ "fileName").text.trim
     val fileSize = (xml \ "fileSize").text.trim.toLong
+    val uploadId = UploadId(UUID.randomUUID().toString)
 
     val msd = dataExtraction.messageSpecData(xml.asInstanceOf[Elem])
 
-    submissionService.processSubmission(xml, request.subscriptionId, fileName, fileSize, msd.get)
+    submissionService.processSubmission(xml, uploadId, request.subscriptionId, fileName, fileSize, msd.get)
   }
 }

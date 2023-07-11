@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-package models.submissions
+package models.submission
 
-import models.submission.MessageSpecData
+import models.upscan.UploadId
 import play.api.libs.json.Json
 
-case class SubmissionDetails(fileName: String, enrolmentId: String, fileSize: Long, documentUrl: String, checkSum: String, messageSpecData: MessageSpecData)
+case class SubmissionDetails(fileName: String,
+                             uploadId: UploadId,
+                             enrolmentId: String,
+                             fileSize: Long,
+                             documentUrl: String,
+                             checkSum: String,
+                             messageSpecData: MessageSpecData
+)
 
 object SubmissionDetails {
   implicit val format = Json.format[SubmissionDetails]
