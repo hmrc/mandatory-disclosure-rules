@@ -31,18 +31,24 @@ sealed trait Algorithm
 case object MD5 extends Algorithm
 case object SHA1 extends Algorithm
 case object SHA2 extends Algorithm
+case object SHA256 extends Algorithm
+case object SHA512 extends Algorithm
 
 object Algorithm {
   implicit val writes: Writes[Algorithm] = Writes[Algorithm] {
-    case MD5  => JsString("md5")
-    case SHA1 => JsString("SHA1") //Todo Stubs use these values but Swagger document states SHA-256 and SHA512 have to confim
-    case SHA2 => JsString("SHA2")
+    case MD5    => JsString("md5")
+    case SHA1   => JsString("SHA1") //Todo Stubs use these values but Swagger document states SHA-256 and SHA512 have to confim
+    case SHA2   => JsString("SHA2")
+    case SHA256 => JsString("SHA-256")
+    case SHA512 => JsString("SHA-512")
   }
   implicit val reads: Reads[Algorithm] = Reads[Algorithm] {
-    case JsString("md5")  => JsSuccess(MD5)
-    case JsString("SHA1") => JsSuccess(SHA1)
-    case JsString("SHA2") => JsSuccess(SHA2)
-    case value            => JsError(s"Unexpected value of _type: $value")
+    case JsString("md5")     => JsSuccess(MD5)
+    case JsString("SHA1")    => JsSuccess(SHA1)
+    case JsString("SHA2")    => JsSuccess(SHA2)
+    case JsString("SHA-256") => JsSuccess(SHA256)
+    case JsString("SHA-512") => JsSuccess(SHA512)
+    case value               => JsError(s"Unexpected value of _type: $value")
   }
 }
 case class Checksum(
