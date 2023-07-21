@@ -56,6 +56,7 @@ class FileNotificationHelperSpec extends SpecBase {
                                                            information,
                                                            recipientOrSender,
                                                            correlationID,
+                                                           SHA2,
                                                            metaData
       ) mustBe fileTransferNotificationWithProperties
     }

@@ -54,7 +54,13 @@ class SDESServiceImpl @Inject() (sdesConnector: SDESConnector,
         val submissionTime: LocalDateTime = DateTimeFormatUtil.zonedDateTimeNow.toLocalDateTime
         val metaData                      = metaDataService.compileMetaData(subscriptionDetails, correlationID, submissionTime, submissionDetails.fileName)
         val fileNotifyRequest = FileNotificationHelper
-          .createFileNotificationRequest(submissionDetails, appConfig.sdesInformationType, appConfig.sdesRecipientOrSender, correlationID.value, metaData)
+          .createFileNotificationRequest(submissionDetails,
+                                         appConfig.sdesInformationType,
+                                         appConfig.sdesRecipientOrSender,
+                                         correlationID.value,
+                                         appConfig.sdesChecksumAlgorithm,
+                                         metaData
+          )
         logger.debug(s"SDES notification request: ${Json.stringify(Json.toJson(fileNotifyRequest))}")
         sdesConnector.fileReady(fileNotifyRequest).flatMap {
           case Right(_) =>

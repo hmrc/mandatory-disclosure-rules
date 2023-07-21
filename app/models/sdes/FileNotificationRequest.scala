@@ -35,9 +35,19 @@ case object SHA256 extends Algorithm
 case object SHA512 extends Algorithm
 
 object Algorithm {
+
+  def apply(algorithm: String): Algorithm = algorithm match {
+    case "md5"     => MD5
+    case "SHA1"    => SHA1
+    case "SHA2"    => SHA2
+    case "SHA-256" => SHA256
+    case "SHA-512" => SHA512
+    case _         => throw new IllegalArgumentException()
+  }
+
   implicit val writes: Writes[Algorithm] = Writes[Algorithm] {
     case MD5    => JsString("md5")
-    case SHA1   => JsString("SHA1") //Todo Stubs use these values but Swagger document states SHA-256 and SHA512 have to confim
+    case SHA1   => JsString("SHA1")
     case SHA2   => JsString("SHA2")
     case SHA256 => JsString("SHA-256")
     case SHA512 => JsString("SHA-512")
