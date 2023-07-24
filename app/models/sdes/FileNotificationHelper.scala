@@ -24,6 +24,7 @@ object FileNotificationHelper {
                                     informationType: String,
                                     recipientOrSender: String,
                                     correlationId: String,
+                                    checksumAlgorithm: Algorithm,
                                     metaData: Map[String, String]
   ): FileTransferNotification =
     FileTransferNotification(
@@ -32,7 +33,7 @@ object FileNotificationHelper {
         Some(recipientOrSender),
         submissionDetails.fileName,
         Some(submissionDetails.documentUrl),
-        Checksum(SHA2, submissionDetails.checkSum),
+        Checksum(checksumAlgorithm, submissionDetails.checkSum),
         submissionDetails.fileSize.toInt,
         mapToProperty(metaData)
       ),

@@ -16,6 +16,7 @@
 
 package config
 
+import models.sdes.Algorithm
 import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
@@ -69,7 +70,9 @@ class AppConfig @Inject() (
   lazy val sdesUrl: String =
     List(Some(servicesConfig.baseUrl("sdes")), apiLocation, Some("notification"), Some("fileready")).flatten.mkString("/")
 
-  lazy val maxNormalFileSize = config.get[String]("max-normal-file-size").toInt
+  lazy val sdesChecksumAlgorithm: Algorithm = Algorithm(config.get[String]("sdes.checksum-algorithm"))
+
+  lazy val maxNormalFileSize: Int = config.get[String]("max-normal-file-size").toInt
 
   lazy val emailSuccessfulTemplate: String   = config.get[String]("emailTemplates.fileUploadSuccessful")
   lazy val emailUnsuccessfulTemplate: String = config.get[String]("emailTemplates.fileUploadUnsuccessful")
