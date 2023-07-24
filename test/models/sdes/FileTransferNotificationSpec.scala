@@ -18,7 +18,8 @@ package models.sdes
 
 import base.SpecBase
 import models.submission.{MDR401, MessageSpecData, MultipleNewInformation}
-import models.submissions.SubmissionDetails
+import models.submission.SubmissionDetails
+import models.upscan.UploadId
 import play.api.libs.json.Json
 
 class FileTransferNotificationSpec extends SpecBase {
@@ -29,7 +30,8 @@ class FileTransferNotificationSpec extends SpecBase {
     val recipientOrSender = "mdr"
     val checksum          = "1234"
     val fileSize          = 12345L
-    val submissionDetails = SubmissionDetails("test.xml", "MDR1", fileSize, "http://localhost/", checksum, messageSpec)
+    val uploadId          = UploadId("uploadId")
+    val submissionDetails = SubmissionDetails("test.xml", uploadId, "MDR1", fileSize, "http://localhost/", checksum, messageSpec)
     val correlationID     = "aa928"
 
     val fileTransferNotification = FileTransferNotification(

@@ -18,7 +18,8 @@ package models.sdes
 
 import base.SpecBase
 import models.submission.{MDR401, MessageSpecData, MultipleNewInformation}
-import models.submissions.SubmissionDetails
+import models.submission.SubmissionDetails
+import models.upscan.UploadId
 
 class FileNotificationHelperSpec extends SpecBase {
 
@@ -28,7 +29,8 @@ class FileNotificationHelperSpec extends SpecBase {
     val recipientOrSender = "mdr"
     val checksum          = "1234"
     val fileSize          = 12345L
-    val submissionDetails = SubmissionDetails("test.xml", "MDR1", fileSize, "http://localhost/", checksum, messageSpec)
+    val uploadId          = UploadId("uploadId")
+    val submissionDetails = SubmissionDetails("test.xml", uploadId, "MDR1", fileSize, "http://localhost/", checksum, messageSpec)
     val correlationID     = "aa928"
     val metaData          = Map[String, String]("filename" -> "test", "id" -> "123")
 

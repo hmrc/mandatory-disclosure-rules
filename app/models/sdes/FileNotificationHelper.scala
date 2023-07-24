@@ -16,7 +16,7 @@
 
 package models.sdes
 
-import models.submissions.SubmissionDetails
+import models.submission.SubmissionDetails
 
 object FileNotificationHelper {
 

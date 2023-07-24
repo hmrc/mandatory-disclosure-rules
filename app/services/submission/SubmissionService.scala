@@ -23,6 +23,7 @@ import controllers.auth.UserRequest
 import models.audit.{AuditFileSubmission, AuditType}
 import models.error.ReadSubscriptionError
 import models.submission._
+import models.upscan.UploadId
 import play.api.libs.json.Json
 import play.api.mvc.ControllerComponents
 import play.api.{Logger, Logging}
@@ -51,13 +52,13 @@ class SubmissionService @Inject() (
     extends BackendController(cc)
     with Logging {
 
-  def processSubmission(xml: NodeSeq, enrolmentId: String, fileName: String, fileSize: Long, messageSpecData: MessageSpecData)(implicit
+  def processSubmission(xml: NodeSeq, uploadId: UploadId, enrolmentId: String, fileName: String, fileSize: Long, messageSpecData: MessageSpecData)(implicit
     request: UserRequest[_]
   ) = {
 
     val subscriptionId           = enrolmentId
     val submissionTime           = DateTimeFormatUtil.zonedDateTimeNow.toLocalDateTime
-    val conversationId           = ConversationId()
+    val conversationId           = ConversationId.fromUploadId(uploadId)
     val uploadedXmlNode: NodeSeq = xml \\ "MDR_OECD"
     val submissionDetails = FileDetails(conversationId,
                                         subscriptionId,

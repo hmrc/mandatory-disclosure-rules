@@ -19,7 +19,7 @@ package controllers
 import config.AppConfig
 import controllers.auth.IdentifierAuthAction
 import handlers.XmlHandler
-import models.submissions.SubmissionDetails
+import models.submission.SubmissionDetails
 import play.api.Logging
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents}
@@ -55,7 +55,8 @@ class SubmissionController @Inject() (
             }
           } else {
             val xml = xmlHandler.load(submission.documentUrl)
-            submissionService.processSubmission(xml, submission.enrolmentId, submission.fileName, submission.fileSize, submission.messageSpecData)
+            submissionService
+              .processSubmission(xml, submission.uploadId, submission.enrolmentId, submission.fileName, submission.fileSize, submission.messageSpecData)
           }
       )
   }
