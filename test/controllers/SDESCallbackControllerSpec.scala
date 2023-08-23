@@ -17,7 +17,7 @@
 package controllers
 
 import base.SpecBase
-import models.sdes.NotificationCallback
+import models.sdes.{NotificationCallback, SHA256}
 import models.sdes.NotificationType.{FileProcessed, FileProcessingFailure, FileReady, FileReceived}
 import models.submission.{Accepted, ConversationId, FileDetails, Pending, RejectedSDES, RejectedSDESVirus, SingleNewInformation}
 import org.scalatest.BeforeAndAfterEach
@@ -49,7 +49,7 @@ class SDESCallbackControllerSpec extends SpecBase with BeforeAndAfterEach {
   "SDESCallbackController" - {
     "must return Ok for a failure and update the fileRespositoryDatabase appropriately" in {
 
-      val sdesResponse = NotificationCallback(FileProcessingFailure, "test.xml", "ci1234", Some("Error"))
+      val sdesResponse = NotificationCallback(FileProcessingFailure, "test.xml", SHA256, "checksum", "ci1234", Some(LocalDateTime.now), Some("Error"))
       val fileDetailsPending =
         FileDetails(
           ConversationId("ci1234"),
@@ -87,7 +87,7 @@ class SDESCallbackControllerSpec extends SpecBase with BeforeAndAfterEach {
     }
     "must return Ok for a Virus failure and update the fileRespositoryDatabase appropriately" in {
 
-      val sdesResponse = NotificationCallback(FileProcessingFailure, "test.xml", "ci1234", Some("Error virus"))
+      val sdesResponse = NotificationCallback(FileProcessingFailure, "test.xml", SHA256, "checksum", "ci1234", Some(LocalDateTime.now), Some("Error virus"))
       val fileDetailsPending =
         FileDetails(
           ConversationId("ci1234"),
@@ -125,7 +125,7 @@ class SDESCallbackControllerSpec extends SpecBase with BeforeAndAfterEach {
     }
     "must return Ok for a when status returned form fileRespositoryDatabase is not pending" in {
 
-      val sdesResponse = NotificationCallback(FileProcessingFailure, "test.xml", "ci1234", Some("Error virus"))
+      val sdesResponse = NotificationCallback(FileProcessingFailure, "test.xml", SHA256, "checksum", "ci1234", Some(LocalDateTime.now), Some("Error virus"))
       val fileDetailsAccepted =
         FileDetails(
           ConversationId("ci1234"),
@@ -149,7 +149,7 @@ class SDESCallbackControllerSpec extends SpecBase with BeforeAndAfterEach {
     }
     "must return Ok for when cannot find status from conversation ID" in {
 
-      val sdesResponse = NotificationCallback(FileProcessingFailure, "test.xml", "ci1234", Some("Error virus"))
+      val sdesResponse = NotificationCallback(FileProcessingFailure, "test.xml", SHA256, "checksum", "ci1234", Some(LocalDateTime.now), Some("Error virus"))
 
       when(mockFileDetailsRepository.findByConversationId(ConversationId("ci1234"))).thenReturn(Future.successful(None))
 
@@ -161,7 +161,7 @@ class SDESCallbackControllerSpec extends SpecBase with BeforeAndAfterEach {
       status(result) mustEqual OK
     }
     "must return Ok for FileReady status" in {
-      val sdesResponse = NotificationCallback(FileReady, "test.xml", "ci1234", Some("Error"))
+      val sdesResponse = NotificationCallback(FileReady, "test.xml", SHA256, "checksum", "ci1234", Some(LocalDateTime.now), Some("Error"))
 
       val request = FakeRequest(POST, routes.SDESCallbackController.callback.url)
         .withJsonBody(Json.toJson(sdesResponse))
@@ -171,7 +171,7 @@ class SDESCallbackControllerSpec extends SpecBase with BeforeAndAfterEach {
       status(result) mustEqual OK
     }
     "must return Ok for FileReceived status" in {
-      val sdesResponse = NotificationCallback(FileReceived, "test.xml", "ci1234", Some("Error"))
+      val sdesResponse = NotificationCallback(FileReceived, "test.xml", SHA256, "checksum", "ci1234", Some(LocalDateTime.now), Some("Error"))
 
       val request = FakeRequest(POST, routes.SDESCallbackController.callback.url)
         .withJsonBody(Json.toJson(sdesResponse))
@@ -181,7 +181,7 @@ class SDESCallbackControllerSpec extends SpecBase with BeforeAndAfterEach {
       status(result) mustEqual OK
     }
     "must return Ok for FileProcessed status" in {
-      val sdesResponse = NotificationCallback(FileProcessed, "test.xml", "ci1234", Some("Error"))
+      val sdesResponse = NotificationCallback(FileProcessed, "test.xml", SHA256, "checksum", "ci1234", Some(LocalDateTime.now), Some("Error"))
 
       val request = FakeRequest(POST, routes.SDESCallbackController.callback.url)
         .withJsonBody(Json.toJson(sdesResponse))
