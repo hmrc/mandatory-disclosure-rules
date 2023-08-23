@@ -18,10 +18,15 @@ package models.sdes
 
 import play.api.libs.json.{Json, OFormat}
 
+import java.time.LocalDateTime
+
 final case class NotificationCallback(
   notification: NotificationType,
   filename: String,
+  checksumAlgorithm: Algorithm,
+  checksum: String,
   correlationID: String,
+  dateTime: Option[LocalDateTime],
   failureReason: Option[String]
 )
 
