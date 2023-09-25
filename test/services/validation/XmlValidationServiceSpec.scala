@@ -19,7 +19,6 @@ package services.validation
 import base.SpecBase
 import models.validation.SaxParseError
 
-import java.net.URL
 import scala.collection.mutable.ListBuffer
 import scala.xml.XML
 
