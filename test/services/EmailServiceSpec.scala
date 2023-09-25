@@ -182,6 +182,26 @@ class EmailServiceSpec extends SpecBase with Generators with ScalaCheckPropertyC
           verify(mockEmailConnector, times(2)).sendEmail(any[EmailRequest])(any[HeaderCarrier])
         }
       }
+      "must submit to the email connector when file upload fails" in {
+
+        when(mockEmailConnector.sendEmail(any[EmailRequest])(any[HeaderCarrier]))
+          .thenReturn(
+            Future.successful(HttpResponse(OK, ""))
+          )
+
+        when(mockSubscriptionService.getContactInformation(any[String])(any[HeaderCarrier], any[ExecutionContext]))
+          .thenReturn(
+            Future.successful(Right(ResponseDetail(subscriptionId, None, isGBUser = true, primaryContact, Some(secondaryContact))))
+          )
+
+        val result = emailService.sendEmail(subscriptionId, submissionTime, messageRefId, isUploadSuccessful = false, reportTypeMessage)
+
+        whenReady(result) { result =>
+          result.map(_.status) mustBe Some(OK)
+
+          verify(mockEmailConnector, times(2)).sendEmail(any[EmailRequest])(any[HeaderCarrier])
+        }
+      }
 
       "must fail to submit to the email connector when invalid email address provided" in {
 

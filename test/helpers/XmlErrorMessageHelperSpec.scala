@@ -94,6 +94,21 @@ class XmlErrorMessageHelperSpec extends SpecBase {
           result mustBe List(GenericError(lineNumber, Message("xml.not.ISO.code", List("TIN issuedBy"))))
         }
 
+        "must return correct error for invalid enum error for attribute with empty value" in {
+          val invalidEnumError1 =
+            SaxParseError(
+              lineNumber,
+              "cvc-enumeration-valid: Value '' is not facet-valid with respect to enumeration '[AF, AX]'. It must be a value from the enumeration."
+            )
+          val invalidEnumError2 =
+            SaxParseError(
+              lineNumber,
+              "cvc-attribute.3: The value '' of attribute 'issuedBy' on element 'mdr:TIN' is not valid with respect to its type, 'CountryCode_Type'."
+            )
+          val result = helper.generateErrorMessages(ListBuffer(invalidEnumError1, invalidEnumError2))
+          result mustBe List(GenericError(lineNumber, Message("xml.optional.field.empty", List("issuedBy"))))
+        }
+
         "must return correct error for missing element error'" in {
 
           val missingElementError1 =
@@ -153,6 +168,18 @@ class XmlErrorMessageHelperSpec extends SpecBase {
 
           val result = helper.generateErrorMessages(ListBuffer(error1, error2))
           result mustBe List(GenericError(lineNumber, Message("xml.not.allowed.length", List("TIN", "200"))))
+        }
+
+        "must return correct error when length exceed for Narrative" in {
+
+          val error1 = SaxParseError(
+            lineNumber,
+            s"cvc-maxLength-valid: Value '$over200' with length = '201' is not facet-valid with respect to maxLength '200' for type 'StringMin1Max200_Type'."
+          )
+          val error2 = SaxParseError(lineNumber, "cvc-complex-type.2.2: Element 'mdr:Narrative' must have no element [children], and the value must be valid.")
+
+          val result = helper.generateErrorMessages(ListBuffer(error1, error2))
+          result mustBe List(GenericError(lineNumber, Message("xml.not.allowed.length.repeatable", List("Narrative", "200"))))
         }
 
         "must return correct error for missing org name'" in {
@@ -227,6 +254,18 @@ class XmlErrorMessageHelperSpec extends SpecBase {
           result mustBe List(GenericError(lineNumber, Message("xml.add.mdr")))
         }
 
+        "must return correct error when empty enum given for MDR" in {
+
+          val invalidEnumError1 = SaxParseError(
+            lineNumber,
+            "cvc-enumeration-valid: Value '' is not facet-valid with respect to enumeration '[MDR]'. It must be a value from the enumeration."
+          )
+          val invalidEnumError2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value '' of element 'mdr:MessageType' is not valid.")
+
+          val result = helper.generateErrorMessages(ListBuffer(invalidEnumError1, invalidEnumError2))
+          result mustBe List(GenericError(lineNumber, Message("xml.add.line.messageType", List("MessageType"))))
+        }
+
         "must return correct error when invalid enum given for element" in {
 
           val invalidEnumError1 = SaxParseError(
@@ -262,6 +301,15 @@ class XmlErrorMessageHelperSpec extends SpecBase {
           val error2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value '90.1' of element 'mdr:Ownership' is not valid.")
           val result = helper.generateErrorMessages(ListBuffer(error1, error2))
           result mustBe List(GenericError(lineNumber, Message("xml.not.valid.percentage", List("Ownership"))))
+        }
+
+        "must return correct error when a percentage is not in the range 0-100 optional field empty" in {
+
+          val error1 =
+            SaxParseError(lineNumber, "cvc-maxInclusive-valid: Value '120' is not facet-valid with respect to maxInclusive '100' for type 'Ownership'.")
+          val error2 = SaxParseError(lineNumber, "cvc-type.3.1.3: The value '' of element 'mdr:Ownership' is not valid.")
+          val result = helper.generateErrorMessages(ListBuffer(error1, error2))
+          result mustBe List(GenericError(lineNumber, Message("xml.optional.field.empty", List("Ownership"))))
         }
 
         "must return correct error for invalid date format" in {
@@ -617,7 +665,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
           result mustBe List(GenericError(lineNumber, Message("xml.not.allowed.length", List("DocRefId", "100"))))
         }
 
-        "must return correct error when allowed length exceeded 4000 and the number is formatted corectly" in {
+        "must return correct error when allowed length exceeded 4000 and the number is formatted correctly" in {
 
           val maxLengthError1 = SaxParseError(
             lineNumber,
