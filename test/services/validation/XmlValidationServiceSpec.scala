@@ -59,5 +59,25 @@ class XmlValidationServiceSpec extends SpecBase {
 
       result.isLeft mustBe false
     }
+
+    "must correctly validate a submission from a URL" in {
+      val service = app.injector.instanceOf[XMLValidationService]
+
+      val url = getClass.getResource("/mdr/fileUpload/validmdr.xml").toString
+
+      val result = service.validate(url, xsdPath)
+
+      result.isLeft mustBe false
+    }
+
+    "must correctly invalidate a submission with a data problem from a URL" in {
+      val service = app.injector.instanceOf[XMLValidationService]
+
+      val url = getClass.getResource("/mdr/fileUpload/invalid.xml").toString
+
+      val result = service.validate(url, xsdPath)
+
+      result.isLeft mustBe true
+    }
   }
 }

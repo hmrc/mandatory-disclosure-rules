@@ -17,5 +17,7 @@
 package models
 
 class WithName(string: String) {
+  // $COVERAGE-OFF$
   override val toString: String = string
+  // $COVERAGE-ON$
 }
