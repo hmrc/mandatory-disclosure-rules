@@ -4,7 +4,7 @@ import sbt.Keys.libraryDependencies
 import sbt._
 
 object AppDependencies {
-  val bootstrap_ver = "7.16.0"
+  val bootstrap_ver = "7.22.0"
   val mongo_ver = "1.3.0"
   val compile = Seq(
     "uk.gov.hmrc"       %% "bootstrap-backend-play-28" % bootstrap_ver,
