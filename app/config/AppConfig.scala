@@ -28,7 +28,7 @@ class AppConfig @Inject() (
   servicesConfig: ServicesConfig
 ) {
 
-  val appName: String     = config.get[String]("appName")
+  val appName: String = config.get[String]("appName")
 
   val auditFileSubmission: Boolean = config.get[Boolean]("auditing.event.fileSubmission.enabled")
 
