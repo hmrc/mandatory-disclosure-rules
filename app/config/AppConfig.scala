@@ -28,17 +28,9 @@ class AppConfig @Inject() (
   servicesConfig: ServicesConfig
 ) {
 
-  val appName: String     = config.get[String]("appName")
-  val authBaseUrl: String = servicesConfig.baseUrl("auth")
-
-  val auditingEnabled: Boolean = config.get[Boolean]("auditing.enabled")
+  val appName: String = config.get[String]("appName")
 
   val auditFileSubmission: Boolean = config.get[Boolean]("auditing.event.fileSubmission.enabled")
-
-  val graphiteHost: String =
-    config.get[String]("microservice.metrics.graphite.host")
-
-  val maxValidationErrors: Int = config.get[Int]("xml.validation.max-errors")
 
   val eisResponseWaitTime: Int = config.get[Int]("microservice.services.eis-response.wait-time")
 

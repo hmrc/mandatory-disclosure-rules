@@ -32,7 +32,6 @@ class FileNotificationHelperSpec extends SpecBase {
     val uploadId          = UploadId("uploadId")
     val submissionDetails = SubmissionDetails("test.xml", uploadId, "MDR1", fileSize, "http://localhost/", checksum, messageSpec)
     val correlationID     = "aa928"
-    val metaData          = Map[String, String]("filename" -> "test", "id" -> "123")
 
     val fileTransferNotification = FileTransferNotification(
       information,
