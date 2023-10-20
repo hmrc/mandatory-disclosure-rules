@@ -48,7 +48,7 @@ class SubmissionValidationController @Inject() (
 
           case InvalidXmlError(saxException) =>
             logger.warn("InvalidXmlError: Failed to validate xml submission")
-            BadRequest(InvalidXmlError(saxException).toString)
+            UnprocessableEntity(InvalidXmlError(saxException).toString)
 
           case _ =>
             logger.warn("Failed to validate xml submission")
