@@ -69,14 +69,14 @@ class SubmissionValidationControllerSpec extends SpecBase with BeforeAndAfterEac
       status(result) mustBe OK
     }
 
-    "must return 400 and a bad request when validation fails" in {
+    "must return unprocessable entity (422) when xml file validation fails" in {
       when(mockUploadSubmissionValidationEngine.validateUploadSubmission(any[String]()))
         .thenReturn(Future.successful(InvalidXmlError("")))
 
       val request = FakeRequest(POST, routes.SubmissionValidationController.validateSubmission.url).withJsonBody(Json.toJson(UpscanURL("someUrl")))
       val result  = route(application, request).value
 
-      status(result) mustBe BAD_REQUEST
+      status(result) mustBe UNPROCESSABLE_ENTITY
     }
 
     "return 500 and an internal server error when upscan URL is missing" in {
