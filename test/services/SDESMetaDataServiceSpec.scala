@@ -47,20 +47,20 @@ class SDESMetaDataServiceSpec extends SpecBase with MockitoSugar with ScalaCheck
         val result = sdesMetaDataService.compileMetaData(responseDetail, conversationID, dateTime, fileName)
 
         result mustBe Map(
-          "/properties/requestCommon/conversationID"                                        -> "conversationID",
-          "/properties/requestCommon/receiptDate"                                           -> "2022-01-01T02:01",
-          "/properties/requestCommon/schemaVersion"                                         -> "1.0.0",
-          "/properties/requestCommon/regime"                                                -> "MDR",
-          "/properties/requestAdditionalDetail/primaryContact/phoneNumber"                  -> "1234567",
-          "/properties/requestAdditionalDetail/primaryContact/emailAddress"                 -> "email@test.com",
-          "/properties/requestAdditionalDetail/primaryContact/mobileNumber"                 -> "12345678",
-          "/properties/requestAdditionalDetail/primaryContact/individualDetails/firstName"  -> "firstName",
-          "/properties/requestAdditionalDetail/primaryContact/individualDetails/middleName" -> "middleName",
-          "/properties/requestAdditionalDetail/primaryContact/individualDetails/lastName"   -> "lastName",
-          "/properties/requestAdditionalDetail/fileName"                                    -> "fileName",
-          "/properties/requestAdditionalDetail/tradingName"                                 -> "tradingName",
-          "/properties/requestAdditionalDetail/subscriptionID"                              -> "subscriptionID",
-          "/properties/requestAdditionalDetail/isGBUser"                                    -> "true"
+          "/requestCommon/conversationID"                                        -> "conversationID",
+          "/requestCommon/receiptDate"                                           -> "2022-01-01T02:01",
+          "/requestCommon/schemaVersion"                                         -> "1.0.0",
+          "/requestCommon/regime"                                                -> "MDR",
+          "/requestAdditionalDetail/primaryContact/phoneNumber"                  -> "1234567",
+          "/requestAdditionalDetail/primaryContact/emailAddress"                 -> "email@test.com",
+          "/requestAdditionalDetail/primaryContact/mobileNumber"                 -> "12345678",
+          "/requestAdditionalDetail/primaryContact/individualDetails/firstName"  -> "firstName",
+          "/requestAdditionalDetail/primaryContact/individualDetails/middleName" -> "middleName",
+          "/requestAdditionalDetail/primaryContact/individualDetails/lastName"   -> "lastName",
+          "/requestAdditionalDetail/fileName"                                    -> "fileName",
+          "/requestAdditionalDetail/tradingName"                                 -> "tradingName",
+          "/requestAdditionalDetail/subscriptionID"                              -> "subscriptionID",
+          "/requestAdditionalDetail/isGBUser"                                    -> "true"
         )
       }
 
@@ -76,26 +76,26 @@ class SDESMetaDataServiceSpec extends SpecBase with MockitoSugar with ScalaCheck
         val result = sdesMetaDataService.compileMetaData(responseDetail, conversationID, dateTime, fileName)
 
         result mustBe Map(
-          "/properties/requestCommon/conversationID"                                          -> "conversationID",
-          "/properties/requestCommon/receiptDate"                                             -> "2022-01-01T02:01",
-          "/properties/requestCommon/schemaVersion"                                           -> "1.0.0",
-          "/properties/requestCommon/regime"                                                  -> "MDR",
-          "/properties/requestAdditionalDetail/primaryContact/phoneNumber"                    -> "1234567",
-          "/properties/requestAdditionalDetail/primaryContact/emailAddress"                   -> "email@test.com",
-          "/properties/requestAdditionalDetail/primaryContact/mobileNumber"                   -> "12345678",
-          "/properties/requestAdditionalDetail/primaryContact/individualDetails/firstName"    -> "firstName",
-          "/properties/requestAdditionalDetail/primaryContact/individualDetails/middleName"   -> "middleName",
-          "/properties/requestAdditionalDetail/primaryContact/individualDetails/lastName"     -> "lastName",
-          "/properties/requestAdditionalDetail/secondaryContact/phoneNumber"                  -> "21234567",
-          "/properties/requestAdditionalDetail/secondaryContact/emailAddress"                 -> "email2@test.com",
-          "/properties/requestAdditionalDetail/secondaryContact/mobileNumber"                 -> "212345678",
-          "/properties/requestAdditionalDetail/secondaryContact/individualDetails/firstName"  -> "firstName2",
-          "/properties/requestAdditionalDetail/secondaryContact/individualDetails/middleName" -> "middleName2",
-          "/properties/requestAdditionalDetail/secondaryContact/individualDetails/lastName"   -> "lastName2",
-          "/properties/requestAdditionalDetail/fileName"                                      -> "fileName",
-          "/properties/requestAdditionalDetail/tradingName"                                   -> "tradingName",
-          "/properties/requestAdditionalDetail/subscriptionID"                                -> "subscriptionID",
-          "/properties/requestAdditionalDetail/isGBUser"                                      -> "true"
+          "/requestCommon/conversationID"                                          -> "conversationID",
+          "/requestCommon/receiptDate"                                             -> "2022-01-01T02:01",
+          "/requestCommon/schemaVersion"                                           -> "1.0.0",
+          "/requestCommon/regime"                                                  -> "MDR",
+          "/requestAdditionalDetail/primaryContact/phoneNumber"                    -> "1234567",
+          "/requestAdditionalDetail/primaryContact/emailAddress"                   -> "email@test.com",
+          "/requestAdditionalDetail/primaryContact/mobileNumber"                   -> "12345678",
+          "/requestAdditionalDetail/primaryContact/individualDetails/firstName"    -> "firstName",
+          "/requestAdditionalDetail/primaryContact/individualDetails/middleName"   -> "middleName",
+          "/requestAdditionalDetail/primaryContact/individualDetails/lastName"     -> "lastName",
+          "/requestAdditionalDetail/secondaryContact/phoneNumber"                  -> "21234567",
+          "/requestAdditionalDetail/secondaryContact/emailAddress"                 -> "email2@test.com",
+          "/requestAdditionalDetail/secondaryContact/mobileNumber"                 -> "212345678",
+          "/requestAdditionalDetail/secondaryContact/individualDetails/firstName"  -> "firstName2",
+          "/requestAdditionalDetail/secondaryContact/individualDetails/middleName" -> "middleName2",
+          "/requestAdditionalDetail/secondaryContact/individualDetails/lastName"   -> "lastName2",
+          "/requestAdditionalDetail/fileName"                                      -> "fileName",
+          "/requestAdditionalDetail/tradingName"                                   -> "tradingName",
+          "/requestAdditionalDetail/subscriptionID"                                -> "subscriptionID",
+          "/requestAdditionalDetail/isGBUser"                                      -> "true"
         )
       }
       "Must provide metaData for an organisation with 1 set of contact details" in {
@@ -110,18 +110,18 @@ class SDESMetaDataServiceSpec extends SpecBase with MockitoSugar with ScalaCheck
         val result = sdesMetaDataService.compileMetaData(responseDetail, conversationID, dateTime, fileName)
 
         result mustBe Map(
-          "/properties/requestCommon/conversationID"                                                -> "conversationID",
-          "/properties/requestCommon/receiptDate"                                                   -> "2022-01-01T02:01",
-          "/properties/requestCommon/schemaVersion"                                                 -> "1.0.0",
-          "/properties/requestCommon/regime"                                                        -> "MDR",
-          "/properties/requestAdditionalDetail/primaryContact/phoneNumber"                          -> "1234567",
-          "/properties/requestAdditionalDetail/primaryContact/emailAddress"                         -> "email@test.com",
-          "/properties/requestAdditionalDetail/primaryContact/mobileNumber"                         -> "12345678",
-          "/properties/requestAdditionalDetail/primaryContact/organisationDetails/organisationName" -> "organisationName",
-          "/properties/requestAdditionalDetail/fileName"                                            -> "fileName",
-          "/properties/requestAdditionalDetail/tradingName"                                         -> "tradingName",
-          "/properties/requestAdditionalDetail/subscriptionID"                                      -> "subscriptionID",
-          "/properties/requestAdditionalDetail/isGBUser"                                            -> "true"
+          "/requestCommon/conversationID"                                                -> "conversationID",
+          "/requestCommon/receiptDate"                                                   -> "2022-01-01T02:01",
+          "/requestCommon/schemaVersion"                                                 -> "1.0.0",
+          "/requestCommon/regime"                                                        -> "MDR",
+          "/requestAdditionalDetail/primaryContact/phoneNumber"                          -> "1234567",
+          "/requestAdditionalDetail/primaryContact/emailAddress"                         -> "email@test.com",
+          "/requestAdditionalDetail/primaryContact/mobileNumber"                         -> "12345678",
+          "/requestAdditionalDetail/primaryContact/organisationDetails/organisationName" -> "organisationName",
+          "/requestAdditionalDetail/fileName"                                            -> "fileName",
+          "/requestAdditionalDetail/tradingName"                                         -> "tradingName",
+          "/requestAdditionalDetail/subscriptionID"                                      -> "subscriptionID",
+          "/requestAdditionalDetail/isGBUser"                                            -> "true"
         )
       }
 
@@ -137,22 +137,22 @@ class SDESMetaDataServiceSpec extends SpecBase with MockitoSugar with ScalaCheck
         val result = sdesMetaDataService.compileMetaData(responseDetail, conversationID, dateTime, fileName)
 
         result mustBe Map(
-          "/properties/requestCommon/conversationID"                                                  -> "conversationID",
-          "/properties/requestCommon/receiptDate"                                                     -> "2022-01-01T02:01",
-          "/properties/requestCommon/schemaVersion"                                                   -> "1.0.0",
-          "/properties/requestCommon/regime"                                                          -> "MDR",
-          "/properties/requestAdditionalDetail/primaryContact/phoneNumber"                            -> "1234567",
-          "/properties/requestAdditionalDetail/primaryContact/emailAddress"                           -> "email@test.com",
-          "/properties/requestAdditionalDetail/primaryContact/mobileNumber"                           -> "12345678",
-          "/properties/requestAdditionalDetail/primaryContact/organisationDetails/organisationName"   -> "organisationName",
-          "/properties/requestAdditionalDetail/secondaryContact/phoneNumber"                          -> "21234567",
-          "/properties/requestAdditionalDetail/secondaryContact/emailAddress"                         -> "email2@test.com",
-          "/properties/requestAdditionalDetail/secondaryContact/mobileNumber"                         -> "212345678",
-          "/properties/requestAdditionalDetail/secondaryContact/organisationDetails/organisationName" -> "organisationName2",
-          "/properties/requestAdditionalDetail/fileName"                                              -> "fileName",
-          "/properties/requestAdditionalDetail/tradingName"                                           -> "tradingName",
-          "/properties/requestAdditionalDetail/subscriptionID"                                        -> "subscriptionID",
-          "/properties/requestAdditionalDetail/isGBUser"                                              -> "true"
+          "/requestCommon/conversationID"                                                  -> "conversationID",
+          "/requestCommon/receiptDate"                                                     -> "2022-01-01T02:01",
+          "/requestCommon/schemaVersion"                                                   -> "1.0.0",
+          "/requestCommon/regime"                                                          -> "MDR",
+          "/requestAdditionalDetail/primaryContact/phoneNumber"                            -> "1234567",
+          "/requestAdditionalDetail/primaryContact/emailAddress"                           -> "email@test.com",
+          "/requestAdditionalDetail/primaryContact/mobileNumber"                           -> "12345678",
+          "/requestAdditionalDetail/primaryContact/organisationDetails/organisationName"   -> "organisationName",
+          "/requestAdditionalDetail/secondaryContact/phoneNumber"                          -> "21234567",
+          "/requestAdditionalDetail/secondaryContact/emailAddress"                         -> "email2@test.com",
+          "/requestAdditionalDetail/secondaryContact/mobileNumber"                         -> "212345678",
+          "/requestAdditionalDetail/secondaryContact/organisationDetails/organisationName" -> "organisationName2",
+          "/requestAdditionalDetail/fileName"                                              -> "fileName",
+          "/requestAdditionalDetail/tradingName"                                           -> "tradingName",
+          "/requestAdditionalDetail/subscriptionID"                                        -> "subscriptionID",
+          "/requestAdditionalDetail/isGBUser"                                              -> "true"
         )
       }
     }
