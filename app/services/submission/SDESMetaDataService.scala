@@ -30,16 +30,16 @@ class SDESMetaDataService extends Logging {
   ): Map[String, String] = {
     val primaryContact   = transformContactInformation(subscriptionDetails.primaryContact, "primaryContact")
     val secondaryContact = subscriptionDetails.secondaryContact.fold(Map.empty[String, String])(sc => transformContactInformation(sc, "secondaryContact"))
-    val tradingName      = subscriptionDetails.tradingName.map(name => Map("/requestAdditionalDetail/tradingName" -> name))
+    val tradingName      = subscriptionDetails.tradingName.map(name => Map("requestAdditionalDetail/tradingName" -> name))
 
     tradingName.getOrElse(Map.empty) ++ Map(
-      "/requestCommon/conversationID"           -> correlationID.value,
-      "/requestCommon/receiptDate"              -> submissionTime.toString,
-      "/requestCommon/regime"                   -> "MDR",
-      "/requestCommon/schemaVersion"            -> "1.0.0",
-      "/requestAdditionalDetail/fileName"       -> fileName,
-      "/requestAdditionalDetail/subscriptionID" -> subscriptionDetails.subscriptionID,
-      "/requestAdditionalDetail/isGBUser"       -> subscriptionDetails.isGBUser.toString
+      "requestCommon/conversationID"           -> correlationID.value,
+      "requestCommon/receiptDate"              -> submissionTime.toString,
+      "requestCommon/regime"                   -> "MDR",
+      "requestCommon/schemaVersion"            -> "1.0.0",
+      "requestAdditionalDetail/fileName"       -> fileName,
+      "requestAdditionalDetail/subscriptionID" -> subscriptionDetails.subscriptionID,
+      "requestAdditionalDetail/isGBUser"       -> subscriptionDetails.isGBUser.toString
     ) ++ primaryContact ++ secondaryContact
   }
 
@@ -48,21 +48,21 @@ class SDESMetaDataService extends Logging {
       case individual: IndividualDetails => transformIndividual(individual, contactType)
       case organisation: OrganisationDetails =>
         Map(
-          s"/requestAdditionalDetail/$contactType/organisationDetails/organisationName" -> organisation.organisationName
+          s"requestAdditionalDetail/$contactType/organisationDetails/organisationName" -> organisation.organisationName
         )
     }
-    val phoneNumber  = contactInformation.phone.map(phone => Map(s"/requestAdditionalDetail/$contactType/phoneNumber" -> phone))
-    val mobileNumber = contactInformation.mobile.map(mobile => Map(s"/requestAdditionalDetail/$contactType/mobileNumber" -> mobile))
-    val email        = Map(s"/requestAdditionalDetail/$contactType/emailAddress" -> contactInformation.email)
+    val phoneNumber  = contactInformation.phone.map(phone => Map(s"requestAdditionalDetail/$contactType/phoneNumber" -> phone))
+    val mobileNumber = contactInformation.mobile.map(mobile => Map(s"requestAdditionalDetail/$contactType/mobileNumber" -> mobile))
+    val email        = Map(s"requestAdditionalDetail/$contactType/emailAddress" -> contactInformation.email)
 
     contactName ++ email ++ phoneNumber.getOrElse(Map.empty) ++ mobileNumber.getOrElse(Map.empty)
   }
 
   private def transformIndividual(individual: IndividualDetails, contactType: String): Map[String, String] = {
-    val firstName = Some(Map(s"/requestAdditionalDetail/$contactType/individualDetails/firstName" -> individual.firstName))
+    val firstName = Some(Map(s"requestAdditionalDetail/$contactType/individualDetails/firstName" -> individual.firstName))
     val middleName =
-      individual.middleName.map(middleName => Map(s"/requestAdditionalDetail/$contactType/individualDetails/middleName" -> middleName))
-    val lastName = Some(Map(s"/requestAdditionalDetail/$contactType/individualDetails/lastName" -> individual.lastName))
+      individual.middleName.map(middleName => Map(s"requestAdditionalDetail/$contactType/individualDetails/middleName" -> middleName))
+    val lastName = Some(Map(s"requestAdditionalDetail/$contactType/individualDetails/lastName" -> individual.lastName))
 
     Seq(firstName, middleName, lastName).flatten.foldLeft(Map.empty[String, String])(_ ++ _)
   }
