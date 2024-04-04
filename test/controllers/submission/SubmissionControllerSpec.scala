@@ -262,34 +262,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
     }
   }
   "submission controller large file path" - {
-    "when a file is posted greater than 3mb with sdes flag set to false, we transform it, send it to the HOD and return OK" in {
-
-      when(mockAppConf.sdesFileTransfer).thenReturn(false)
-      when(mockFileDetailsRepository.insert(any[FileDetails]()))
-        .thenReturn(Future.successful(true))
-      when(mockReadSubscriptionService.getContactInformation(any[String]())(any[HeaderCarrier](), any[ExecutionContext]()))
-        .thenReturn(Future.successful(Right(responseDetail)))
-      when(mockSubmissionConnector.submitDisclosure(any[NodeSeq](), any[ConversationId])(any[HeaderCarrier]()))
-        .thenReturn(Future.successful(HttpResponse(NO_CONTENT, "")))
-      when(mockXMLValidationService.validate(any[NodeSeq], any[String]))
-        .thenReturn(Right(basicXml))
-
-      val jsonPost = Json.toJson(SubmissionDetails("fileName", UploadId("uploadId"), "enrolmentId", 4000000L, "dummyUrl", "1234", messageSpec))
-
-      val request                = FakeRequest(POST, SubmissionController.submitDisclosure.url).withJsonBody(jsonPost)
-      val result: Future[Result] = route(application, request).value
-
-      status(result) mustBe OK
-
-      val argumentCaptor: ArgumentCaptor[NodeSeq]                      = ArgumentCaptor.forClass(classOf[NodeSeq])
-      val argumentCaptorSubmissionDetails: ArgumentCaptor[FileDetails] = ArgumentCaptor.forClass(classOf[FileDetails])
-      val argumentCaptorConversationId: ArgumentCaptor[ConversationId] = ArgumentCaptor.forClass(classOf[ConversationId])
-
-      verify(mockFileDetailsRepository, times(1)).insert(argumentCaptorSubmissionDetails.capture())
-      verify(mockSubmissionConnector, times(1)).submitDisclosure(argumentCaptor.capture(), argumentCaptorConversationId.capture())(any[HeaderCarrier]())
-    }
     "when a file is larger than 3mb we use the SDES journey" in {
-      when(mockAppConf.sdesFileTransfer).thenReturn(true)
       val conversationId = ConversationId("1234")
       when(mockSDESService.fileNotify(any[SubmissionDetails])(any[HeaderCarrier])).thenReturn(Future.successful(Right(conversationId)))
 
@@ -302,7 +275,6 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
       verify(mockSDESService, times(1)).fileNotify(any[SubmissionDetails])(any[HeaderCarrier])
     }
     "when the sdesService returns an error we return an Internal Server Error" in {
-      when(mockAppConf.sdesFileTransfer).thenReturn(true)
       when(mockSDESService.fileNotify(any[SubmissionDetails])(any[HeaderCarrier])).thenReturn(Future.successful(Left(new Exception("Error"))))
 
       val jsonPost = Json.toJson(SubmissionDetails("fileName", UploadId("uploadId"), "enrolmentId", 4000000L, "dummyUrl", "1234", messageSpec))
