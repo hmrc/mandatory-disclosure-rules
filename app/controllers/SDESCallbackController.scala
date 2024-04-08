@@ -28,7 +28,6 @@ import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SDESCallbackController @Inject() (
-  //authenticate: IdentifierAuthAction, //ToDo tax-frauds does not authenticate can we use it?
   fileDetailsRepository: FileDetailsRepository,
   cc: ControllerComponents
 )(implicit ec: ExecutionContext)
@@ -53,7 +52,6 @@ class SDESCallbackController @Inject() (
               Future.successful(Ok) //Leave fileDetailsRepository record state as Pending
             case FileProcessingFailure =>
               logger.warn(s"SDES transfer failed with message ${callBackNotification.failureReason}")
-              //ToDo check that we are not overwriting and EIS response
               fileDetailsRepository.findByConversationId(ConversationId(callBackNotification.correlationID)) flatMap {
                 case Some(fileDetails) =>
                   if (fileDetails.status == Pending) {
@@ -63,12 +61,14 @@ class SDESCallbackController @Inject() (
                       fileDetailsRepository.updateStatus(callBackNotification.correlationID, RejectedSDES).map(_ => Ok)
                     }
                   } else {
-                    logger.warn("SDESCallbackController: EIS has already responded") //ToDo confirm how we handle this case
+                    logger.warn(
+                      s"SDESCallbackController: Unexpected SDES response - EIS has already responded for correlation ID: ${callBackNotification.correlationID}"
+                    )
                     Future.successful(Ok)
                   }
                 case None =>
-                  logger.warn(s"Cannot file correlation ID for callback: ${callBackNotification.correlationID}")
-                  Future.successful(Ok) //ToDo confirm error handling
+                  logger.warn(s"SDESCallbackController: Unexpected SDES response - Cannot find file with correlation ID: ${callBackNotification.correlationID}")
+                  Future.successful(Ok)
               }
             case FileProcessed =>
               logger.info(s"Processing FileProcessed: ${callBackNotification.correlationID} awaiting EIS response")
