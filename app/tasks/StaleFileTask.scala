@@ -22,22 +22,20 @@ package tasks
 
 package tasks
 
-import javax.inject.Inject
-import javax.inject.Named
-
-import akka.actor.ActorRef
 import akka.actor.ActorSystem
+import config.AppConfig
+import play.api.Logging
+import repositories.submission.FileDetailsRepository
 
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
-class StaleFileTask @Inject() (actorSystem: ActorSystem, @Named("some-actor") someActor: ActorRef)(implicit
+@Singleton
+class StaleFileTask @Inject() (actorSystem: ActorSystem, repository: FileDetailsRepository, config: AppConfig)(implicit
   executionContext: ExecutionContext
-) {
-  actorSystem.scheduler.scheduleAtFixedRate(
-    initialDelay = 0.microseconds,
-    interval = 30.seconds,
-    receiver = someActor,
-    message = "tick"
-  )
+) extends Logging {
+  actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = 0.microseconds, config.staleTaskInterval) { () =>
+    repository.findStaleSubmissions().map(_.map(file => logger.warn(s"Stale file found - conversationId: ${file._id}, filename: ${file.name}")))
+  }
 }

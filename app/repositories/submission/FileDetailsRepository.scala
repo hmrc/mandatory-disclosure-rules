@@ -122,6 +122,7 @@ class FileDetailsRepository @Inject() (
       lt("submitted", LocalDateTime.now().minusHours(2))
     )
     collection.find(filter).toFuture()
+
   }
 
 }
