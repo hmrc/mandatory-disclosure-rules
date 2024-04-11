@@ -26,10 +26,12 @@ import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
 import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+
 class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepositorySupport[FileDetails] {
 
-  lazy val config              = app.injector.instanceOf[Configuration]
-  lazy val metricsService      = app.injector.instanceOf[MetricsService]
+  lazy val config = app.injector.instanceOf[Configuration]
+  lazy val metricsService = app.injector.instanceOf[MetricsService]
 
   private val mockAppConfig = mock[AppConfig]
   when(mockAppConfig.cacheTtl) thenReturn 1
@@ -37,17 +39,37 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
   override lazy val repository = new FileDetailsRepository(mongoComponent, mockAppConfig, metricsService)
 
   val dateTimeNow: LocalDateTime = LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.MILLIS)
-  val fileDetails: FileDetails =
+  val fileDetails: FileDetails = {
     FileDetails(ConversationId("conversationId123456"),
-                "subscriptionId",
-                "messageRefId",
-                Some(SingleNewInformation),
-                Pending,
-                "file1.xml",
-                dateTimeNow,
-                dateTimeNow
+      "subscriptionId",
+      "messageRefId",
+      Some(SingleNewInformation),
+      Pending,
+      "file1.xml",
+      dateTimeNow,
+      dateTimeNow
     )
+  }
 
+  "findStaleSubmissions" - {
+    "retrieve a stale pending submission" in {
+      val oldFile = fileDetails.copy(
+        submitted = LocalDateTime.now().minusDays(1),
+        name = "oldfile.xml",
+        _id = ConversationId("conversationId777777"
+        ))
+
+      val result: Future[Seq[FileDetails]] = for {
+        _ <- repository.insert(oldFile)
+        _ <- repository.insert(fileDetails)
+        res <- repository.findStaleSubmissions(Pending)
+      } yield res
+
+      whenReady(result) {
+        _ mustBe Seq(oldFile)
+      }
+    }
+  }
   "Insert" - {
     "must insert FileDetails" in {
       val res = repository.insert(fileDetails)
@@ -98,8 +120,8 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
       whenReady(res) { result =>
         result must matchPattern {
           case Some(
-                FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Some(SingleNewInformation), Accepted, "file1.xml", _, _)
-              ) =>
+          FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Some(SingleNewInformation), Accepted, "file1.xml", _, _)
+          ) =>
         }
       }
     }
@@ -110,22 +132,22 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
         result mustBe true
       }
       val res = repository.updateStatus("conversationId123456",
-                                        Rejected(ValidationErrors(Some(Seq(FileErrors(FileErrorCode.FailedSchemaValidation, Some("details")))), None))
+        Rejected(ValidationErrors(Some(Seq(FileErrors(FileErrorCode.FailedSchemaValidation, Some("details")))), None))
       )
 
       whenReady(res) { result =>
         result must matchPattern {
           case Some(
-                FileDetails(ConversationId("conversationId123456"),
-                            "subscriptionId",
-                            "messageRefId",
-                            Some(SingleNewInformation),
-                            Rejected(ValidationErrors(Some(Seq(FileErrors(FileErrorCode.FailedSchemaValidation, Some("details")))), None)),
-                            "file1.xml",
-                            _,
-                            _
-                )
-              ) =>
+          FileDetails(ConversationId("conversationId123456"),
+          "subscriptionId",
+          "messageRefId",
+          Some(SingleNewInformation),
+          Rejected(ValidationErrors(Some(Seq(FileErrors(FileErrorCode.FailedSchemaValidation, Some("details")))), None)),
+          "file1.xml",
+          _,
+          _
+          )
+          ) =>
         }
       }
     }
@@ -142,5 +164,6 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
     }
 
   }
+
 
 }
