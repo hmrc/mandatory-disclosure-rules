@@ -54,7 +54,7 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
   "findStaleSubmissions" - {
     "retrieve a stale pending submission" in {
       val oldFile = fileDetails.copy(
-        submitted = LocalDateTime.now().minusDays(1),
+        submitted = dateTimeNow.minusDays(1),
         name = "oldfile.xml",
         _id = ConversationId("conversationId777777"
         ))
@@ -66,7 +66,7 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
       } yield res
 
       whenReady(result) {
-        _ mustBe Seq(oldFile)
+        _ mustBe List(oldFile)
       }
     }
   }

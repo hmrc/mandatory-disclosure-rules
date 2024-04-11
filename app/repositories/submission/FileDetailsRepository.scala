@@ -20,7 +20,7 @@ import config.AppConfig
 import metrics.MetricsService
 import models.submission.{ConversationId, FileDetails, FileStatus, Pending}
 import org.mongodb.scala.bson.conversions.Bson
-import org.mongodb.scala.model.Filters.equal
+import org.mongodb.scala.model.Filters._
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.Updates.set
 import org.mongodb.scala.model._
@@ -33,40 +33,40 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class FileDetailsRepository @Inject()(
-                                       val mongo: MongoComponent,
-                                       appConfig: AppConfig,
-                                       metricsService: MetricsService
-                                     )(implicit ec: ExecutionContext)
-  extends PlayMongoRepository[FileDetails](
-    mongoComponent = mongo,
-    collectionName = "file-details",
-    domainFormat = FileDetails.format,
-    indexes = Seq(
-      IndexModel(
-        ascending("lastUpdated"),
-        IndexOptions()
-          .name("submission-last-updated-index")
-          .expireAfter(appConfig.submissionTtl, TimeUnit.DAYS)
+class FileDetailsRepository @Inject() (
+  val mongo: MongoComponent,
+  appConfig: AppConfig,
+  metricsService: MetricsService
+)(implicit ec: ExecutionContext)
+    extends PlayMongoRepository[FileDetails](
+      mongoComponent = mongo,
+      collectionName = "file-details",
+      domainFormat = FileDetails.format,
+      indexes = Seq(
+        IndexModel(
+          ascending("lastUpdated"),
+          IndexOptions()
+            .name("submission-last-updated-index")
+            .expireAfter(appConfig.submissionTtl, TimeUnit.DAYS)
+        ),
+        IndexModel(ascending("subscriptionId"),
+                   IndexOptions()
+                     .name("subscriptionId-index")
+                     .unique(false)
+        ),
+        IndexModel(ascending("status"),
+                   IndexOptions()
+                     .name("status-index")
+                     .unique(false)
+        )
       ),
-      IndexModel(ascending("subscriptionId"),
-        IndexOptions()
-          .name("subscriptionId-index")
-          .unique(false)
-      ),
-      IndexModel(ascending("status"),
-        IndexOptions()
-          .name("status-index")
-          .unique(false)
-      )
-    ),
-    replaceIndexes = true
-  ) {
+      replaceIndexes = true
+    ) {
 
   def updateStatus(
-                    conversationId: String,
-                    newStatus: FileStatus
-                  ): Future[Option[FileDetails]] = {
+    conversationId: String,
+    newStatus: FileStatus
+  ): Future[Option[FileDetails]] = {
 
     val filter: Bson = equal("_id", conversationId)
     val modifier = Updates.combine(
@@ -117,9 +117,12 @@ class FileDetailsRepository @Inject()(
       }
 
   def findStaleSubmissions(status: FileStatus = Pending): Future[Seq[FileDetails]] = {
-    val filter: Bson = equal("status", Codecs.toBson(status))
-    val now = LocalDateTime.now()
+    //    val filter: Bson = equal("status", Codecs.toBson(status))
+    val filter: Bson = and(
+      equal("status", Codecs.toBson(status)),
+      lt("submitted", LocalDateTime.now().minusHours(2))
+    )
     collection.find(filter).toFuture()
-    }
+  }
 
 }
