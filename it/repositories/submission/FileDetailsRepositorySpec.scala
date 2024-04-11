@@ -39,7 +39,7 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
   override lazy val repository = new FileDetailsRepository(mongoComponent, mockAppConfig, metricsService)
 
   val dateTimeNow: LocalDateTime = LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.MILLIS)
-  val fileDetails: FileDetails = {
+  val someSubmittedFile: FileDetails = {
     FileDetails(ConversationId("conversationId123456"),
       "subscriptionId",
       "messageRefId",
@@ -53,55 +53,62 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
 
   "findStaleSubmissions" - {
     "retrieve a stale pending submission" in {
-      val oldFile = fileDetails.copy(
+      val oldPendingFile = someSubmittedFile.copy(
         submitted = dateTimeNow.minusDays(1),
         name = "oldfile.xml",
         _id = ConversationId("conversationId777777"
         ))
+      val oldRejectedFile = someSubmittedFile.copy(
+        status = RejectedSDES,
+        submitted = dateTimeNow.minusDays(1),
+        name = "oldishfile.xml",
+        _id = ConversationId("conversationId777778"
+        ))
 
       val result: Future[Seq[FileDetails]] = for {
-        _ <- repository.insert(oldFile)
-        _ <- repository.insert(fileDetails)
-        res <- repository.findStaleSubmissions(Pending)
+        _ <- repository.insert(someSubmittedFile)
+        _ <- repository.insert(oldPendingFile)
+        _ <- repository.insert(oldRejectedFile)
+        res <- repository.findStaleSubmissions()
       } yield res
 
       whenReady(result) {
-        _ mustBe List(oldFile)
+        _ mustBe List(oldPendingFile)
       }
     }
   }
   "Insert" - {
     "must insert FileDetails" in {
-      val res = repository.insert(fileDetails)
+      val res = repository.insert(someSubmittedFile)
       whenReady(res) { result =>
         result mustBe true
       }
     }
 
     "must read FileDetails by SubscriptionId" in {
-      val insert = repository.insert(fileDetails)
+      val insert = repository.insert(someSubmittedFile)
       whenReady(insert) { result =>
         result mustBe true
       }
       val res = repository.findBySubscriptionId("subscriptionId")
       whenReady(res) { result =>
-        result mustBe Seq(fileDetails)
+        result mustBe Seq(someSubmittedFile)
       }
     }
 
     "must read FileDetails by ConversationId" in {
-      val insert = repository.insert(fileDetails)
+      val insert = repository.insert(someSubmittedFile)
       whenReady(insert) { result =>
         result mustBe true
       }
       val res = repository.findByConversationId(ConversationId("conversationId123456"))
       whenReady(res) { result =>
-        result mustBe Some(fileDetails)
+        result mustBe Some(someSubmittedFile)
       }
     }
 
     "must read FileDetails by ConversationId doesn't exists" in {
-      val insert = repository.insert(fileDetails)
+      val insert = repository.insert(someSubmittedFile)
       whenReady(insert) { result =>
         result mustBe true
       }
@@ -112,7 +119,7 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
     }
 
     "must update FileDetails status to Accepted by ConversationId" in {
-      val insert = repository.insert(fileDetails)
+      val insert = repository.insert(someSubmittedFile)
       whenReady(insert) { result =>
         result mustBe true
       }
@@ -127,7 +134,7 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
     }
 
     "must update FileDetails status to Rejected by ConversationId" in {
-      val insert = repository.insert(fileDetails)
+      val insert = repository.insert(someSubmittedFile)
       whenReady(insert) { result =>
         result mustBe true
       }
@@ -153,7 +160,7 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
     }
 
     "must read FileStatus by ConversationId" in {
-      val insert = repository.insert(fileDetails)
+      val insert = repository.insert(someSubmittedFile)
       whenReady(insert) { result =>
         result mustBe true
       }
