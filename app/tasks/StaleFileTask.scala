@@ -16,12 +16,6 @@
 
 package tasks
 
-/*
- * Copyright (C) Lightbend Inc. <https://www.lightbend.com>
- */
-
-package tasks
-
 import akka.actor.ActorSystem
 import config.AppConfig
 import play.api.Logging

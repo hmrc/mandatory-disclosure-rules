@@ -20,7 +20,7 @@ import com.google.inject.AbstractModule
 import handlers.{XmlHandler, XmlHandlerImpl}
 import services.submission.{SDESService, SDESServiceImpl}
 import services.upscan.{MongoBackedUploadProgressTracker, UploadProgressTracker}
-import tasks.tasks.StaleFileTask
+import tasks.StaleFileTask
 
 import java.time.{Clock, ZoneOffset}
 
