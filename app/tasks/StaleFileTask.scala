@@ -20,16 +20,44 @@ import akka.actor.ActorSystem
 import config.AppConfig
 import play.api.Logging
 import repositories.submission.FileDetailsRepository
+import uk.gov.hmrc.mongo.TimestampSupport
+import uk.gov.hmrc.mongo.lock.{MongoLockRepository, ScheduledLockService}
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class StaleFileTask @Inject() (actorSystem: ActorSystem, repository: FileDetailsRepository, config: AppConfig)(implicit
+class StaleFileTask @Inject() (actorSystem: ActorSystem,
+                               repository: FileDetailsRepository,
+                               config: AppConfig,
+                               mongoLockRepository: MongoLockRepository,
+                               timestampSupport: TimestampSupport
+)(implicit
   executionContext: ExecutionContext
 ) extends Logging {
-  actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = 0.microseconds, config.staleTaskInterval) { () =>
-    repository.findStaleSubmissions().map(_.map(file => logger.warn(s"Stale file found - conversationId: ${file._id}, filename: ${file.name}")))
+
+  private val interval = config.staleTaskInterval
+
+  val lockService =
+    ScheduledLockService(
+      lockRepository = mongoLockRepository,
+      lockId = "stale-file-task",
+      timestampSupport = timestampSupport,
+      schedulerInterval = interval
+    )
+
+  actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = 0.microseconds, interval) { () =>
+    lockService
+      .withLock {
+        Future {
+          repository.findStaleSubmissions().map(_.map(file => logger.warn(s"Stale file found - conversationId: ${file._id}, filename: ${file.name}")))
+        }
+      }
+//      .map {
+  //        case Some(res) => logger.debug(s"Finished with $res. Lock has been released.")
+  //        case None      => logger.debug("Failed to take lock")
+  //      }
+
   }
 }

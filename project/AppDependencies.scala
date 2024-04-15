@@ -5,7 +5,7 @@ import sbt._
 
 object AppDependencies {
   val bootstrap_ver = "7.22.0"
-  val mongo_ver = "1.3.0"
+  val mongo_ver = "1.8.0"
   val compile = Seq(
     "uk.gov.hmrc"       %% "bootstrap-backend-play-28" % bootstrap_ver,
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-28"        % mongo_ver,
