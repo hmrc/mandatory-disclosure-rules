@@ -20,7 +20,8 @@ import models.sdes.NotificationType.{FileProcessed, FileProcessingFailure, FileR
 import models.sdes._
 import models.submission.{ConversationId, Pending, RejectedSDES, RejectedSDESVirus}
 import play.api.Logging
-import play.api.mvc.ControllerComponents
+import play.api.libs.json.JsValue
+import play.api.mvc.{Action, ControllerComponents}
 import repositories.submission.FileDetailsRepository
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
@@ -34,45 +35,47 @@ class SDESCallbackController @Inject() (
     extends BackendController(cc)
     with Logging {
 
-  def callback = Action.async(parse.json) { request =>
+  def callback: Action[JsValue] = Action.async(parse.json) { request =>
     request.body
       .validate[NotificationCallback]
       .fold(
-        invalid = _ => Future.successful(InternalServerError),
+        invalid = _ => {
+          // This should never happen. Will trigger a Pagerduty alert.
+          logger.warn(s"SDESCallbackController: Unexpected SDES response - Invalid JSON payload")
+          Future.successful(InternalServerError)
+        },
         valid = callBackNotification => {
           logger.info(
-            s"Received SDES callback for file: ${callBackNotification.filename}, with correlationId : ${callBackNotification.correlationID} and status : ${callBackNotification.notification}"
+            s"SDESCallbackController: Received ${callBackNotification.notification} callback for file: ${callBackNotification.filename}, with correlationId: ${callBackNotification.correlationID}"
           )
           callBackNotification.notification match {
-            case FileReady =>
-              logger.info(s"Processing FileReady received: ${callBackNotification.correlationID}")
-              Future.successful(Ok) //Leave fileDetailsRepository record state as Pending
-            case FileReceived =>
-              logger.info(s"Processing FileReceived:  ${callBackNotification.correlationID}")
-              Future.successful(Ok) //Leave fileDetailsRepository record state as Pending
+            case FileReady | FileReceived | FileProcessed =>
+              // Leave file as Pending until we get a response from CADX.
+              Future.successful(Ok)
             case FileProcessingFailure =>
-              logger.warn(s"SDES transfer failed with message ${callBackNotification.failureReason}")
+              // File has failed to reach CADX, update the file status so the user can see the transfer has failed.
+              val failureReason = callBackNotification.failureReason.getOrElse("")
+
+              logger.warn(s"SDESCallbackController: File transfer failed with reason: $failureReason")
               fileDetailsRepository.findByConversationId(ConversationId(callBackNotification.correlationID)) flatMap {
-                case Some(fileDetails) =>
-                  if (fileDetails.status == Pending) {
-                    if (callBackNotification.failureReason.getOrElse("").matches(".*virus.*")) {
-                      fileDetailsRepository.updateStatus(callBackNotification.correlationID, RejectedSDESVirus).map(_ => Ok)
-                    } else {
-                      fileDetailsRepository.updateStatus(callBackNotification.correlationID, RejectedSDES).map(_ => Ok)
-                    }
-                  } else {
-                    logger.warn(
-                      s"SDESCallbackController: Unexpected SDES response - EIS has already responded for correlation ID: ${callBackNotification.correlationID}"
-                    )
-                    Future.successful(Ok)
-                  }
+                case Some(fileDetails) if fileDetails.status == Pending =>
+                  val newStatus = if (failureReason.matches(".*virus.*")) RejectedSDESVirus else RejectedSDES
+
+                  fileDetailsRepository.updateStatus(callBackNotification.correlationID, newStatus).map(_ => Ok)
+                case Some(_) =>
+                  // SDES has told us the file has failed to reach CADX, but we've already had a response from CADX.
+                  // This should never happen and will trigger a Pagerduty alert.
+                  logger.warn(
+                    s"SDESCallbackController: Unexpected SDES response - EIS has already responded for correlation ID: ${callBackNotification.correlationID}"
+                  )
+                  Future.successful(Ok)
                 case None =>
+                  // We've got a status update for a file we have no record of. This should only be possible if the SDES
+                  // callback is incorrect, or if there has been a > 28 day delay between the file being submitted and
+                  // us receiving this callback. This also shouldn't happen and will trigger a Pagerduty alert.
                   logger.warn(s"SDESCallbackController: Unexpected SDES response - Cannot find file with correlation ID: ${callBackNotification.correlationID}")
                   Future.successful(Ok)
               }
-            case FileProcessed =>
-              logger.info(s"Processing FileProcessed: ${callBackNotification.correlationID} awaiting EIS response")
-              Future.successful(Ok) // Leave fileDetailsRepository record state as Pending
           }
         }
       )
