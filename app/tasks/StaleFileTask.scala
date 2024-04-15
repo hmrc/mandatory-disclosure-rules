@@ -19,6 +19,7 @@ package tasks
 import akka.actor.ActorSystem
 import config.AppConfig
 import play.api.Logging
+import play.api.inject.ApplicationLifecycle
 import repositories.submission.FileDetailsRepository
 import uk.gov.hmrc.mongo.TimestampSupport
 import uk.gov.hmrc.mongo.lock.{MongoLockRepository, ScheduledLockService}
@@ -26,10 +27,12 @@ import uk.gov.hmrc.mongo.lock.{MongoLockRepository, ScheduledLockService}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 @Singleton
 class StaleFileTask @Inject() (actorSystem: ActorSystem,
                                repository: FileDetailsRepository,
+                               lifecycle: ApplicationLifecycle,
                                config: AppConfig,
                                mongoLockRepository: MongoLockRepository,
                                timestampSupport: TimestampSupport
@@ -37,27 +40,34 @@ class StaleFileTask @Inject() (actorSystem: ActorSystem,
   executionContext: ExecutionContext
 ) extends Logging {
 
+  private val enabled  = config.staleTaskEnabled
   private val interval = config.staleTaskInterval
 
-  val lockService =
-    ScheduledLockService(
+  if (enabled) {
+
+    val lockService = ScheduledLockService(
       lockRepository = mongoLockRepository,
       lockId = "stale-file-task",
       timestampSupport = timestampSupport,
       schedulerInterval = interval
     )
 
-  actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = 0.microseconds, interval) { () =>
-    lockService
-      .withLock {
-        Future {
-          repository.findStaleSubmissions().map(_.map(file => logger.warn(s"Stale file found - conversationId: ${file._id}, filename: ${file.name}")))
+    val cancellable = actorSystem.scheduler.scheduleWithFixedDelay(initialDelay = 1.second, interval) { () =>
+      lockService
+        .withLock {
+          logger.info("StaleFileTask: Started")
+          repository
+            .findStaleSubmissions()
+            .map(files => files.map(file => logger.warn(s"StaleFileTask: Stale file found - conversationId: ${file._id}, filename: ${file.name}")))
         }
-      }
-//      .map {
-  //        case Some(res) => logger.debug(s"Finished with $res. Lock has been released.")
-  //        case None      => logger.debug("Failed to take lock")
-  //      }
+        .onComplete {
+          case Success(_) => logger.info("StaleFileTask: Complete")
+          case Failure(e) => logger.warn("StaleFileTask: An error occurred", e)
+        }
+    }
+
+    lifecycle.addStopHook(() => Future.successful(cancellable.cancel()))
 
   }
+
 }
