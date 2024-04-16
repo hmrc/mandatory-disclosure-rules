@@ -56,14 +56,14 @@ class StaleFileTask @Inject() (actorSystem: ActorSystem,
       lockService
         .withLock {
           logger.info("StaleFileTask: Started")
+
           repository
             .findStaleSubmissions()
             .map(files => files.map(file => logger.warn(s"StaleFileTask: Stale file found - conversationId: ${file._id}, filename: ${file.name}")))
+
+          Future.successful(logger.info("StaleFileTask: Complete"))
         }
-        .onComplete {
-          case Success(_) => logger.info("StaleFileTask: Complete")
-          case Failure(e) => logger.warn("StaleFileTask: An error occurred", e)
-        }
+        .recover(e => logger.warn("StaleFileTask: An error occurred", e))
     }
 
     lifecycle.addStopHook(() => Future.successful(cancellable.cancel()))
