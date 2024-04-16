@@ -21,6 +21,7 @@ import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.duration.FiniteDuration
 
 @Singleton
 class AppConfig @Inject() (
@@ -73,4 +74,7 @@ class AppConfig @Inject() (
   lazy val submissionTtl: Int = config.get[Int]("mongodb.submission.timeToLiveInDays")
 
   lazy val sdesFileTransfer: Boolean = config.get[Boolean]("features.sdesFileTransfer")
+
+  val staleTaskInterval: FiniteDuration = config.get[FiniteDuration]("tasks.staleFiles.interval")
+  val staleTaskEnabled: Boolean         = config.get[Boolean]("tasks.staleFiles.enabled")
 }

@@ -19,7 +19,7 @@ package services
 import base.SpecBase
 import connectors.SDESConnector
 import models.sdes._
-import models.submission.{FileDetails, MDR401, MessageSpecData, MultipleNewInformation, SubmissionDetails}
+import models.submission._
 import models.subscription.{ContactInformation, OrganisationDetails, ResponseDetail}
 import models.upscan.UploadId
 import org.mockito.ArgumentMatchers.any
@@ -31,6 +31,7 @@ import play.api.inject.bind
 import repositories.submission.FileDetailsRepository
 import services.submission.SDESService
 import services.subscription.SubscriptionService
+import tasks.StaleFileTask
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,6 +42,7 @@ class SDESServiceSpec extends SpecBase with MockitoSugar with ScalaCheckDrivenPr
   val mockSubscriptionService: SubscriptionService     = mock[SubscriptionService]
   val mockSDESConnector: SDESConnector                 = mock[SDESConnector]
   val mockFileDetailsRepository: FileDetailsRepository = mock[FileDetailsRepository]
+  val mockStaleFileTask                                = mock[StaleFileTask]
 
   override def beforeEach(): Unit =
     reset(
@@ -54,7 +56,8 @@ class SDESServiceSpec extends SpecBase with MockitoSugar with ScalaCheckDrivenPr
       .overrides(
         bind[FileDetailsRepository].toInstance(mockFileDetailsRepository),
         bind[SDESConnector].toInstance(mockSDESConnector),
-        bind[SubscriptionService].toInstance(mockSubscriptionService)
+        bind[SubscriptionService].toInstance(mockSubscriptionService),
+        bind[StaleFileTask].toInstance(mockStaleFileTask)
       )
 
     val sdesService = application.injector().instanceOf[SDESService]

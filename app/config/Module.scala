@@ -20,6 +20,7 @@ import com.google.inject.AbstractModule
 import handlers.{XmlHandler, XmlHandlerImpl}
 import services.submission.{SDESService, SDESServiceImpl}
 import services.upscan.{MongoBackedUploadProgressTracker, UploadProgressTracker}
+import tasks.StaleFileTask
 
 import java.time.{Clock, ZoneOffset}
 
@@ -30,5 +31,6 @@ class Module() extends AbstractModule {
     bind(classOf[XmlHandler]).to(classOf[XmlHandlerImpl]).asEagerSingleton()
     bind(classOf[Clock]).toInstance(Clock.systemDefaultZone.withZone(ZoneOffset.UTC))
     bind(classOf[SDESService]).to(classOf[SDESServiceImpl]).asEagerSingleton()
+    bind(classOf[StaleFileTask]).asEagerSingleton()
   }
 }

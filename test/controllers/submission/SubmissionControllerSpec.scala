@@ -41,6 +41,7 @@ import services.audit.AuditService
 import services.submission.{SDESService, TransformService}
 import services.subscription.SubscriptionService
 import services.validation.XMLValidationService
+import tasks.StaleFileTask
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 
@@ -59,6 +60,7 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
   val mockXMLValidationService: XMLValidationService   = mock[XMLValidationService]
   val mockSDESService: SDESService                     = mock[SDESService]
   val mockAppConf: AppConfig                           = mock[AppConfig]
+  val mockStaleFileTask                                = mock[StaleFileTask]
 
   val messageSpec                = MessageSpecData("x9999", MDR401, 2, "OECD1", MultipleNewInformation)
   val errorStatusCodes: Seq[Int] = Seq(BAD_REQUEST, FORBIDDEN, NOT_FOUND, METHOD_NOT_ALLOWED, CONFLICT, INTERNAL_SERVER_ERROR, SERVICE_UNAVAILABLE)
@@ -84,7 +86,8 @@ class SubmissionControllerSpec extends SpecBase with MockitoSugar with ScalaChec
       bind[SDESService].toInstance(mockSDESService),
       bind[AppConfig].toInstance(mockAppConf),
       bind[XmlHandler].toInstance(new XmlMockBasicHandler),
-      bind[IdentifierAuthAction].to[FakeIdentifierAuthAction]
+      bind[IdentifierAuthAction].to[FakeIdentifierAuthAction],
+      bind[StaleFileTask].toInstance(mockStaleFileTask)
     )
     .build()
 
