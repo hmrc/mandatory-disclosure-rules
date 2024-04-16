@@ -119,10 +119,10 @@ class FileDetailsRepository @Inject() (
   def findStaleSubmissions(): Future[Seq[FileDetails]] = {
     val filter: Bson = and(
       equal("status", Codecs.toBson(Pending.asInstanceOf[FileStatus])),
-      lt("submitted", LocalDateTime.now().minusHours(2))
+      lt("submitted", LocalDateTime.now().minusSeconds(appConfig.staleTaskAlertAfter.toSeconds))
     )
-    collection.find(filter).toFuture()
 
+    collection.find(filter).toFuture()
   }
 
 }
