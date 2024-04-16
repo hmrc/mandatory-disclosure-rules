@@ -27,7 +27,7 @@ import uk.gov.hmrc.mongo.lock.{MongoLockRepository, ScheduledLockService}
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
+import scala.util.control.NonFatal
 
 @Singleton
 class StaleFileTask @Inject() (actorSystem: ActorSystem,
@@ -60,10 +60,14 @@ class StaleFileTask @Inject() (actorSystem: ActorSystem,
           repository
             .findStaleSubmissions()
             .map(files => files.map(file => logger.warn(s"StaleFileTask: Stale file found - conversationId: ${file._id}, filename: ${file.name}")))
-
-          Future.successful(logger.info("StaleFileTask: Complete"))
         }
-        .recover(e => logger.warn("StaleFileTask: An error occurred", e))
+        .map {
+          case Some(_) => logger.info("StaleFileTask: Complete")
+          case None    => logger.debug("StaleFileTask: Skipped - could not acquire lock")
+        }
+        .recover { case NonFatal(e) =>
+          logger.warn(s"StaleFileTask: An error occurred: ${e.getMessage}", e)
+        }
     }
 
     lifecycle.addStopHook(() => Future.successful(cancellable.cancel()))

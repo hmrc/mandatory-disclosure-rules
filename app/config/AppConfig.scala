@@ -75,8 +75,8 @@ class AppConfig @Inject() (
 
   lazy val sdesFileTransfer: Boolean = config.get[Boolean]("features.sdesFileTransfer")
 
-  val staleTaskEnabled: Boolean         = config.get[Boolean]("tasks.staleFiles.enabled")
-  val staleTaskInterval: FiniteDuration = config.get[FiniteDuration]("tasks.staleFiles.interval")
+  val staleTaskEnabled: Boolean           = config.get[Boolean]("tasks.staleFiles.enabled")
+  val staleTaskInterval: FiniteDuration   = config.get[FiniteDuration]("tasks.staleFiles.interval")
   val staleTaskAlertAfter: FiniteDuration = config.get[FiniteDuration]("tasks.staleFiles.alertAfter")
 
 }
