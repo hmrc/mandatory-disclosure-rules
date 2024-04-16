@@ -27,6 +27,7 @@ import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.concurrent.duration.DurationInt
 
 class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepositorySupport[FileDetails] {
 
@@ -35,6 +36,7 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
 
   private val mockAppConfig = mock[AppConfig]
   when(mockAppConfig.cacheTtl) thenReturn 1
+  when(mockAppConfig.staleTaskAlertAfter) thenReturn 2.hours
 
   override lazy val repository = new FileDetailsRepository(mongoComponent, mockAppConfig, metricsService)
 

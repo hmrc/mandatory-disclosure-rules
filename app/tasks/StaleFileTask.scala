@@ -61,7 +61,9 @@ class StaleFileTask @Inject() (actorSystem: ActorSystem,
             .findStaleSubmissions()
             .map(files => files.map(file => logger.warn(s"StaleFileTask: Stale file found - conversationId: ${file._id.value}, filename: ${file.name}")))
 
-          Future.successful(logger.info("StaleFileTask: Complete"))
+          logger.info("StaleFileTask: Complete")
+
+          Future.unit
         }
         .onComplete {
           case Success(_) => ()
