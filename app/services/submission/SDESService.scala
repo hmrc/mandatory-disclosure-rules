@@ -65,7 +65,7 @@ class SDESServiceImpl @Inject() (sdesConnector: SDESConnector,
         sdesConnector.fileReady(fileNotifyRequest).flatMap {
           case Right(_) =>
             logger.info(
-              s"SDES has been notified of file :: ${fileNotifyRequest.file.name}  with correlationId::${fileNotifyRequest.audit.correlationID}"
+              s"SDES has been notified of large file: ${fileNotifyRequest.file.name} with conversationId: ${fileNotifyRequest.audit.correlationID}."
             )
             val fileDetails: FileDetails = FileDetails(
               correlationID,
