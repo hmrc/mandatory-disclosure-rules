@@ -60,12 +60,16 @@ class StaleFileTask @Inject() (actorSystem: ActorSystem,
           repository
             .findStaleSubmissions()
             .map { files =>
-              files.foreach(file => logger.warn(s"StaleFileTask: Stale file found - conversationId: ${file._id.value}, filename: ${file.name}"))
-              logger.info("StaleFileTask: Complete")
+              files.foreach(file => logger.warn(s"StaleFileTask: Stale file found. ConversationId: ${file._id.value}, Filename: ${file.name}"))
+              files.length
             }
         }
         .onComplete {
-          case Success(_) => ()
+          case Success(result) =>
+            result match {
+              case Some(staleRecordCount) => logger.info(s"StaleFileTask: Complete. ${staleRecordCount} stale files found.")
+              case None => ()
+            }
           case Failure(e) => logger.warn(s"StaleFileTask: An error occurred: ${e.getMessage}", e)
         }
     }
