@@ -21,6 +21,7 @@ import play.api.Configuration
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.duration.FiniteDuration
 
 @Singleton
 class AppConfig @Inject() (
@@ -71,4 +72,9 @@ class AppConfig @Inject() (
 
   lazy val cacheTtl: Int      = config.get[Int]("mongodb.timeToLiveInSeconds")
   lazy val submissionTtl: Int = config.get[Int]("mongodb.submission.timeToLiveInDays")
+
+  val staleTaskEnabled: Boolean           = config.get[Boolean]("tasks.staleFiles.enabled")
+  val staleTaskInterval: FiniteDuration   = config.get[FiniteDuration]("tasks.staleFiles.interval")
+  val staleTaskAlertAfter: FiniteDuration = config.get[FiniteDuration]("tasks.staleFiles.alertAfter")
+
 }

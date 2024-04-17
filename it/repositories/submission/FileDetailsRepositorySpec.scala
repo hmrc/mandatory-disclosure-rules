@@ -26,60 +26,91 @@ import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
 import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.concurrent.duration.DurationInt
+
 class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepositorySupport[FileDetails] {
 
-  lazy val config              = app.injector.instanceOf[Configuration]
-  lazy val metricsService      = app.injector.instanceOf[MetricsService]
+  lazy val config = app.injector.instanceOf[Configuration]
+  lazy val metricsService = app.injector.instanceOf[MetricsService]
 
   private val mockAppConfig = mock[AppConfig]
   when(mockAppConfig.cacheTtl) thenReturn 1
+  when(mockAppConfig.staleTaskAlertAfter) thenReturn 2.hours
 
   override lazy val repository = new FileDetailsRepository(mongoComponent, mockAppConfig, metricsService)
 
   val dateTimeNow: LocalDateTime = LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.MILLIS)
-  val fileDetails: FileDetails =
+  val someSubmittedFile: FileDetails = {
     FileDetails(ConversationId("conversationId123456"),
-                "subscriptionId",
-                "messageRefId",
-                Some(SingleNewInformation),
-                Pending,
-                "file1.xml",
-                dateTimeNow,
-                dateTimeNow
+      "subscriptionId",
+      "messageRefId",
+      Some(SingleNewInformation),
+      Pending,
+      "file1.xml",
+      dateTimeNow,
+      dateTimeNow
     )
+  }
 
+  "findStaleSubmissions" - {
+    "retrieve a stale pending submission" in {
+      val oldPendingFile = someSubmittedFile.copy(
+        submitted = dateTimeNow.minusDays(1),
+        name = "oldfile.xml",
+        _id = ConversationId("conversationId777777"
+        ))
+      val oldRejectedFile = someSubmittedFile.copy(
+        status = RejectedSDES,
+        submitted = dateTimeNow.minusDays(1),
+        name = "oldishfile.xml",
+        _id = ConversationId("conversationId777778"
+        ))
+
+      val result: Future[Seq[FileDetails]] = for {
+        _ <- repository.insert(someSubmittedFile)
+        _ <- repository.insert(oldPendingFile)
+        _ <- repository.insert(oldRejectedFile)
+        res <- repository.findStaleSubmissions()
+      } yield res
+
+      whenReady(result) {
+        _ mustBe List(oldPendingFile)
+      }
+    }
+  }
   "Insert" - {
     "must insert FileDetails" in {
-      val res = repository.insert(fileDetails)
+      val res = repository.insert(someSubmittedFile)
       whenReady(res) { result =>
         result mustBe true
       }
     }
 
     "must read FileDetails by SubscriptionId" in {
-      val insert = repository.insert(fileDetails)
+      val insert = repository.insert(someSubmittedFile)
       whenReady(insert) { result =>
         result mustBe true
       }
       val res = repository.findBySubscriptionId("subscriptionId")
       whenReady(res) { result =>
-        result mustBe Seq(fileDetails)
+        result mustBe Seq(someSubmittedFile)
       }
     }
 
     "must read FileDetails by ConversationId" in {
-      val insert = repository.insert(fileDetails)
+      val insert = repository.insert(someSubmittedFile)
       whenReady(insert) { result =>
         result mustBe true
       }
       val res = repository.findByConversationId(ConversationId("conversationId123456"))
       whenReady(res) { result =>
-        result mustBe Some(fileDetails)
+        result mustBe Some(someSubmittedFile)
       }
     }
 
     "must read FileDetails by ConversationId doesn't exists" in {
-      val insert = repository.insert(fileDetails)
+      val insert = repository.insert(someSubmittedFile)
       whenReady(insert) { result =>
         result mustBe true
       }
@@ -90,7 +121,7 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
     }
 
     "must update FileDetails status to Accepted by ConversationId" in {
-      val insert = repository.insert(fileDetails)
+      val insert = repository.insert(someSubmittedFile)
       whenReady(insert) { result =>
         result mustBe true
       }
@@ -98,40 +129,40 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
       whenReady(res) { result =>
         result must matchPattern {
           case Some(
-                FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Some(SingleNewInformation), Accepted, "file1.xml", _, _)
-              ) =>
+          FileDetails(ConversationId("conversationId123456"), "subscriptionId", "messageRefId", Some(SingleNewInformation), Accepted, "file1.xml", _, _)
+          ) =>
         }
       }
     }
 
     "must update FileDetails status to Rejected by ConversationId" in {
-      val insert = repository.insert(fileDetails)
+      val insert = repository.insert(someSubmittedFile)
       whenReady(insert) { result =>
         result mustBe true
       }
       val res = repository.updateStatus("conversationId123456",
-                                        Rejected(ValidationErrors(Some(Seq(FileErrors(FileErrorCode.FailedSchemaValidation, Some("details")))), None))
+        Rejected(ValidationErrors(Some(Seq(FileErrors(FileErrorCode.FailedSchemaValidation, Some("details")))), None))
       )
 
       whenReady(res) { result =>
         result must matchPattern {
           case Some(
-                FileDetails(ConversationId("conversationId123456"),
-                            "subscriptionId",
-                            "messageRefId",
-                            Some(SingleNewInformation),
-                            Rejected(ValidationErrors(Some(Seq(FileErrors(FileErrorCode.FailedSchemaValidation, Some("details")))), None)),
-                            "file1.xml",
-                            _,
-                            _
-                )
-              ) =>
+          FileDetails(ConversationId("conversationId123456"),
+          "subscriptionId",
+          "messageRefId",
+          Some(SingleNewInformation),
+          Rejected(ValidationErrors(Some(Seq(FileErrors(FileErrorCode.FailedSchemaValidation, Some("details")))), None)),
+          "file1.xml",
+          _,
+          _
+          )
+          ) =>
         }
       }
     }
 
     "must read FileStatus by ConversationId" in {
-      val insert = repository.insert(fileDetails)
+      val insert = repository.insert(someSubmittedFile)
       whenReady(insert) { result =>
         result mustBe true
       }
@@ -142,5 +173,6 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
     }
 
   }
+
 
 }

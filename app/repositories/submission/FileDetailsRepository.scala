@@ -15,11 +15,12 @@
  */
 
 package repositories.submission
+
 import config.AppConfig
 import metrics.MetricsService
-import models.submission.{ConversationId, FileDetails, FileStatus}
+import models.submission.{ConversationId, FileDetails, FileStatus, Pending}
 import org.mongodb.scala.bson.conversions.Bson
-import org.mongodb.scala.model.Filters.equal
+import org.mongodb.scala.model.Filters._
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.Updates.set
 import org.mongodb.scala.model._
@@ -51,6 +52,11 @@ class FileDetailsRepository @Inject() (
         IndexModel(ascending("subscriptionId"),
                    IndexOptions()
                      .name("subscriptionId-index")
+                     .unique(false)
+        ),
+        IndexModel(ascending("status"),
+                   IndexOptions()
+                     .name("status-index")
                      .unique(false)
         )
       ),
@@ -109,5 +115,14 @@ class FileDetailsRepository @Inject() (
         metricsService.fileStatusPendingCounter.inc()
         true
       }
+
+  def findStaleSubmissions(): Future[Seq[FileDetails]] = {
+    val filter: Bson = and(
+      equal("status", Codecs.toBson(Pending.asInstanceOf[FileStatus])),
+      lt("submitted", LocalDateTime.now().minusSeconds(appConfig.staleTaskAlertAfter.toSeconds))
+    )
+
+    collection.find(filter).toFuture()
+  }
 
 }
