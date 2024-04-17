@@ -86,7 +86,7 @@ class SubmissionService @Inject() (
           case Right(_) =>
             submissionConnector.submitDisclosure(submissionXml, conversationId).flatMap { httpResponse =>
               logger.info(
-                s"EIS has been notified of small file: ${fileName} with conversationId: ${conversationId.value}."
+                s"EIS has been notified of small file: $fileName with conversationId: ${conversationId.value}."
               )
               if (appConfig.auditFileSubmission) {
                 auditService.sendAuditEvent(
