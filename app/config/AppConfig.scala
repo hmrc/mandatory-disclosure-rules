@@ -73,8 +73,6 @@ class AppConfig @Inject() (
   lazy val cacheTtl: Int      = config.get[Int]("mongodb.timeToLiveInSeconds")
   lazy val submissionTtl: Int = config.get[Int]("mongodb.submission.timeToLiveInDays")
 
-  lazy val sdesFileTransfer: Boolean = config.get[Boolean]("features.sdesFileTransfer")
-
   val staleTaskEnabled: Boolean           = config.get[Boolean]("tasks.staleFiles.enabled")
   val staleTaskInterval: FiniteDuration   = config.get[FiniteDuration]("tasks.staleFiles.interval")
   val staleTaskAlertAfter: FiniteDuration = config.get[FiniteDuration]("tasks.staleFiles.alertAfter")
