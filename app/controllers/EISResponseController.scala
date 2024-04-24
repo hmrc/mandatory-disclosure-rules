@@ -81,7 +81,7 @@ class EISResponseController @Inject() (cc: ControllerComponents,
               DateTimeFormatUtil.displayFormattedDate(updatedFileDetails.submitted),
               updatedFileDetails.messageRefId,
               updatedFileDetails.status == FileStatusAccepted,
-              reportTypeMessage(updatedFileDetails.reportType)
+              ReportType.getMessage(updatedFileDetails.reportType)
             )
           case _ =>
             logger.warn("Upload file status is rejected on fast journey. No email has been sent")
@@ -92,14 +92,4 @@ class EISResponseController @Inject() (cc: ControllerComponents,
         InternalServerError
     }
   }
-
-  private def reportTypeMessage(reportType: Option[ReportType]): String =
-    reportType match {
-      case Some(MultipleNewInformation)       => "The file contains new information in multiple reports."
-      case Some(MultipleCorrectionsDeletions) => "The file contains corrections or deletions for multiple reports."
-      case Some(SingleNewInformation)         => "The file contains new information in one report."
-      case Some(SingleCorrection)             => "The file contains corrections in one report."
-      case Some(SingleDeletion)               => "The file contains a deletion of a previous report."
-      case _                                  => ""
-    }
 }
