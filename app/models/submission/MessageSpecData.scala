@@ -56,6 +56,16 @@ object ReportType {
     case JsString("SingleOther")                  => JsSuccess(SingleOther)
     case value                                    => JsError(s"Unexpected value of _type: $value")
   }
+
+  def getMessage(reportType: Option[ReportType]): String =
+    reportType match {
+      case Some(MultipleNewInformation)       => "The file contains new information in multiple reports."
+      case Some(MultipleCorrectionsDeletions) => "The file contains corrections or deletions for multiple reports."
+      case Some(SingleNewInformation)         => "The file contains new information in one report."
+      case Some(SingleCorrection)             => "The file contains corrections in one report."
+      case Some(SingleDeletion)               => "The file contains a deletion of a previous report."
+      case _                                  => ""
+    }
 }
 
 sealed trait MessageTypeIndic

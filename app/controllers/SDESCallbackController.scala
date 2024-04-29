@@ -16,66 +16,97 @@
 
 package controllers
 
-import models.sdes.NotificationType.{FileProcessed, FileProcessingFailure, FileReady, FileReceived}
+import models.sdes.NotificationType.FileProcessingFailure
 import models.sdes._
-import models.submission.{ConversationId, Pending, RejectedSDES, RejectedSDESVirus}
+import models.submission._
 import play.api.Logging
-import play.api.mvc.ControllerComponents
+import play.api.libs.json.JsValue
+import play.api.mvc.{Action, ControllerComponents}
 import repositories.submission.FileDetailsRepository
+import services.EmailService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import utils.DateTimeFormatUtil
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class SDESCallbackController @Inject() (
   fileDetailsRepository: FileDetailsRepository,
+  emailService: EmailService,
   cc: ControllerComponents
 )(implicit ec: ExecutionContext)
     extends BackendController(cc)
     with Logging {
 
-  def callback = Action.async(parse.json) { request =>
+  def callback: Action[JsValue] = Action.async(parse.json) { request =>
+    implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
+
     request.body
       .validate[NotificationCallback]
       .fold(
-        invalid = _ => Future.successful(InternalServerError),
-        valid = callBackNotification => {
-          logger.info(
-            s"Received SDES callback for file: ${callBackNotification.filename}, with correlationId : ${callBackNotification.correlationID} and status : ${callBackNotification.notification}"
-          )
-          callBackNotification.notification match {
-            case FileReady =>
-              logger.info(s"Processing FileReady received: ${callBackNotification.correlationID}")
-              Future.successful(Ok) //Leave fileDetailsRepository record state as Pending
-            case FileReceived =>
-              logger.info(s"Processing FileReceived:  ${callBackNotification.correlationID}")
-              Future.successful(Ok) //Leave fileDetailsRepository record state as Pending
-            case FileProcessingFailure =>
-              logger.warn(s"SDES transfer failed with message ${callBackNotification.failureReason}")
-              fileDetailsRepository.findByConversationId(ConversationId(callBackNotification.correlationID)) flatMap {
-                case Some(fileDetails) =>
-                  if (fileDetails.status == Pending) {
-                    if (callBackNotification.failureReason.getOrElse("").matches(".*virus.*")) {
-                      fileDetailsRepository.updateStatus(callBackNotification.correlationID, RejectedSDESVirus).map(_ => Ok)
-                    } else {
-                      fileDetailsRepository.updateStatus(callBackNotification.correlationID, RejectedSDES).map(_ => Ok)
-                    }
-                  } else {
-                    logger.warn(
-                      s"SDESCallbackController: Unexpected SDES response - EIS has already responded for correlation ID: ${callBackNotification.correlationID}"
-                    )
-                    Future.successful(Ok)
-                  }
-                case None =>
-                  logger.warn(s"SDESCallbackController: Unexpected SDES response - Cannot find file with correlation ID: ${callBackNotification.correlationID}")
-                  Future.successful(Ok)
-              }
-            case FileProcessed =>
-              logger.info(s"Processing FileProcessed: ${callBackNotification.correlationID} awaiting EIS response")
-              Future.successful(Ok) // Leave fileDetailsRepository record state as Pending
-          }
-        }
+        _ => {
+          logger.warn(logErrorInvalidJson)
+          Future.successful(InternalServerError)
+        },
+        callback => handleSDESCallback(callback)
       )
-
   }
+
+  private def handleSDESCallback(callback: NotificationCallback)(implicit hc: HeaderCarrier): Future[Status] = {
+    logger.info(logReceived(callback))
+
+    callback.notification match {
+      case FileProcessingFailure =>
+        logger.warn(logFileProcessingFailure(callback))
+
+        fileDetailsRepository.findByConversationId(ConversationId(callback.correlationID)) flatMap {
+          case Some(fileDetails) if fileDetails.status == Pending =>
+            val status = if (callback.failureReason.getOrElse("").matches(".*virus.*")) RejectedSDESVirus else RejectedSDES
+
+            fileDetailsRepository
+              .updateStatus(callback.correlationID, status)
+              .map {
+                case Some(updatedFileDetails) =>
+                  emailService.sendAndLogEmail(
+                    updatedFileDetails.subscriptionId,
+                    DateTimeFormatUtil.displayFormattedDate(updatedFileDetails.submitted),
+                    updatedFileDetails.messageRefId,
+                    isUploadSuccessful = false,
+                    ReportType.getMessage(updatedFileDetails.reportType)
+                  )
+                  Ok
+                case None =>
+                  logger.warn(logErrorDbNotUpdated(callback))
+                  InternalServerError
+              }
+          case Some(_) =>
+            logger.warn(logErrorStatusNotPending(callback))
+            Future.successful(Ok)
+          case None =>
+            logger.warn(logErrorFileNotFound(callback))
+            Future.successful(Ok)
+        }
+      case _ =>
+        Future.successful(Ok)
+    }
+  }
+
+  private val logReceived = (callback: NotificationCallback) =>
+    s"SDESCallbackController: Received SDES ${callback.notification} callback for file: ${callback.filename} (${callback.correlationID})"
+
+  private val logFileProcessingFailure = (callback: NotificationCallback) =>
+    s"SDESCallbackController: SDES transfer failed with message: ${callback.failureReason} (${callback.correlationID})"
+
+  private val logErrorInvalidJson = "SDESCallbackController: Unexpected error - sdes callback failed json validation"
+
+  private val logErrorDbNotUpdated = (callback: NotificationCallback) =>
+    s"SDESCallbackController: Unexpected error - unable to update file status in db (${callback.correlationID})"
+
+  private val logErrorStatusNotPending = (callback: NotificationCallback) =>
+    s"SDESCallbackController: Unexpected error - file status is not Pending (${callback.correlationID})"
+
+  private val logErrorFileNotFound = (callback: NotificationCallback) =>
+    s"SDESCallbackController: Unexpected error - cannot find file in database (${callback.correlationID})"
 }
