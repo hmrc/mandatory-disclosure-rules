@@ -52,6 +52,18 @@ class RecordErrorCodeSpec extends SpecBase {
       errorCode mustBe Some(RecordErrorCode.MissingCorrDocRefId)
     }
 
+    "deserialize from JSON correctly - DocRefIDIsNoLongerValid" in {
+      val json      = JsString("80014")
+      val errorCode = Json.fromJson[RecordErrorCode](json).asOpt
+      errorCode mustBe Some(RecordErrorCode.DocRefIDIsNoLongerValid)
+    }
+
+    "deserialize from JSON correctly - CustomError" in {
+      val json      = JsString("99999")
+      val errorCode = Json.fromJson[RecordErrorCode](json).asOpt
+      errorCode mustBe Some(RecordErrorCode.CustomError)
+    }
+
     "deserialize from JSON with unknown code correctly" in {
       val json      = JsString("99998")
       val errorCode = Json.fromJson[RecordErrorCode](json).asOpt
