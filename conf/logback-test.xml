@@ -43,7 +43,7 @@
         <appender-ref ref="STDOUT_IGNORE_NETTY" />
     </logger>
 
-    <logger name="akka" additivity="false">
+    <logger name="pekko" additivity="false">
         <appender-ref ref="STDOUT" />
     </logger>
 

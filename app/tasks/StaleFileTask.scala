@@ -16,7 +16,7 @@
 
 package tasks
 
-import akka.actor.ActorSystem
+import org.apache.pekko.actor.ActorSystem
 import config.AppConfig
 import play.api.Logging
 import play.api.inject.ApplicationLifecycle
