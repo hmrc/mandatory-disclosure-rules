@@ -39,7 +39,7 @@ class MongoBackedUploadProgressTrackerSpec extends SpecBase {
       when(mockUploadSessionRepository.insert(any[UploadSessionDetails]()))
         .thenReturn(Future.successful(true))
       val insert = Await.result(
-        (sut.requestUpload(UploadId("123"), Reference("123"))),
+        sut.requestUpload(UploadId("123"), Reference("123")),
         10 seconds
       )
       insert mustEqual true

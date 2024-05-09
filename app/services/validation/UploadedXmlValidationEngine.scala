@@ -36,19 +36,21 @@ class UploadedXmlValidationEngine @Inject() (xmlValidationService: XMLValidation
 ) extends Logging {
 
   def validateUploadSubmission(upScanUrl: String): Future[SubmissionValidationResult] =
-    try performXmlValidation(upScanUrl) match {
-      case Right(messageSpecData) =>
-        messageSpecData match {
-          case Some(msd) => Future.successful(SubmissionValidationSuccess(msd))
-          case None =>
-            val errorMessage = "Could not retrieve messageSpec information from the submission"
-            logger.warn(errorMessage)
-            Future.successful(InvalidXmlError(errorMessage))
-        }
+    try
+      performXmlValidation(upScanUrl) match {
+        case Right(messageSpecData) =>
+          messageSpecData match {
+            case Some(msd) => Future.successful(SubmissionValidationSuccess(msd))
+            case None =>
+              val errorMessage = "Could not retrieve messageSpec information from the submission"
+              logger.warn(errorMessage)
+              Future.successful(InvalidXmlError(errorMessage))
+          }
 
-      case Left(errors) =>
-        Future.successful(SubmissionValidationFailure(ValidationErrors(errors)))
-    } catch {
+        case Left(errors) =>
+          Future.successful(SubmissionValidationFailure(ValidationErrors(errors)))
+      }
+    catch {
       case e: SAXParseException =>
         logger.warn(s"XML parsing failed. The XML parser has thrown the exception: $e")
         Future.successful(InvalidXmlError(e.getMessage))

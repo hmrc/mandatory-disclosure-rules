@@ -50,7 +50,8 @@ class SDESServiceImpl @Inject() (sdesConnector: SDESConnector,
   override def fileNotify(submissionDetails: SubmissionDetails)(implicit hc: HeaderCarrier): Future[Either[Exception, ConversationId]] =
     readSubscriptionService.getContactInformation(submissionDetails.enrolmentId).flatMap {
       case Right(subscriptionDetails) =>
-        val correlationID: ConversationId = ConversationId() //CorrelationID is also a UUID so using ConversationId for compatibility with FileDetailsRepository
+        val correlationID: ConversationId =
+          ConversationId() // CorrelationID is also a UUID so using ConversationId for compatibility with FileDetailsRepository
         val submissionTime: LocalDateTime = DateTimeFormatUtil.zonedDateTimeNow.toLocalDateTime
         val metaData                      = metaDataService.compileMetaData(subscriptionDetails, correlationID, submissionTime, submissionDetails.fileName)
         val fileNotifyRequest = FileNotificationHelper

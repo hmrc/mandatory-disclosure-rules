@@ -20,17 +20,7 @@ import config.AppConfig
 import controllers.actions.EISResponsePreConditionCheckActionRefiner
 import controllers.auth.ValidateAuthTokenAction
 import models.audit.AuditType
-import models.submission.{
-  Accepted => FileStatusAccepted,
-  FileStatus,
-  MultipleCorrectionsDeletions,
-  MultipleNewInformation,
-  Rejected,
-  ReportType,
-  SingleCorrection,
-  SingleDeletion,
-  SingleNewInformation
-}
+import models.submission.{Accepted => FileStatusAccepted, FileStatus, Rejected, ReportType}
 import models.xml.{BREResponse, ValidationStatus}
 import play.api.Logging
 import play.api.libs.json.Json
