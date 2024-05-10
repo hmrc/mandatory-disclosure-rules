@@ -1,7 +1,9 @@
-import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, integrationTestSettings}
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
+import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, itSettings}
 
 val appName = "mandatory-disclosure-rules"
+
+ThisBuild / scalaVersion := "2.13.13"
+ThisBuild / majorVersion := 0
 
 val silencerVersion = "1.7.6"
 
@@ -24,10 +26,8 @@ lazy val scalaCompilerOptions = Seq(
 
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
-  .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
+  .disablePlugins(JUnitXmlReportPlugin) // Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(
-    majorVersion             := 0,
-    scalaVersion             := "2.13.8",
     PlayKeys.playDefaultPort := 10019,
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
     Compile / scalafmtOnCompile                                := true,
@@ -44,8 +44,12 @@ lazy val microservice = Project(appName, file("."))
       "-Wconf:cat=unused&src=.*Routes\\.scala:s"
     )
   )
-  .configs(IntegrationTest)
   .settings(ScoverageSettings.settings: _*)
-  .settings(integrationTestSettings(): _*)
   .settings(addTestReportOption(Test, "test-reports"))
   .settings(resolvers += Resolver.jcenterRepo)
+
+lazy val it = project
+  .enablePlugins(PlayScala)
+  .dependsOn(microservice % "test->test") // the "test->test" allows reusing test code and test dependencies
+  .settings(itSettings())
+  .settings(libraryDependencies ++= AppDependencies.test)

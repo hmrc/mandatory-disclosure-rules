@@ -76,7 +76,7 @@ class SubmissionService @Inject() (
     readSubscriptionService.getContactInformation(subscriptionId).flatMap {
       case Right(value) =>
         val submissionXml: NodeSeq = transformService.addSubscriptionDetailsToSubmission(uploadedXmlNode, value, submissionMetaData)
-        val sanitisedXml           = scala.xml.Utility.trim(scala.xml.XML.loadString(submissionXml.mkString)) //trim only behaves correctly with xml.Elem
+        val sanitisedXml           = scala.xml.Utility.trim(scala.xml.XML.loadString(submissionXml.mkString)) // trim only behaves correctly with xml.Elem
         val validatedResponse      = xmlValidationService.validate(xml = sanitisedXml, filePath = appConfig.submissionXSDFilePath)
 
         validatedResponse match {

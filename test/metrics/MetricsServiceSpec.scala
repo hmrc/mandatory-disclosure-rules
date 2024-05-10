@@ -17,7 +17,7 @@
 package metrics
 
 import base.SpecBase
-import com.kenshoo.play.metrics.MetricsImpl
+import uk.gov.hmrc.play.bootstrap.metrics.MetricsImpl
 import models.submission.{Accepted, Rejected}
 import models.xml.ValidationErrors
 import org.scalacheck.Gen

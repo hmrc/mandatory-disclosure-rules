@@ -89,7 +89,7 @@ class UpScanSessionRepositorySpec extends SpecBase with DefaultPlayMongoReposito
     "must update the status and the lastUpdated time" in {
       insert(uploadDetails).futureValue
 
-      val result         = repository.updateStatus(Reference("xxxx"), Failed).futureValue
+      val result = repository.updateStatus(Reference("xxxx"), Failed).futureValue
       result mustEqual true
 
       val expectedResult = uploadDetails copy (status = Failed, lastUpdated = instant)

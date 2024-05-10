@@ -37,7 +37,7 @@ object RequestCommonForUpdate {
   private val mdtp      = "MDTP"
 
   def apply(regime: String): RequestCommonForUpdate = {
-    //Generate a 32 chars UUID without hyphens
+    // Generate a 32 chars UUID without hyphens
     val acknowledgementReference = UUID.randomUUID().toString.replace("-", "")
     RequestCommonForUpdate(
       regime = regime,

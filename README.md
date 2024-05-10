@@ -40,14 +40,17 @@ This service runs on port 10019 and is named MANDATORY_DISCLOSURE_RULES in servi
 
 Run the following command to start services locally:
 
-    sm --start MDR_ALL -r
-    
+ 
+```bash
+sm2 --start MDR_ALL
+```
+
 #### *Acceptance test repo*:  
 [mandatory-disclosure-rules-file-upload-ui-tests](https://github.com/hmrc/mandatory-disclosure-rules-file-upload-ui-tests)
 
 ## Requirements
 
-This service is written in [Scala](http://www.scala-lang.org/) and [Play](http://playframework.com/), and requires a Java 8 [JRE] to run.
+This service is written in [Scala](http://www.scala-lang.org/) and [Play](http://playframework.com/), and requires at least Java 11 [JRE] to run.
 
 ## SDES Info
 

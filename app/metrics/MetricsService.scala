@@ -17,8 +17,8 @@
 package metrics
 
 import com.codahale.metrics.Counter
-import com.kenshoo.play.metrics.Metrics
 import models.submission.{Accepted, FileStatus, Rejected}
+import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
