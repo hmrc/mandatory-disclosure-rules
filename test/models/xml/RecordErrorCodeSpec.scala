@@ -28,6 +28,25 @@ class RecordErrorCodeSpec extends SpecBase {
     JsString(errorCode.code)
   }
 
+  val ErrorCodes: Iterator[String] =
+    Iterator("80000", "80001", "80002", "80003", "80004", "80005", "80008", "80009", "80010", "80011", "80013", "80014", "99999")
+
+  def matchErrorCode(code: String): RecordErrorCode = code match {
+    case "80000" => RecordErrorCode.DocRefIDAlreadyUsed
+    case "80001" => RecordErrorCode.DocRefIDFormat
+    case "80002" => RecordErrorCode.CorrDocRefIdUnknown
+    case "80003" => RecordErrorCode.CorrDocRefIdNoLongerValid
+    case "80004" => RecordErrorCode.CorrDocRefIdForNewData
+    case "80005" => RecordErrorCode.MissingCorrDocRefId
+    case "80008" => RecordErrorCode.ResendOption
+    case "80009" => RecordErrorCode.DeleteParentRecord
+    case "80010" => RecordErrorCode.MessageTypeIndic
+    case "80011" => RecordErrorCode.CorrDocRefIDTwiceInSameMessage
+    case "80013" => RecordErrorCode.UnknownDocRefID
+    case "80014" => RecordErrorCode.DocRefIDIsNoLongerValid
+    case "99999" => RecordErrorCode.CustomError
+  }
+
   "RecordErrorCode" - {
     "read errorCode" in {
       for (errorCode <- RecordErrorCode.values) {
@@ -47,21 +66,12 @@ class RecordErrorCodeSpec extends SpecBase {
     }
 
     "deserialize from JSON correctly" in {
-      val json      = JsString("80005")
-      val errorCode = Json.fromJson[RecordErrorCode](json).asOpt
-      errorCode mustBe Some(RecordErrorCode.MissingCorrDocRefId)
-    }
-
-    "deserialize from JSON correctly - DocRefIDIsNoLongerValid" in {
-      val json      = JsString("80014")
-      val errorCode = Json.fromJson[RecordErrorCode](json).asOpt
-      errorCode mustBe Some(RecordErrorCode.DocRefIDIsNoLongerValid)
-    }
-
-    "deserialize from JSON correctly - CustomError" in {
-      val json      = JsString("99999")
-      val errorCode = Json.fromJson[RecordErrorCode](json).asOpt
-      errorCode mustBe Some(RecordErrorCode.CustomError)
+      while (ErrorCodes.hasNext) {
+        val code = ErrorCodes.next()
+        val json = JsString(code)
+        val errorCode = Json.fromJson[RecordErrorCode](json).asOpt
+        errorCode mustBe Some(matchErrorCode(code))
+      }
     }
 
     "deserialize from JSON with unknown code correctly" in {
