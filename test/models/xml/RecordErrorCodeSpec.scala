@@ -67,8 +67,8 @@ class RecordErrorCodeSpec extends SpecBase {
 
     "deserialize from JSON correctly" in {
       while (ErrorCodes.hasNext) {
-        val code = ErrorCodes.next()
-        val json = JsString(code)
+        val code      = ErrorCodes.next()
+        val json      = JsString(code)
         val errorCode = Json.fromJson[RecordErrorCode](json).asOpt
         errorCode mustBe Some(matchErrorCode(code))
       }

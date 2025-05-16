@@ -4,7 +4,7 @@ import sbt.*
 object AppDependencies {
   val playVersion   = "play-30"
   val bootstrap_ver = "8.5.0"
-  val mongo_ver     = "1.9.0"
+  val mongo_ver     = "2.6.0"
 
   val compile: Seq[ModuleID] = Seq(
     "uk.gov.hmrc"       %% s"bootstrap-backend-$playVersion" % bootstrap_ver,
