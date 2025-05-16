@@ -2,7 +2,7 @@ import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, itSettings}
 
 val appName = "mandatory-disclosure-rules"
 
-ThisBuild / scalaVersion := "2.13.13"
+ThisBuild / scalaVersion := "2.13.16"
 ThisBuild / majorVersion := 0
 
 val silencerVersion = "1.7.6"
