@@ -42,7 +42,7 @@ object SubmissionValidationResult {
 case class ValidationErrors(errors: Seq[GenericError])
 
 object ValidationErrors {
-  implicit val format = Json.format[ValidationErrors]
+  implicit val format: OFormat[ValidationErrors] = Json.format[ValidationErrors]
 }
 
 case class SubmissionValidationSuccess(messageSpecData: MessageSpecData) extends SubmissionValidationResult

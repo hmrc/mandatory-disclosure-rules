@@ -21,4 +21,8 @@ object AppDependencies {
     "uk.gov.hmrc.mongo" %% s"hmrc-mongo-test-$playVersion" % mongo_ver,
     "org.mockito"       %% "mockito-scala"                 % "1.17.31"
   ).map(_ % Test)
+
+  val overrides: Seq[ModuleID] = Seq(
+    "com.fasterxml.jackson.core" % "jackson-core" % "2.15.0"
+  )
 }

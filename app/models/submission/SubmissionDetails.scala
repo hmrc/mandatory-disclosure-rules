@@ -17,7 +17,7 @@
 package models.submission
 
 import models.upscan.UploadId
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class SubmissionDetails(fileName: String,
                              uploadId: UploadId,
@@ -29,5 +29,5 @@ case class SubmissionDetails(fileName: String,
 )
 
 object SubmissionDetails {
-  implicit val format = Json.format[SubmissionDetails]
+  implicit val format: OFormat[SubmissionDetails] = Json.format[SubmissionDetails]
 }

@@ -16,10 +16,10 @@
 
 package models.validation
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class SaxParseError(lineNumber: Int, errorMessage: String)
 
 object SaxParseError {
-  implicit val format = Json.format[SaxParseError]
+  implicit val format: OFormat[SaxParseError] = Json.format[SaxParseError]
 }
