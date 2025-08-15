@@ -28,7 +28,7 @@ case class UpscanInitiateResponse(
 )
 
 object UpscanInitiateResponse {
-  implicit val format = Json.format[UpscanInitiateResponse]
+  implicit val format: OFormat[UpscanInitiateResponse] = Json.format[UpscanInitiateResponse]
 }
 
 case class Reference(value: String) extends AnyVal
@@ -65,11 +65,11 @@ sealed trait CallbackBody {
 
 object CallbackBody {
 
-  implicit val uploadDetailsReads = Json.reads[UploadDetails]
+  implicit val uploadDetailsReads: Reads[UploadDetails] = Json.reads[UploadDetails]
 
-  implicit val failedCallbackBodyReads = Json.reads[FailedCallbackBody]
+  implicit val failedCallbackBodyReads: Reads[FailedCallbackBody] = Json.reads[FailedCallbackBody]
 
-  implicit val reads = new Reads[CallbackBody] {
+  implicit val reads: Reads[CallbackBody] = new Reads[CallbackBody] {
 
     override def reads(json: JsValue): JsResult[CallbackBody] =
       json \ "fileStatus" match {
@@ -92,7 +92,7 @@ case class UploadDetails(
 )
 
 object UploadDetails {
-  implicit val format = Json.format[UploadDetails]
+  implicit val format: OFormat[UploadDetails] = Json.format[UploadDetails]
 }
 
 case class ReadyCallbackBody(
