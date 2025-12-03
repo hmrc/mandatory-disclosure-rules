@@ -17,10 +17,9 @@
 package models.xml
 
 import base.SpecBase
-import com.lucidchart.open.xtract.{ParseFailure, ParseSuccess}
 import models.xml.RecordErrorCode.UnknownRecordErrorCode
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
-import play.api.libs.json.{JsNull, JsString, Json, Writes}
+import play.api.libs.json._
 
 class RecordErrorCodeSpec extends SpecBase {
 
@@ -51,18 +50,18 @@ class RecordErrorCodeSpec extends SpecBase {
     "read errorCode" in {
       for (errorCode <- RecordErrorCode.values) {
         val xml = <Code>{errorCode.code}</Code>
-        RecordErrorCode.xmlReads.read(xml) mustBe ParseSuccess(errorCode)
+        XmlReads[RecordErrorCode].reads(xml) mustBe JsSuccess(errorCode)
       }
     }
 
     "read unknown errorCode" in {
       val xml = <Code>{50000}</Code>
-      RecordErrorCode.xmlReads.read(xml) mustBe ParseSuccess(UnknownRecordErrorCode("50000"))
+      XmlReads[RecordErrorCode].reads(xml) mustBe JsSuccess(UnknownRecordErrorCode("50000"))
     }
 
     "return ParseFailureError for invalid value" in {
       val xml = <Code>Invalid</Code>
-      RecordErrorCode.xmlReads.read(xml) mustBe an[ParseFailure]
+      XmlReads[RecordErrorCode].reads(xml) mustBe an[JsError]
     }
 
     "deserialize from JSON correctly" in {

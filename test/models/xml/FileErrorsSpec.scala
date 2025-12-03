@@ -17,8 +17,8 @@
 package models.xml
 
 import base.SpecBase
-import com.lucidchart.open.xtract.{ParseFailure, ParseSuccess, XmlReader}
 import models.xml.FileErrorCode.UnknownFileErrorCode
+import play.api.libs.json.{JsError, JsSuccess}
 
 import scala.xml.Elem
 
@@ -32,7 +32,7 @@ class FileErrorsSpec extends SpecBase {
                           <gsm:Details Language="EN">Duplicate message ref ID</gsm:Details>
                         </gsm:FileError>
 
-        XmlReader.of[FileErrors].read(xml) mustBe ParseSuccess(FileErrors(errorCode, Some("Duplicate message ref ID")))
+        XmlReads[FileErrors].reads(xml) mustBe JsSuccess(FileErrors(errorCode, Some("Duplicate message ref ID")))
       }
     }
 
@@ -42,7 +42,7 @@ class FileErrorsSpec extends SpecBase {
         <gsm:Details Language="EN">error message</gsm:Details>
       </gsm:FileError>
 
-      XmlReader.of[FileErrors].read(xml) mustBe ParseSuccess(FileErrors(UnknownFileErrorCode("50011"), Some("error message")))
+      XmlReads[FileErrors].reads(xml) mustBe JsSuccess(FileErrors(UnknownFileErrorCode("50011"), Some("error message")))
     }
 
     "must fail to read xml as FileErrors for invalid code" in {
@@ -51,7 +51,7 @@ class FileErrorsSpec extends SpecBase {
         <gsm:Details Language="EN">error message</gsm:Details>
       </gsm:FileError>
 
-      XmlReader.of[FileErrors].read(xml) mustBe an[ParseFailure]
+      XmlReads[FileErrors].reads(xml) mustBe an[JsError]
     }
   }
 }

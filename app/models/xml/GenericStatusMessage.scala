@@ -16,18 +16,19 @@
 
 package models.xml
 
-import cats.implicits.catsSyntaxTuple2Semigroupal
-import com.lucidchart.open.xtract.XmlReader._
-import com.lucidchart.open.xtract.{__, XmlReader}
+import models.xml.ValidationErrors.xmlReads
+import models.xml.ValidationStatus.xmlReads
+import models.xml.XmlPath._
 import play.api.libs.json.{Json, OWrites}
 
 case class GenericStatusMessage(validationErrors: ValidationErrors, status: ValidationStatus.Value)
 
 object GenericStatusMessage {
-  implicit val xmlReader: XmlReader[GenericStatusMessage] = (
-    (__ \ "ValidationErrors").read[ValidationErrors],
-    (__ \ "ValidationResult" \ "Status").read(enum(ValidationStatus))
-  ).mapN(apply)
+  implicit val xmlReads: XmlReads[GenericStatusMessage] =
+    for {
+      validationErrors <- (__ \ "ValidationErrors").read[ValidationErrors]
+      status           <- (__ \ "ValidationResult" \ "Status").read[ValidationStatus.Value]
+    } yield GenericStatusMessage(validationErrors, status)
 
   implicit val writes: OWrites[GenericStatusMessage] = Json.writes[GenericStatusMessage]
 }

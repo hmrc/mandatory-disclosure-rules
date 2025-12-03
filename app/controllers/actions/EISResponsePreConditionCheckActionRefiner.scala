@@ -16,11 +16,11 @@
 
 package controllers.actions
 
-import com.lucidchart.open.xtract.{ParseFailure, ParseSuccess, PartialParseSuccess, XmlReader}
 import config.AppConfig
 import controllers.auth.EISRequest
-import models.xml.BREResponse
+import models.xml.{BREResponse, XmlReads}
 import play.api.Logging
+import play.api.libs.json.{JsError, JsResult, JsSuccess}
 import play.api.mvc.Results.BadRequest
 import play.api.mvc.{ActionRefiner, Request, Result}
 import services.validation.XMLValidationService
@@ -54,23 +54,22 @@ class EISResponsePreConditionCheckActionRefiner @Inject() (validationService: XM
         Future.successful(Left(BadRequest("request body must be an XML")))
     }
 
-  private def readXmlAsBREResponse[A](request: Request[A], xml: NodeSeq, conversationId: String): Either[Result, EISRequest[A]] =
-    XmlReader.of[BREResponse].read(xml) match {
+  private def readXmlAsBREResponse[A](request: Request[A], xml: NodeSeq, conversationId: String)(implicit
+    xmlReads: XmlReads[BREResponse]
+  ): Either[Result, EISRequest[A]] = {
+    val result: JsResult[BREResponse] = xmlReads.reads(xml)
 
-      case ParseSuccess(breResponse: BREResponse) if conversationId.equalsIgnoreCase(breResponse.conversationID.trim) =>
-        Right(EISRequest(request, breResponse))
+    result match {
+      case JsSuccess(breResponse, _) if conversationId.equalsIgnoreCase(breResponse.conversationID.trim) => Right(EISRequest(request, breResponse))
 
-      case ParseSuccess(breResponse: BREResponse) =>
+      case JsSuccess(breResponse, _) =>
         logger.warn(s"x-conversation-id in request header: $conversationId does not match with conversationID: ${breResponse.conversationID} in the xml")
         Left(BadRequest(s"Request header 'x-conversation-id' does not match with xml conversationId"))
 
-      case PartialParseSuccess(_, errors) =>
-        logger.warn(s"failed to read the xml from EIS: $errors")
-        Left(BadRequest(s"Failed to read the xml from EIS: $errors"))
-
-      case ParseFailure(errors) =>
+      case JsError(errors) =>
         logger.warn(s"ParseFailure: failed to read the xml from EIS: $errors")
         Left(BadRequest(s"failed to read the xml from EIS with errors: $errors"))
     }
+  }
 
 }

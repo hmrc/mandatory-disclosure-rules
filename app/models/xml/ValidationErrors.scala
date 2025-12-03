@@ -16,18 +16,18 @@
 
 package models.xml
 
-import cats.implicits._
-import com.lucidchart.open.xtract.{__, XmlReader}
+import models.xml.XmlPath._
 import play.api.libs.json.{Json, OFormat}
 
 case class ValidationErrors(fileError: Option[Seq[FileErrors]], recordError: Option[Seq[RecordError]])
 
 object ValidationErrors {
 
-  implicit val xmlReader: XmlReader[ValidationErrors] = (
-    (__ \ "FileError").read(strictReadOptionSeq[FileErrors]),
-    (__ \ "RecordError").read(strictReadOptionSeq[RecordError])
-  ).mapN(apply)
+  implicit val xmlReads: XmlReads[ValidationErrors] =
+    for {
+      fileError   <- (__ \ "FileError").readListOpt[FileErrors]
+      recordError <- (__ \ "RecordError").readListOpt[RecordError]
+    } yield ValidationErrors(fileError, recordError)
 
   implicit val format: OFormat[ValidationErrors] = Json.format[ValidationErrors]
 }

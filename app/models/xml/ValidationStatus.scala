@@ -16,12 +16,16 @@
 
 package models.xml
 
+import models.xml.XmlPrimitiveReads._
 import play.api.libs.json.{JsString, Writes}
 
 object ValidationStatus extends Enumeration {
   type ValidationStatus = Value
   val accepted: Value = Value("Accepted")
   val rejected: Value = Value("Rejected")
+
+  implicit val xmlReads: XmlReads[ValidationStatus.Value] =
+    enumReads(ValidationStatus)
 
   implicit val writes: Writes[ValidationStatus] = Writes[ValidationStatus] { v =>
     JsString(v.toString)

@@ -16,19 +16,20 @@
 
 package models.xml
 
-import cats.implicits.catsSyntaxTuple3Semigroupal
-import com.lucidchart.open.xtract.{__, XmlReader}
+import models.xml.XmlPath._
+import models.xml.XmlPrimitiveReads._
 import play.api.libs.json.{Json, OFormat}
 
 case class RecordError(code: RecordErrorCode, details: Option[String], docRefIDInError: Option[Seq[String]])
 
 object RecordError {
 
-  implicit val xmlReader: XmlReader[RecordError] = (
-    (__ \ "Code").read[RecordErrorCode],
-    (__ \ "Details").read[String].optional,
-    (__ \ "DocRefIDInError").read(strictReadOptionSeq[String])
-  ).mapN(apply)
+  implicit val xmlReads: XmlReads[RecordError] =
+    for {
+      code            <- (__ \ "Code").read[RecordErrorCode]
+      details         <- (__ \ "Details").readOpt[String]
+      docRefIDInError <- (__ \ "DocRefIDInError").readListOpt[String]
+    } yield RecordError(code, details, docRefIDInError)
 
   implicit val format: OFormat[RecordError] = Json.format[RecordError]
 }
