@@ -17,9 +17,9 @@
 package models.xml
 
 import base.SpecBase
-import com.lucidchart.open.xtract.{ParseSuccess, XmlReader}
 import models.xml.FileErrorCode.MessageRefIDHasAlreadyBeenUsed
 import models.xml.RecordErrorCode.MessageTypeIndic
+import play.api.libs.json.JsSuccess
 
 import java.util.UUID
 
@@ -58,7 +58,7 @@ class BREResponseSpec extends SpecBase {
 
       val fileErrors = Some(List(FileErrors(MessageRefIDHasAlreadyBeenUsed, Some("Duplicate message ref ID"))))
 
-      val expectedResult = ParseSuccess(
+      val expectedResult = JsSuccess(
         BREResponse(
           "MDR",
           uuid,
@@ -80,8 +80,7 @@ class BREResponseSpec extends SpecBase {
         )
       )
 
-      XmlReader.of[BREResponse].read(xml) mustBe expectedResult
-
+      XmlReads[BREResponse].reads(xml) mustBe expectedResult
     }
 
     "must read xml as BREResponse for the status 'Accepted'" in {
@@ -104,10 +103,9 @@ class BREResponseSpec extends SpecBase {
                   </requestDetail>
                 </BREResponse>
 
-      val expectedResult = ParseSuccess(BREResponse("MDR", uuid, GenericStatusMessage(ValidationErrors(None, None), ValidationStatus.accepted)))
+      val expectedResult = JsSuccess(BREResponse("MDR", uuid, GenericStatusMessage(ValidationErrors(None, None), ValidationStatus.accepted)))
 
-      XmlReader.of[BREResponse].read(xml) mustBe expectedResult
-
+      XmlReads[BREResponse].reads(xml) mustBe expectedResult
     }
 
   }

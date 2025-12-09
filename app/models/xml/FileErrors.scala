@@ -16,18 +16,19 @@
 
 package models.xml
 
-import cats.implicits.catsSyntaxTuple2Semigroupal
-import com.lucidchart.open.xtract.{__, XmlReader}
+import models.xml.XmlPath._
+import models.xml.XmlPrimitiveReads._
 import play.api.libs.json.{Json, OFormat}
 
 case class FileErrors(code: FileErrorCode, details: Option[String])
 
 object FileErrors {
 
-  implicit val xmlReader: XmlReader[FileErrors] = (
-    (__ \ "Code").read[FileErrorCode],
-    (__ \ "Details").read[String].optional
-  ).mapN(apply)
+  implicit val xmlReads: XmlReads[FileErrors] =
+    for {
+      code    <- (__ \ "Code").read[FileErrorCode]
+      details <- (__ \ "Details").readOpt[String]
+    } yield FileErrors(code, details)
 
   implicit val format: OFormat[FileErrors] = Json.format[FileErrors]
 }

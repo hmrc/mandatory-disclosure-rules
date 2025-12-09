@@ -17,11 +17,10 @@
 package models.xml
 
 import base.SpecBase
-import com.lucidchart.open.xtract.{ParseFailure, ParseSuccess}
 import models.xml.FileErrorCode.{MessageRefIDHasAlreadyBeenUsed, UnknownFileErrorCode}
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
-import play.api.libs.json.{JsString, Json}
+import play.api.libs.json.{JsError, JsString, JsSuccess, Json}
 
 class FileErrorCodeSpec extends SpecBase with ScalaCheckPropertyChecks {
 
@@ -29,18 +28,18 @@ class FileErrorCodeSpec extends SpecBase with ScalaCheckPropertyChecks {
     "read errorCode" in {
       for (errorCode <- FileErrorCode.values) {
         val xml = <Code>{errorCode.code}</Code>
-        FileErrorCode.xmlReads.read(xml) mustBe ParseSuccess(errorCode)
+        XmlReads[FileErrorCode].reads(xml) mustBe JsSuccess(errorCode)
       }
     }
 
     "read unknown errorCode" in {
       val xml = <Code>{50000}</Code>
-      FileErrorCode.xmlReads.read(xml) mustBe ParseSuccess(UnknownFileErrorCode("50000"))
+      XmlReads[FileErrorCode].reads(xml) mustBe JsSuccess(UnknownFileErrorCode("50000"))
     }
 
     "return ParseFailureError for invalid value" in {
       val xml = <Code>Invalid</Code>
-      FileErrorCode.xmlReads.read(xml) mustBe an[ParseFailure]
+      XmlReads[FileErrorCode].reads(xml) mustBe an[JsError]
     }
 
     "deserialize from JSON correctly" in {
@@ -57,12 +56,12 @@ class FileErrorCodeSpec extends SpecBase with ScalaCheckPropertyChecks {
 
     "read unknown errorCode from XML" in {
       val xml = <Code>50000</Code>
-      FileErrorCode.xmlReads.read(xml) shouldBe ParseSuccess(UnknownFileErrorCode("50000"))
+      XmlReads[FileErrorCode].reads(xml) shouldBe JsSuccess(UnknownFileErrorCode("50000"))
     }
 
     "return ParseFailure for invalid value from XML" in {
       val xml = <Code>Invalid</Code>
-      FileErrorCode.xmlReads.read(xml) shouldBe an[ParseFailure]
+      XmlReads[FileErrorCode].reads(xml) shouldBe an[JsError]
     }
   }
 }

@@ -17,8 +17,8 @@
 package models.xml
 
 import base.SpecBase
-import com.lucidchart.open.xtract.{ParseFailure, ParseSuccess, XmlReader}
 import models.xml.RecordErrorCode.UnknownRecordErrorCode
+import play.api.libs.json.{JsError, JsSuccess}
 
 import scala.xml.Elem
 
@@ -33,7 +33,7 @@ class RecordErrorSpec extends SpecBase {
                           <gsm:DocRefIDInError>asjdhjjhjssjhdjshdAJGSJJS</gsm:DocRefIDInError>
                         </gsm:RecordError>
 
-        XmlReader.of[RecordError].read(xml) mustBe ParseSuccess(
+        XmlReads[RecordError].reads(xml) mustBe JsSuccess(
           RecordError(errorCode, Some("error details"), Some(Seq("asjdhjjhjssjhdjshdAJGSJJS")))
         )
       }
@@ -45,7 +45,7 @@ class RecordErrorSpec extends SpecBase {
         <gsm:Details Language="EN">error message</gsm:Details>
       </gsm:FileError>
 
-      XmlReader.of[RecordError].read(xml) mustBe ParseSuccess(RecordError(UnknownRecordErrorCode("50011"), Some("error message"), None))
+      XmlReads[RecordError].reads(xml) mustBe JsSuccess(RecordError(UnknownRecordErrorCode("50011"), Some("error message"), None))
     }
 
     "must fail to read xml as FileErrors for invalid code" in {
@@ -54,7 +54,7 @@ class RecordErrorSpec extends SpecBase {
         <gsm:Details Language="EN">error message</gsm:Details>
       </gsm:FileError>
 
-      XmlReader.of[RecordError].read(xml) mustBe an[ParseFailure]
+      XmlReads[RecordError].reads(xml) mustBe an[JsError]
     }
   }
 }

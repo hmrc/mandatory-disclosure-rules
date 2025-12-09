@@ -16,19 +16,21 @@
 
 package models.xml
 
-import cats.implicits.catsSyntaxTuple3Semigroupal
-import com.lucidchart.open.xtract.{__, XmlReader}
+import models.xml.GenericStatusMessage.xmlReads
+import models.xml.XmlPath._
+import models.xml.XmlPrimitiveReads._
 import play.api.libs.json.{Json, OWrites}
 
 case class BREResponse(regime: String, conversationID: String, genericStatusMessage: GenericStatusMessage)
 
 object BREResponse {
 
-  implicit val xmlReader: XmlReader[BREResponse] = (
-    (__ \ "requestCommon" \ "regime").read[String],
-    (__ \ "requestCommon" \ "conversationID").read[String],
-    (__ \ "requestDetail" \ "GenericStatusMessage").read[GenericStatusMessage]
-  ).mapN(apply)
+  implicit val xmlReads: XmlReads[BREResponse] =
+    for {
+      regime               <- (__ \ "requestCommon" \ "regime").read[String]
+      conversationId       <- (__ \ "requestCommon" \ "conversationID").read[String]
+      genericStatusMessage <- (__ \ "requestDetail" \ "GenericStatusMessage").read[GenericStatusMessage]
+    } yield BREResponse(regime, conversationId, genericStatusMessage)
 
   implicit val writes: OWrites[BREResponse] = Json.writes[BREResponse]
 }

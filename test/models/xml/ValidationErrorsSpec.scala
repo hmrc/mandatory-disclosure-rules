@@ -17,9 +17,9 @@
 package models.xml
 
 import base.SpecBase
-import com.lucidchart.open.xtract.{ParseSuccess, XmlReader}
 import models.xml.FileErrorCode.MessageRefIDHasAlreadyBeenUsed
 import models.xml.RecordErrorCode.MessageTypeIndic
+import play.api.libs.json.JsSuccess
 
 class ValidationErrorsSpec extends SpecBase {
 
@@ -38,7 +38,7 @@ class ValidationErrorsSpec extends SpecBase {
                   </gsm:RecordError>
                 </gsm:ValidationErrors>
 
-      XmlReader.of[ValidationErrors].read(xml) mustBe ParseSuccess(
+      XmlReads[ValidationErrors].reads(xml) mustBe JsSuccess(
         ValidationErrors(
           Some(List(FileErrors(MessageRefIDHasAlreadyBeenUsed, Some("Duplicate message ref ID")))),
           Some(
@@ -59,7 +59,7 @@ class ValidationErrorsSpec extends SpecBase {
 
       val xml = <gsm:ValidationErrors></gsm:ValidationErrors>
 
-      XmlReader.of[ValidationErrors].read(xml) mustBe ParseSuccess(ValidationErrors(None, None))
+      XmlReads[ValidationErrors].reads(xml) mustBe JsSuccess(ValidationErrors(None, None))
 
     }
   }

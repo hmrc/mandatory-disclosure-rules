@@ -17,10 +17,9 @@
 package models.xml
 
 import base.SpecBase
-import com.lucidchart.open.xtract.{ParseFailure, ParseSuccess, XmlReader}
 import models.xml.FileErrorCode.MessageRefIDHasAlreadyBeenUsed
 import models.xml.RecordErrorCode.MessageTypeIndic
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Json}
 
 import scala.xml.Elem
 
@@ -35,11 +34,11 @@ class GenericStatusMessageSpec extends SpecBase {
                         </gsm:ValidationResult>
                       </gsm:GenericStatusMessage>
 
-      val result = XmlReader.of[GenericStatusMessage].read(xml)
+      val result = XmlReads[GenericStatusMessage].reads(xml)
 
-      result mustBe ParseSuccess(GenericStatusMessage(ValidationErrors(None, None), ValidationStatus.accepted))
+      result mustBe JsSuccess(GenericStatusMessage(ValidationErrors(None, None), ValidationStatus.accepted))
 
-      Json.toJson(result.toOption.get) mustBe Json.parse("""{"validationErrors":{},"status":"Accepted"}""")
+      Json.toJson(result.asOpt.get) mustBe Json.parse("""{"validationErrors":{},"status":"Accepted"}""")
 
     }
 
@@ -61,8 +60,8 @@ class GenericStatusMessageSpec extends SpecBase {
                       </gsm:ValidationResult>
                     </gsm:GenericStatusMessage>
 
-      val result = XmlReader.of[GenericStatusMessage].read(xml)
-      result mustBe ParseSuccess(
+      val result = XmlReads[GenericStatusMessage].reads(xml)
+      result mustBe JsSuccess(
         GenericStatusMessage(
           ValidationErrors(
             Some(List(FileErrors(MessageRefIDHasAlreadyBeenUsed, Some("Duplicate message ref ID")))),
@@ -86,14 +85,14 @@ class GenericStatusMessageSpec extends SpecBase {
           |"recordError":[{"code":"80010","details":"A message can contain either new records (OECD1) or corrections/deletions (OECD2 and OECD3), but cannot contain a mixture of both","docRefIDInError":["asjdhjjhjssjhdjshdAJGSJJS"]}]},
           |"status":"Rejected"}""".stripMargin)
 
-      Json.toJson(result.toOption.get) mustBe expectedJson
+      Json.toJson(result.asOpt.get) mustBe expectedJson
 
     }
 
     "must fail for an invalid xml" in {
       val xml: Elem = <test>random XML</test>
 
-      XmlReader.of[GenericStatusMessage].read(xml) mustBe an[ParseFailure]
+      XmlReads[GenericStatusMessage].reads(xml) mustBe an[JsError]
     }
   }
 }

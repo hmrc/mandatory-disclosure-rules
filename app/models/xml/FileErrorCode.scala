@@ -16,10 +16,7 @@
 
 package models.xml
 
-import com.lucidchart.open.xtract._
-import play.api.libs.json.{__, JsString, Reads, Writes}
-
-import scala.xml.NodeSeq
+import play.api.libs.json._
 
 sealed abstract class FileErrorCode(val code: String)
 
@@ -62,16 +59,20 @@ object FileErrorCode {
     case otherCode => UnknownFileErrorCode(otherCode)
   }
 
-  implicit val xmlReads: XmlReader[FileErrorCode] =
-    (xml: NodeSeq) => {
-      case class FileErrorCodeParseError(message: String) extends ParseError
-      values.find(x => x.code == xml.text) match {
-        case Some(errorCode) => ParseSuccess(errorCode)
-        case None =>
-          try ParseSuccess(UnknownFileErrorCode(Integer.parseInt(xml.text).toString))
+  val byCode: Map[String, FileErrorCode] = values.map(f => f.code -> f).toMap
+
+  implicit val xmlReads: XmlReads[FileErrorCode] =
+    XmlReads.from { ns =>
+      val txt = ns.text.trim
+      byCode.get(txt) match {
+        case Some(value) => JsSuccess(value)
+        case None if txt.nonEmpty =>
+          try
+            JsSuccess(UnknownFileErrorCode(Integer.parseInt(txt).toString))
           catch {
-            case _: Exception => ParseFailure(FileErrorCodeParseError(s"Invalid or missing FileErrorCode: ${xml.text}"))
+            case _: Exception => JsError(JsonValidationError(s"Invalid or missing FileErrorCode: $txt"))
           }
+        case _ => JsError("error.required.fileErrorCode")
       }
     }
 

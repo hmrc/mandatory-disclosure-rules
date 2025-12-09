@@ -11,7 +11,6 @@ object AppDependencies {
     "uk.gov.hmrc.mongo" %% s"hmrc-mongo-$playVersion"        % mongo_ver,
     "org.julienrf"      %% "play-json-derived-codecs"        % "11.0.0",
     "org.typelevel"     %% "cats-core"                       % "2.10.0",
-    "com.lucidchart"    %% "xtract"                          % "2.3.0"
   )
 
   val test: Seq[ModuleID] = Seq(
