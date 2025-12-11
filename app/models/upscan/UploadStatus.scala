@@ -47,10 +47,10 @@ object UploadStatus {
     override def reads(json: JsValue): JsResult[UploadStatus] = {
       val jsObject = json.asInstanceOf[JsObject]
       jsObject.value.get("_type") match {
-        case Some(JsString("NotStarted"))  => JsSuccess(NotStarted)
-        case Some(JsString("InProgress"))  => JsSuccess(InProgress)
-        case Some(JsString("Failed"))      => JsSuccess(Failed)
-        case Some(JsString("Quarantined")) => JsSuccess(Quarantined)
+        case Some(JsString("NotStarted"))           => JsSuccess(NotStarted)
+        case Some(JsString("InProgress"))           => JsSuccess(InProgress)
+        case Some(JsString("Failed"))               => JsSuccess(Failed)
+        case Some(JsString("Quarantined"))          => JsSuccess(Quarantined)
         case Some(JsString("UploadedSuccessfully")) =>
           Json.fromJson[UploadedSuccessfully](jsObject)(
             uploadedSuccessfullyFormat
@@ -67,10 +67,10 @@ object UploadStatus {
 
     override def writes(p: UploadStatus): JsValue =
       p match {
-        case NotStarted  => JsObject(Map("_type" -> JsString("NotStarted")))
-        case InProgress  => JsObject(Map("_type" -> JsString("InProgress")))
-        case Failed      => JsObject(Map("_type" -> JsString("Failed")))
-        case Quarantined => JsObject(Map("_type" -> JsString("Quarantined")))
+        case NotStarted        => JsObject(Map("_type" -> JsString("NotStarted")))
+        case InProgress        => JsObject(Map("_type" -> JsString("InProgress")))
+        case Failed            => JsObject(Map("_type" -> JsString("Failed")))
+        case Quarantined       => JsObject(Map("_type" -> JsString("Quarantined")))
         case s: UploadRejected =>
           Json
             .toJson(s)(uploadRejectedFormat)

@@ -19,8 +19,8 @@ package services
 import base.SpecBase
 import models.submission.ConversationId
 import models.subscription.{ContactInformation, IndividualDetails, OrganisationDetails, ResponseDetail}
-import org.mockito.MockitoSugar
 import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import services.submission.SDESMetaDataService
 

@@ -16,10 +16,10 @@
 
 package services.upscan
 
-import javax.inject.Inject
-import models.upscan._
+import models.upscan.*
 import play.api.Logging
 
+import javax.inject.Inject
 import scala.concurrent.Future
 
 class UpScanCallbackDispatcher @Inject() (sessionStorage: UploadProgressTracker) extends Logging {

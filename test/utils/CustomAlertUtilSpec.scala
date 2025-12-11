@@ -17,14 +17,22 @@
 package utils
 
 import base.SpecBase
-import models.xml.FileErrorCode.{FailedSchemaValidation, UnknownFileErrorCode}
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.spi.ILoggingEvent
+import models.xml.FileErrorCode.{CustomError as FileCustomError, FailedSchemaValidation, UnknownFileErrorCode}
 import models.xml.RecordErrorCode.{CustomError, DocRefIDFormat, UnknownRecordErrorCode}
-import models.xml.FileErrorCode.{CustomError => FileCustomError}
 import models.xml.{FileErrors, RecordError, ValidationErrors}
+import org.mockito.Mockito.*
 import play.api.Logger
+import uk.gov.hmrc.play.bootstrap.tools.LogCapturing
 import utils.ErrorDetails.{error_details_901, error_details_910}
 
-class CustomAlertUtilSpec extends SpecBase {
+import scala.reflect.ClassTag
+
+class CustomAlertUtilSpec extends SpecBase with LogCapturing {
+
+  def withCaptureOfLoggingFrom[T](body: (=> List[ILoggingEvent]) => Unit)(implicit classTag: ClassTag[T]): Unit =
+    withCaptureOfLoggingFrom(Logger(classTag.runtimeClass))(body)
 
   "alertForProblemStatus" - {
 
@@ -33,129 +41,112 @@ class CustomAlertUtilSpec extends SpecBase {
     s"should return logger warning with message '$loggerMessage'" - {
 
       "when an 'unknown file' error occurs" in {
-        val mockLogger = mock[Logger]
-
-        when(mockLogger.isWarnEnabled).thenReturn(true)
         val errors = ValidationErrors(None, Some(Seq(RecordError(UnknownRecordErrorCode("12345"), None, None))))
 
-        val alertUtil = new CustomAlertUtil {
-          override val logger: Logger = mockLogger
-        }
+        withCaptureOfLoggingFrom[CustomAlertUtil] { logs =>
+          new CustomAlertUtil().alertForProblemStatus(errors)
 
-        alertUtil.alertForProblemStatus(errors)
-        verify(mockLogger, times(1)).warn(loggerMessage)
+          logs.exists { event =>
+            event.getLevel == Level.WARN &&
+            event.getMessage.contains("File Rejected with unexpected error")
+          } mustBe true
+        }
       }
 
       "when an 'unknown record' error occurs" in {
-        val mockLogger = mock[Logger]
-
-        when(mockLogger.isWarnEnabled).thenReturn(true)
         val errors = ValidationErrors(Some(Seq(FileErrors(UnknownFileErrorCode("12345"), None))), None)
 
-        val alertUtil = new CustomAlertUtil {
-          override val logger: Logger = mockLogger
-        }
+        withCaptureOfLoggingFrom[CustomAlertUtil] { logs =>
+          new CustomAlertUtil().alertForProblemStatus(errors)
 
-        alertUtil.alertForProblemStatus(errors)
-        verify(mockLogger, times(1)).warn(loggerMessage)
+          logs.exists { event =>
+            event.getLevel == Level.WARN &&
+            event.getMessage.contains("File Rejected with unexpected error")
+          } mustBe true
+        }
       }
 
       "when a 'problem' error occurs" in {
-        val mockLogger = mock[Logger]
-
-        when(mockLogger.isWarnEnabled).thenReturn(true)
         val errors = ValidationErrors(Some(Seq(FileErrors(FailedSchemaValidation, None))), Some(Seq(RecordError(DocRefIDFormat, None, None))))
 
-        val alertUtil = new CustomAlertUtil {
-          override val logger: Logger = mockLogger
-        }
+        withCaptureOfLoggingFrom[CustomAlertUtil] { logs =>
+          new CustomAlertUtil().alertForProblemStatus(errors)
 
-        alertUtil.alertForProblemStatus(errors)
-        verify(mockLogger, times(1)).warn(loggerMessage)
+          logs.exists { event =>
+            event.getLevel == Level.WARN &&
+            event.getMessage.contains("File Rejected with unexpected error")
+          } mustBe true
+        }
       }
 
       "when a 'problem' error occurs for unsupported ErrorDetails for CustomError" in {
-        val mockLogger = mock[Logger]
-
-        when(mockLogger.isWarnEnabled).thenReturn(true)
         val errors = ValidationErrors(Some(Seq(FileErrors(FailedSchemaValidation, None))), Some(Seq(RecordError(CustomError, Some("something"), None))))
 
-        val alertUtil = new CustomAlertUtil {
-          override val logger: Logger = mockLogger
-        }
+        withCaptureOfLoggingFrom[CustomAlertUtil] { logs =>
+          new CustomAlertUtil().alertForProblemStatus(errors)
 
-        alertUtil.alertForProblemStatus(errors)
-        verify(mockLogger, times(1)).warn(loggerMessage)
+          logs.exists { event =>
+            event.getLevel == Level.WARN &&
+            event.getMessage.contains("File Rejected with unexpected error")
+          } mustBe true
+        }
       }
 
       "when a 'problem' error occurs for CustomError with ErrorDetails 'None'" in {
-        val mockLogger = mock[Logger]
-
-        when(mockLogger.isWarnEnabled).thenReturn(true)
         val errors = ValidationErrors(None, Some(Seq(RecordError(CustomError, None, None))))
 
-        val alertUtil = new CustomAlertUtil {
-          override val logger: Logger = mockLogger
-        }
+        withCaptureOfLoggingFrom[CustomAlertUtil] { logs =>
+          new CustomAlertUtil().alertForProblemStatus(errors)
 
-        alertUtil.alertForProblemStatus(errors)
-        verify(mockLogger, times(1)).warn(loggerMessage)
+          logs.exists { event =>
+            event.getLevel == Level.WARN &&
+            event.getMessage.contains("File Rejected with unexpected error")
+          } mustBe true
+        }
       }
 
       "when a 'Rejected' error occurs for supported ErrorDetails" in {
-        val mockLogger = mock[Logger]
-
-        when(mockLogger.isWarnEnabled).thenReturn(true)
         val errors = ValidationErrors(None, Some(Seq(RecordError(CustomError, Some(error_details_901), None))))
 
-        val alertUtil = new CustomAlertUtil {
-          override val logger: Logger = mockLogger
+        withCaptureOfLoggingFrom[CustomAlertUtil] { logs =>
+          new CustomAlertUtil().alertForProblemStatus(errors)
+          logs.isEmpty mustBe true
         }
-
-        alertUtil.alertForProblemStatus(errors)
-        verify(mockLogger, never).warn(loggerMessage)
       }
 
       "when a 'problem' error occurs for CustomError with ErrorDetails 'None' for FileError" in {
-        val mockLogger = mock[Logger]
-
-        when(mockLogger.isWarnEnabled).thenReturn(true)
         val errors = ValidationErrors(Some(Seq(FileErrors(FileCustomError, None))), None)
 
-        val alertUtil = new CustomAlertUtil {
-          override val logger: Logger = mockLogger
-        }
+        withCaptureOfLoggingFrom[CustomAlertUtil] { logs =>
+          new CustomAlertUtil().alertForProblemStatus(errors)
 
-        alertUtil.alertForProblemStatus(errors)
-        verify(mockLogger, times(1)).warn(loggerMessage)
+          logs.exists { event =>
+            event.getLevel == Level.WARN &&
+            event.getMessage.contains("File Rejected with unexpected error")
+          } mustBe true
+        }
       }
 
       "when a 'problem' error occurs for CustomError with unacceptable ErrorDetails  for FileError" in {
-        val mockLogger = mock[Logger]
-
-        when(mockLogger.isWarnEnabled).thenReturn(true)
         val errors = ValidationErrors(Some(Seq(FileErrors(FileCustomError, Some("something")))), None)
 
-        val alertUtil = new CustomAlertUtil {
-          override val logger: Logger = mockLogger
-        }
+        withCaptureOfLoggingFrom[CustomAlertUtil] { logs =>
+          new CustomAlertUtil().alertForProblemStatus(errors)
 
-        alertUtil.alertForProblemStatus(errors)
-        verify(mockLogger, times(1)).warn(loggerMessage)
+          logs.exists { event =>
+            event.getLevel == Level.WARN &&
+            event.getMessage.contains("File Rejected with unexpected error")
+          } mustBe true
+        }
       }
 
       "when a 'Rejected' error occurs for supported ErrorDetails for FileError" in {
-        val mockLogger = mock[Logger]
-
-        when(mockLogger.isWarnEnabled).thenReturn(true)
         val errors = ValidationErrors(Some(Seq(FileErrors(FileCustomError, Some(error_details_910)))), None)
 
-        val alertUtil = new CustomAlertUtil {
-          override val logger: Logger = mockLogger
+        withCaptureOfLoggingFrom[CustomAlertUtil] { logs =>
+          new CustomAlertUtil().alertForProblemStatus(errors)
+          logs.isEmpty mustBe true
         }
-
-        alertUtil.alertForProblemStatus(errors)
-        verify(mockLogger, never).warn(loggerMessage)
       }
     }
   }

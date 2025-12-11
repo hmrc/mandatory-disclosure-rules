@@ -20,6 +20,7 @@ import base.SpecBase
 import models.sdes.NotificationType.{FileProcessed, FileProcessingFailure, FileReady, FileReceived}
 import models.sdes.{NotificationCallback, SHA256}
 import models.submission._
+import org.mockito.Mockito.*
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
 import org.scalatest.BeforeAndAfterEach
@@ -56,7 +57,7 @@ class SDESCallbackControllerSpec extends SpecBase with BeforeAndAfterEach with T
 
   "SDESCallbackController" - {
 
-    val conversationId = "ci1234"
+    val conversationId     = "ci1234"
     val fileDetailsPending =
       FileDetails(
         ConversationId(conversationId),
@@ -141,7 +142,7 @@ class SDESCallbackControllerSpec extends SpecBase with BeforeAndAfterEach with T
           val result = route(application, request).value
 
           status(result) mustEqual INTERNAL_SERVER_ERROR
-          verifyZeroInteractions(mockEmailService)
+          verifyNoInteractions(mockEmailService)
         }
 
       }
@@ -160,7 +161,7 @@ class SDESCallbackControllerSpec extends SpecBase with BeforeAndAfterEach with T
           val result = route(application, request).value
 
           status(result) mustEqual OK
-          verifyZeroInteractions(mockEmailService)
+          verifyNoInteractions(mockEmailService)
         }
 
       }
@@ -177,7 +178,7 @@ class SDESCallbackControllerSpec extends SpecBase with BeforeAndAfterEach with T
           val result = route(application, request).value
 
           status(result) mustEqual OK
-          verifyZeroInteractions(mockEmailService)
+          verifyNoInteractions(mockEmailService)
         }
 
       }
@@ -202,7 +203,7 @@ class SDESCallbackControllerSpec extends SpecBase with BeforeAndAfterEach with T
           val result = route(application, request).value
 
           status(result) mustEqual OK
-          verifyZeroInteractions(mockEmailService)
+          verifyNoInteractions(mockEmailService)
         }
       }
     }
@@ -216,7 +217,7 @@ class SDESCallbackControllerSpec extends SpecBase with BeforeAndAfterEach with T
         val result = route(application, request).value
 
         status(result) mustEqual INTERNAL_SERVER_ERROR
-        verifyZeroInteractions(mockEmailService)
+        verifyNoInteractions(mockEmailService)
       }
 
     }

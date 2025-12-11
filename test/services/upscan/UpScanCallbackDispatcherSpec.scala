@@ -17,10 +17,11 @@
 package services.upscan
 
 import base.SpecBase
-import models.upscan.{ErrorDetails, FailedCallbackBody, Quarantined, ReadyCallbackBody, Reference, UploadDetails, UploadRejected, UploadedSuccessfully}
+import models.upscan.*
+import org.mockito.Mockito.*
 import play.api.Application
 import play.api.inject.bind
-import models.upscan.Failed
+
 import java.time.Instant
 import scala.concurrent.Future
 
@@ -39,7 +40,7 @@ class UpScanCallbackDispatcherSpec extends SpecBase {
   "UpscanCallbackDispatcher" - {
 
     "handleCallback must return UploadedSuccessfully for the input ReadyCallbackBody" in {
-      val reference = Reference("ref")
+      val reference     = Reference("ref")
       val uploadDetails = UploadDetails(
         Instant.now(),
         "1234",

@@ -16,8 +16,8 @@
 
 package models.xml
 
-import models.xml.XmlPath._
-import models.xml.XmlPrimitiveReads._
+import models.xml.XmlPath.*
+import models.xml.XmlPrimitiveReads.*
 import play.api.libs.json.{Json, OFormat}
 
 case class FileErrors(code: FileErrorCode, details: Option[String])

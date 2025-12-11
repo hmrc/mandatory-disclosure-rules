@@ -17,8 +17,8 @@
 package models.xml
 
 import models.xml.GenericStatusMessage.xmlReads
-import models.xml.XmlPath._
-import models.xml.XmlPrimitiveReads._
+import models.xml.XmlPath.*
+import models.xml.XmlPrimitiveReads.*
 import play.api.libs.json.{Json, OWrites}
 
 case class BREResponse(regime: String, conversationID: String, genericStatusMessage: GenericStatusMessage)

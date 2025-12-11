@@ -23,11 +23,10 @@ import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 class EmailAddressSpec extends SpecBase with ScalaCheckPropertyChecks with Generators {
 
   "EmailAddress isValid" - {
-    "must return true for valid email" in {
-      forAll(validEmailAddressService -> "validEmail") { email: String =>
+    "must return true for valid email" in
+      forAll(validEmailAddressService -> "validEmail") { email =>
         EmailAddress.isValid(email) mustBe true
       }
-    }
     "must return false for invalid emails" in {
       EmailAddress.isValid("Onelinewithoutat.sign") mustBe false
       EmailAddress.isValid("invalid@@email") mustBe false

@@ -22,16 +22,16 @@ import controllers.HttpResponseExt
 import controllers.auth.UserRequest
 import models.audit.{AuditFileSubmission, AuditType}
 import models.error.ReadSubscriptionError
-import models.submission._
+import models.submission.*
 import models.upscan.UploadId
 import play.api.libs.json.Json
-import play.api.mvc.ControllerComponents
+import play.api.mvc.{ControllerComponents, Result}
 import play.api.{Logger, Logging}
 import repositories.submission.FileDetailsRepository
 import services.audit.AuditService
 import services.subscription.SubscriptionService
 import services.validation.XMLValidationService
-import uk.gov.hmrc.http.HttpReads.is2xx
+import uk.gov.hmrc.http.HttpErrorFunctions.is2xx
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import utils.DateTimeFormatUtil
 
@@ -54,13 +54,13 @@ class SubmissionService @Inject() (
 
   def processSubmission(xml: NodeSeq, uploadId: UploadId, enrolmentId: String, fileName: String, fileSize: Long, messageSpecData: MessageSpecData)(implicit
     request: UserRequest[_]
-  ) = {
+  ): Future[Result] = {
 
     val subscriptionId           = enrolmentId
     val submissionTime           = DateTimeFormatUtil.zonedDateTimeNow.toLocalDateTime
     val conversationId           = ConversationId.fromUploadId(uploadId)
     val uploadedXmlNode: NodeSeq = xml \\ "MDR_OECD"
-    val submissionDetails = FileDetails(conversationId,
+    val submissionDetails        = FileDetails(conversationId,
                                         subscriptionId,
                                         messageSpecData.messageRefId,
                                         Some(messageSpecData.reportType),

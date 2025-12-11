@@ -29,7 +29,7 @@ class BREResponseSpec extends SpecBase {
 
     "must read xml as BREResponse for the status 'Rejected'" in {
       val uuid = UUID.randomUUID().toString
-      val xml = <BREResponse>
+      val xml  = <BREResponse>
                   <requestCommon>
                     <receiptDate>2001-12-17T09:30:47Z</receiptDate>
                     <regime>MDR</regime>
@@ -85,7 +85,7 @@ class BREResponseSpec extends SpecBase {
 
     "must read xml as BREResponse for the status 'Accepted'" in {
       val uuid = UUID.randomUUID().toString
-      val xml = <BREResponse>
+      val xml  = <BREResponse>
                   <requestCommon>
                     <receiptDate>2001-12-17T09:30:47Z</receiptDate>
                     <regime>MDR</regime>

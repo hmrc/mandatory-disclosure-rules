@@ -20,14 +20,15 @@ import base.SpecBase
 import controllers.auth.{FakeIdentifierAuthAction, IdentifierAuthAction}
 import models.submission.{MDR401, MessageSpecData, MultipleNewInformation}
 import models.upscan.UpscanURL
-import models.validation._
+import models.validation.*
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import play.api.test.Helpers.{status, POST, _}
+import play.api.test.Helpers.{status, POST, *}
 import services.validation.UploadedXmlValidationEngine
 
 import scala.concurrent.Future

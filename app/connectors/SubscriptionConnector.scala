@@ -59,7 +59,7 @@ class SubscriptionConnector @Inject() (
     updateSubscription: UpdateSubscriptionForMDRRequest
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
-    val serviceName = "update-subscription"
+    val serviceName  = "update-subscription"
     val extraHeaders = Seq()
       .withBearerToken(s"${config.bearerToken(serviceName)}")
       .withXForwardedHost()

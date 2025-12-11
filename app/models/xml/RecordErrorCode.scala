@@ -16,7 +16,7 @@
 
 package models.xml
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 sealed abstract class RecordErrorCode(val code: String)
 
@@ -79,7 +79,7 @@ object RecordErrorCode {
     XmlReads.from { ns =>
       val txt = ns.text.trim
       byCode.get(txt) match {
-        case Some(value) => JsSuccess(value)
+        case Some(value)          => JsSuccess(value)
         case None if txt.nonEmpty =>
           try
             JsSuccess(UnknownRecordErrorCode(Integer.parseInt(txt).toString))

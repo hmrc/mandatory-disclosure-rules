@@ -18,9 +18,10 @@ package controllers
 
 import base.SpecBase
 import controllers.auth.{FakeIdentifierAuthAction, IdentifierAuthAction}
-import models.submission._
+import models.submission.*
 import models.xml.ValidationErrors
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.http.Status.{NOT_FOUND, OK}
@@ -46,15 +47,15 @@ class FileDetailsControllerSpec extends SpecBase with BeforeAndAfterEach {
     .build()
 
   val submissionTime1 = LocalDateTime.now()
-  val fileDetails1 =
+  val fileDetails1    =
     FileDetails(ConversationId(), "subscriptionId1", "messageRefId1", Some(SingleNewInformation), Pending, "fileName1", submissionTime1, submissionTime1)
   val submissionTime2 = LocalDateTime.now()
-  val fileDetails2 =
+  val fileDetails2    =
     FileDetails(ConversationId(), "subscriptionId1", "messageRefId1", Some(SingleNewInformation), Accepted, "fileName2", submissionTime2, submissionTime2)
   val files = Seq(fileDetails1, fileDetails2)
 
   val conversationId = ConversationId()
-  val fileDetails = FileDetails(
+  val fileDetails    = FileDetails(
     conversationId,
     subscriptionId = "subscriptionId",
     messageRefId = "messageRefId",
@@ -68,7 +69,7 @@ class FileDetailsControllerSpec extends SpecBase with BeforeAndAfterEach {
   "FileDetailsController" - {
     "must return FileDetails for the input 'conversationId'" in {
       val conversationId = ConversationId()
-      val fileDetails = FileDetails(
+      val fileDetails    = FileDetails(
         conversationId,
         subscriptionId = "subscriptionId",
         messageRefId = "messageRefId",

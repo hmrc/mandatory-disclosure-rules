@@ -30,7 +30,7 @@ class SubmissionConnector @Inject() (
 )(implicit ec: ExecutionContext) {
 
   def submitDisclosure(submission: NodeSeq, conversationId: ConversationId)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
-    val serviceName = "submission"
+    val serviceName  = "submission"
     val extraHeaders = Seq()
       .withBearerToken(s"${config.bearerToken(serviceName)}")
       .withXForwardedHost()

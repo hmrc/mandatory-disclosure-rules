@@ -36,7 +36,7 @@ object ResponseDetail {
       override def reads(json: JsValue): JsResult[NonEmptyList[A]] = json.validate(listReads).map(NonEmptyList.fromListUnsafe)
     }
 
-  val logger = Logger.apply(getClass)
+  val logger                                     = Logger.apply(getClass)
   implicit lazy val reads: Reads[ResponseDetail] = {
     import play.api.libs.functional.syntax._
 

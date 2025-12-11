@@ -38,7 +38,7 @@ class FileDetailsController @Inject() (
   def getFileDetails(conversationId: ConversationId): Action[AnyContent] = authenticate.async { _ =>
     fileDetailsRepository.findByConversationId(conversationId) map {
       case Some(fileDetails) => Ok(Json.toJson(ResponseFileDetails.build(fileDetails)))
-      case _ =>
+      case _                 =>
         logger.warn(s"No record found for the conversationId: ${conversationId.value}")
         NotFound
     }
@@ -56,7 +56,7 @@ class FileDetailsController @Inject() (
   def getStatus(conversationId: ConversationId): Action[AnyContent] = authenticate.async { _ =>
     fileDetailsRepository.findStatusByConversationId(conversationId) map {
       case Some(status) => Ok(Json.toJson(status))
-      case _ =>
+      case _            =>
         logger.warn(s"No status found for the conversationId: $conversationId")
         NotFound
     }

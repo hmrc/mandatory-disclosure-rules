@@ -17,7 +17,7 @@
 package repositories.upscan
 
 import config.AppConfig
-import models.upscan._
+import models.upscan.*
 import org.mongodb.scala.bson.conversions.Bson
 import org.mongodb.scala.model.Filters.equal
 import org.mongodb.scala.model.Indexes.ascending
@@ -48,7 +48,7 @@ class UpScanSessionRepository @Inject() (
           ascending("lastUpdated"),
           IndexOptions()
             .name("up-scan-last-updated-index")
-            .expireAfter(appConfig.cacheTtl, TimeUnit.SECONDS)
+            .expireAfter(appConfig.cacheTtl.toLong, TimeUnit.SECONDS)
         ),
         IndexModel(ascending("uploadId"),
                    IndexOptions()
@@ -77,7 +77,7 @@ class UpScanSessionRepository @Inject() (
     newStatus: UploadStatus
   ): Future[Boolean] = {
 
-    val filter: Bson = equal("reference.value", Codecs.toBson(reference.value))
+    val filter: Bson   = equal("reference.value", Codecs.toBson(reference.value))
     val modifier: Bson = Updates.combine(
       set("status", Codecs.toBson(newStatus)),
       set("lastUpdated", Instant.now(clock))
@@ -87,14 +87,14 @@ class UpScanSessionRepository @Inject() (
 
     collection
       .findOneAndUpdate(filter, modifier, options)
-      .toFuture
+      .toFuture()
       .map(_ => true)
   }
 
   def insert(uploadDetails: UploadSessionDetails): Future[Boolean] =
     collection
       .insertOne(uploadDetails)
-      .toFuture
+      .toFuture()
       .map(_ => true)
 
 }

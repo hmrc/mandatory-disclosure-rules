@@ -20,8 +20,9 @@ import base.SpecBase
 import config.AppConfig
 import helpers.XmlErrorMessageHelper
 import models.submission.{MDR401, MessageSpecData, MultipleNewInformation}
-import models.validation._
+import models.validation.*
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.*
 import services.DataExtraction
 
 import scala.collection.mutable.ListBuffer

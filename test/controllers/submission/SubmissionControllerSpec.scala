@@ -20,22 +20,24 @@ import base.SpecBase
 import config.AppConfig
 import connectors.{SubmissionConnector, SubscriptionConnector}
 import controllers.auth.{FakeIdentifierAuthAction, IdentifierAuthAction}
-import controllers.routes._
-import controllers.submission.SubmissionFixture._
+import controllers.routes.*
+import controllers.submission.SubmissionFixture.*
 import handlers.{XmlHandler, XmlMockBasicHandler}
 import models.error.ReadSubscriptionError
-import models.submission._
+import models.submission.*
 import models.upscan.UploadId
 import models.validation.SaxParseError
 import org.mockito.ArgumentMatchers.any
-import org.mockito.{ArgumentCaptor, ArgumentMatchers, MockitoSugar}
+import org.mockito.Mockito.*
+import org.mockito.{ArgumentCaptor, ArgumentMatchers}
 import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.inject.bind
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.submission.FileDetailsRepository
 import services.audit.AuditService
 import services.submission.{SDESService, TransformService}

@@ -20,10 +20,10 @@ import config.AppConfig
 import metrics.MetricsService
 import models.submission.{ConversationId, FileDetails, FileStatus, Pending}
 import org.mongodb.scala.bson.conversions.Bson
-import org.mongodb.scala.model.Filters._
+import org.mongodb.scala.model.*
+import org.mongodb.scala.model.Filters.*
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.Updates.set
-import org.mongodb.scala.model._
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.{Codecs, PlayMongoRepository}
 
@@ -47,7 +47,7 @@ class FileDetailsRepository @Inject() (
           ascending("lastUpdated"),
           IndexOptions()
             .name("submission-last-updated-index")
-            .expireAfter(appConfig.submissionTtl, TimeUnit.DAYS)
+            .expireAfter(appConfig.submissionTtl.toLong, TimeUnit.DAYS)
         ),
         IndexModel(ascending("subscriptionId"),
                    IndexOptions()
@@ -69,7 +69,7 @@ class FileDetailsRepository @Inject() (
   ): Future[Option[FileDetails]] = {
 
     val filter: Bson = equal("_id", conversationId)
-    val modifier = Updates.combine(
+    val modifier     = Updates.combine(
       set("status", Codecs.toBson(newStatus)),
       set("lastUpdated", LocalDateTime.now)
     )
@@ -104,13 +104,13 @@ class FileDetailsRepository @Inject() (
     val filter: Bson = equal("subscriptionId", subscriptionId)
     collection
       .find(filter)
-      .toFuture
+      .toFuture()
   }
 
   def insert(fileDetails: FileDetails): Future[Boolean] =
     collection
       .insertOne(fileDetails)
-      .toFuture
+      .toFuture()
       .map { _ =>
         metricsService.fileStatusPendingCounter.inc()
         true

@@ -22,6 +22,7 @@ import generators.Generators
 import models.error.{ReadSubscriptionError, UpdateSubscriptionError}
 import models.subscription.{RequestDetailForUpdate, ResponseDetail}
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.*
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.Application
 import play.api.inject.bind
@@ -123,7 +124,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
       val request =
         FakeRequest(
           POST,
-          routes.SubscriptionController.readSubscription.url
+          routes.SubscriptionController.readSubscription().url
         )
 
       val result = route(application, request).value
@@ -147,7 +148,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
       val request =
         FakeRequest(
           POST,
-          routes.SubscriptionController.readSubscription.url
+          routes.SubscriptionController.readSubscription().url
         )
 
       val result = route(application, request).value
@@ -171,7 +172,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
       val request =
         FakeRequest(
           POST,
-          routes.SubscriptionController.updateSubscription.url
+          routes.SubscriptionController.updateSubscription().url
         ).withJsonBody(requestDetailJson)
 
       val result = route(application, request).value
@@ -195,7 +196,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
       val request =
         FakeRequest(
           POST,
-          routes.SubscriptionController.updateSubscription.url
+          routes.SubscriptionController.updateSubscription().url
         ).withJsonBody(requestDetailJson)
 
       val result = route(application, request).value
@@ -203,8 +204,7 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
 
     }
 
-    "should return BAD_REQUEST when Json is Invalid" in {
-
+    "should return BAD_REQUEST when Json is Invalid" in
       when(
         mockSubscriptionService
           .updateSubscription(any[RequestDetailForUpdate]())(
@@ -217,6 +217,17 @@ class SubscriptionControllerSpec extends SpecBase with Generators with ScalaChec
         )
       )
 
+    "should return error when JSON is malformed" in {
+      val request =
+        FakeRequest(
+          POST,
+          routes.SubscriptionController.updateSubscription().url
+        ).withJsonBody(Json.parse("""{}"""))
+
+      val result = route(application, request).value
+      status(result) mustEqual INTERNAL_SERVER_ERROR
+      contentAsString(result) mustEqual "Json Validation Failed"
     }
+
   }
 }

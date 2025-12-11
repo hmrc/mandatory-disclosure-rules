@@ -23,7 +23,7 @@ class MessageSpecDataSpec extends SpecBase {
 
   "MessageSpecDataSpec" - {
     "must serialize MessageSpec" in {
-      val msd = MessageSpecData("XDSG111111", MDR401, 2, "OECD1", MultipleNewInformation)
+      val msd          = MessageSpecData("XDSG111111", MDR401, 2, "OECD1", MultipleNewInformation)
       val expectedJson =
         Json.parse(
           """{"messageRefId":"XDSG111111","messageTypeIndic":"MDR401","mdrBodyCount":2,"docTypeIndic":"OECD1","reportType":"MultipleNewInformation"}"""

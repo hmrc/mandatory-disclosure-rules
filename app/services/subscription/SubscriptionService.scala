@@ -55,7 +55,7 @@ class SubscriptionService @Inject() (subscriptionConnector: SubscriptionConnecto
   )(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Either[UpdateSubscriptionError, Unit]] =
     subscriptionConnector.updateSubscription(UpdateSubscriptionForMDRRequest(requestDetailForUpdate)).map { res =>
       res.status match {
-        case OK => Right(())
+        case OK     => Right(())
         case status =>
           logger.warn(s"Update Subscription Got Status $status")
           Left(UpdateSubscriptionError(status))

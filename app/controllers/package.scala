@@ -29,8 +29,8 @@ package object controllers {
   implicit class HttpResponseExt(httpResponse: HttpResponse) {
     def handleResponse(implicit logger: Logger): Result =
       httpResponse.status match {
-        case OK        => Ok
-        case NOT_FOUND => NotFound(httpResponse.body)
+        case OK          => Ok
+        case NOT_FOUND   => NotFound(httpResponse.body)
         case BAD_REQUEST =>
           logDownStreamError(httpResponse.body)
           BadRequest(httpResponse.body)

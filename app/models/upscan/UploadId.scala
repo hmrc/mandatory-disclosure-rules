@@ -16,7 +16,7 @@
 
 package models.upscan
 
-import play.api.libs.json._
+import play.api.libs.json.*
 import play.api.mvc.QueryStringBindable
 
 case class UploadId(value: String) extends AnyVal
@@ -28,7 +28,11 @@ object UploadId {
   ): QueryStringBindable[UploadId] =
     stringBinder.transform(UploadId(_), _.value)
 
-  implicit val uploadIdFormat: OFormat[UploadId] = Json.format[UploadId]
+  implicit val uploadIdFormat: OFormat[UploadId] = new OFormat[UploadId] {
+    override def writes(id: UploadId): JsObject = Json.obj("value" -> id.value)
+
+    override def reads(json: JsValue): JsResult[UploadId] = (json \ "value").validate[String].map(UploadId.apply)
+  }
 
   implicit def readsUploadId: Reads[UploadId] =
     Reads.StringReads.map(UploadId(_))

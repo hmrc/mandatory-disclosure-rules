@@ -16,8 +16,8 @@
 
 package models.xml
 
-import models.xml.XmlPath._
-import models.xml.XmlPrimitiveReads._
+import models.xml.XmlPath.*
+import models.xml.XmlPrimitiveReads.*
 import play.api.libs.json.{Json, OFormat}
 
 case class RecordError(code: RecordErrorCode, details: Option[String], docRefIDInError: Option[Seq[String]])

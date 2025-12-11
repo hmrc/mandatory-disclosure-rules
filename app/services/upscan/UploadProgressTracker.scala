@@ -16,7 +16,7 @@
 
 package services.upscan
 
-import models.upscan.{InProgress, Reference, UploadId, UploadSessionDetails, UploadStatus}
+import models.upscan.*
 import org.bson.types.ObjectId
 import play.api.Logging
 import repositories.upscan.UpScanSessionRepository

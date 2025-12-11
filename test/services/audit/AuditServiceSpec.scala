@@ -18,6 +18,7 @@ package services.audit
 
 import base.SpecBase
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.inject.bind
@@ -41,7 +42,7 @@ class AuditServiceSpec extends SpecBase with BeforeAndAfterEach {
     )
     .build()
 
-  override def beforeEach: Unit =
+  override def beforeEach(): Unit =
     reset(mockAuditConnector)
 
   val auditService: AuditService = app.injector.instanceOf[AuditService]

@@ -18,7 +18,7 @@ package models.xml
 
 import models.xml.ValidationErrors.xmlReads
 import models.xml.ValidationStatus.xmlReads
-import models.xml.XmlPath._
+import models.xml.XmlPath.*
 import play.api.libs.json.{Json, OWrites}
 
 case class GenericStatusMessage(validationErrors: ValidationErrors, status: ValidationStatus.Value)

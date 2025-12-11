@@ -199,7 +199,7 @@ class XmlErrorMessageHelper extends SaxParseErrorRegExConstants {
       case genericInvalidErrorFormat(dateStr, attribute) if attribute == "date" || attribute == "dateTime" =>
         errorMessage2 match {
           case missingOrInvalidErrorFormat("", "BirthDate") => Some(Message("xml.optional.field.empty", Seq("BirthDate")))
-          case missingOrInvalidErrorFormat(_, element) =>
+          case missingOrInvalidErrorFormat(_, element)      =>
             Try {
               DateTimeFormatter.ISO_DATE.parse(dateStr)
             } match {

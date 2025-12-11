@@ -18,7 +18,7 @@ package models.xml
 
 import base.SpecBase
 import models.xml.FileErrorCode.{MessageRefIDHasAlreadyBeenUsed, UnknownFileErrorCode}
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import org.scalatest.matchers.should.Matchers.shouldBe
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.libs.json.{JsError, JsString, JsSuccess, Json}
 

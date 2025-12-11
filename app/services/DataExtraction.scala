@@ -16,11 +16,11 @@
 
 package services
 
-import models.submission._
+import cats.syntax.option.*
+import models.submission.*
 
 import javax.inject.Inject
 import scala.xml.Elem
-import cats.syntax.option._
 
 @Inject
 class DataExtraction()() {

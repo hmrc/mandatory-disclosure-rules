@@ -18,7 +18,7 @@ package models.xml
 
 import base.SpecBase
 import models.xml.RecordErrorCode.UnknownRecordErrorCode
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import org.scalatest.matchers.should.Matchers.shouldBe
 import play.api.libs.json._
 
 class RecordErrorCodeSpec extends SpecBase {

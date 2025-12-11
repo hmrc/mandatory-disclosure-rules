@@ -45,7 +45,7 @@ class SDESMetaDataService extends Logging {
 
   private def transformContactInformation(contactInformation: ContactInformation, contactType: String): Map[String, String] = {
     val contactName = contactInformation.contactType match {
-      case individual: IndividualDetails => transformIndividual(individual, contactType)
+      case individual: IndividualDetails     => transformIndividual(individual, contactType)
       case organisation: OrganisationDetails =>
         Map(
           s"requestAdditionalDetail/$contactType/organisationDetails/organisationName" -> organisation.organisationName
@@ -59,7 +59,7 @@ class SDESMetaDataService extends Logging {
   }
 
   private def transformIndividual(individual: IndividualDetails, contactType: String): Map[String, String] = {
-    val firstName = Some(Map(s"requestAdditionalDetail/$contactType/individualDetails/firstName" -> individual.firstName))
+    val firstName  = Some(Map(s"requestAdditionalDetail/$contactType/individualDetails/firstName" -> individual.firstName))
     val middleName =
       individual.middleName.map(middleName => Map(s"requestAdditionalDetail/$contactType/individualDetails/middleName" -> middleName))
     val lastName = Some(Map(s"requestAdditionalDetail/$contactType/individualDetails/lastName" -> individual.lastName))

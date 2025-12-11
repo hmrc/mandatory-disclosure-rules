@@ -60,8 +60,7 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
         }
       }
 
-      "must return an error status for  invalid read Subscription" in {
-
+      "must return an error status for  invalid read Subscription" in
         forAll(arbitrary[DisplaySubscriptionForMDRRequest], errorCodes) { (sub, errorCode) =>
           stubResponse(
             "/dac6/dct70d/v1",
@@ -71,7 +70,6 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
           val result = connector.readSubscriptionInformation(sub)
           result.futureValue.status mustBe errorCode
         }
-      }
     }
 
     "update subscription" - {
@@ -87,8 +85,7 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
         }
       }
 
-      "must return an error status for failed update Subscription" in {
-
+      "must return an error status for failed update Subscription" in
         forAll(arbitrary[UpdateSubscriptionForMDRRequest], errorCodes) { (sub, errorCode) =>
           stubResponse(
             "/dac6/dct70e/v1",
@@ -98,7 +95,6 @@ class SubscriptionConnectorSpec extends SpecBase with WireMockServerHandler with
           val result = connector.updateSubscription(sub)
           result.futureValue.status mustBe errorCode
         }
-      }
     }
 
   }

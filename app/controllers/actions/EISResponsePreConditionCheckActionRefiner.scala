@@ -40,7 +40,7 @@ class EISResponsePreConditionCheckActionRefiner @Inject() (validationService: XM
         request.headers.get("x-conversation-id") match {
           case Some(conversationId) =>
             validationService.validate(xml, appConfig.eisResponseXSDFilePath) match {
-              case Right(xml) => Future.successful(readXmlAsBREResponse(request, xml, conversationId))
+              case Right(xml)   => Future.successful(readXmlAsBREResponse(request, xml, conversationId))
               case Left(errors) =>
                 logger.warn(s"XML parsing failed with error: $errors")
                 Future.successful(Left(BadRequest))

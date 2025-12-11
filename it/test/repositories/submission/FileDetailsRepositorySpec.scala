@@ -19,8 +19,9 @@ package repositories.submission
 import base.SpecBase
 import config.AppConfig
 import metrics.MetricsService
-import models.submission._
+import models.submission.*
 import models.xml.{FileErrorCode, FileErrors, ValidationErrors}
+import org.mockito.Mockito.*
 import play.api.Configuration
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
@@ -31,16 +32,16 @@ import scala.concurrent.duration.DurationInt
 
 class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepositorySupport[FileDetails] {
 
-  lazy val config         = app.injector.instanceOf[Configuration]
-  lazy val metricsService = app.injector.instanceOf[MetricsService]
+  lazy val config: Configuration          = app.injector.instanceOf[Configuration]
+  lazy val metricsService: MetricsService = app.injector.instanceOf[MetricsService]
 
   private val mockAppConfig = mock[AppConfig]
   when(mockAppConfig.cacheTtl) thenReturn 1
   when(mockAppConfig.staleTaskAlertAfter) thenReturn 2.hours
 
-  override lazy val repository = new FileDetailsRepository(mongoComponent, mockAppConfig, metricsService)
+  val repository: FileDetailsRepository = new FileDetailsRepository(mongoComponent, mockAppConfig, metricsService)
 
-  val dateTimeNow: LocalDateTime = LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.MILLIS)
+  val dateTimeNow: LocalDateTime     = LocalDateTime.now().truncatedTo(java.time.temporal.ChronoUnit.MILLIS)
   val someSubmittedFile: FileDetails =
     FileDetails(ConversationId("conversationId123456"),
                 "subscriptionId",
@@ -54,7 +55,7 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
 
   "findStaleSubmissions" - {
     "retrieve a stale pending submission" in {
-      val oldPendingFile = someSubmittedFile.copy(submitted = dateTimeNow.minusDays(1), name = "oldfile.xml", _id = ConversationId("conversationId777777"))
+      val oldPendingFile  = someSubmittedFile.copy(submitted = dateTimeNow.minusDays(1), name = "oldfile.xml", _id = ConversationId("conversationId777777"))
       val oldRejectedFile = someSubmittedFile.copy(status = RejectedSDES,
                                                    submitted = dateTimeNow.minusDays(1),
                                                    name = "oldishfile.xml",
@@ -141,14 +142,15 @@ class FileDetailsRepositorySpec extends SpecBase with DefaultPlayMongoRepository
       whenReady(res) { result =>
         result must matchPattern {
           case Some(
-                FileDetails(ConversationId("conversationId123456"),
-                            "subscriptionId",
-                            "messageRefId",
-                            Some(SingleNewInformation),
-                            Rejected(ValidationErrors(Some(Seq(FileErrors(FileErrorCode.FailedSchemaValidation, Some("details")))), None)),
-                            "file1.xml",
-                            _,
-                            _
+                FileDetails(
+                  ConversationId("conversationId123456"),
+                  "subscriptionId",
+                  "messageRefId",
+                  Some(SingleNewInformation),
+                  Rejected(ValidationErrors(Some(Seq(FileErrors(FileErrorCode.FailedSchemaValidation, Some("details")))), None)),
+                  "file1.xml",
+                  _,
+                  _
                 )
               ) =>
         }

@@ -78,10 +78,9 @@ class DataExtractionSpec extends SpecBase {
       extractor.messageSpecData(XMLFixtures.missingMessageTypeIndic) mustBe None
     }
 
-    "messageSpec must throw NoSuchElement when messageTypeIndic invalid " in {
+    "messageSpec must throw NoSuchElement when messageTypeIndic invalid " in
       assertThrows[NoSuchElementException] {
         extractor.messageSpecData(XMLFixtures.invalidMessageTypeIndic) mustBe None
       }
-    }
   }
 }

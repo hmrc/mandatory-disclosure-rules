@@ -37,7 +37,7 @@ class UploadCallbackController @Inject() (
     with I18nSupport {
 
   val callback: Action[JsValue] = Action.async(parse.json) { implicit request =>
-    withJsonBody[CallbackBody] { feedback: CallbackBody =>
+    withJsonBody[CallbackBody] { feedback =>
       upscanCallbackDispatcher
         .handleCallback(feedback)
         .map(_ => Ok)

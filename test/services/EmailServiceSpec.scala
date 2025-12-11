@@ -23,6 +23,7 @@ import models.email.EmailRequest
 import models.error.ReadSubscriptionError
 import models.subscription.{ContactInformation, OrganisationDetails, ResponseDetail}
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 import play.api.Application
@@ -39,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class EmailServiceSpec extends SpecBase with Generators with ScalaCheckPropertyChecks with BeforeAndAfterEach {
 
-  override def beforeEach: Unit =
+  override def beforeEach(): Unit =
     reset(
       mockEmailConnector,
       mockSubscriptionService

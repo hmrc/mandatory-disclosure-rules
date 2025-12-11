@@ -49,7 +49,7 @@ class SubmissionController @Inject() (
           if (submission.fileSize > appConfig.maxNormalFileSize) {
             sdesService.fileNotify(submission) map {
               case Right(conversationId) => Ok(Json.toJson(conversationId))
-              case Left(e) =>
+              case Left(e)               =>
                 logger.warn(s"SDES notify ready error ${e.getMessage}")
                 InternalServerError(s"SDES notify error")
             }
