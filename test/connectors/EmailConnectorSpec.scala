@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,35 +38,29 @@ class EmailConnectorSpec extends SpecBase with WireMockServerHandler with Genera
   lazy val connector: EmailConnector = app.injector.instanceOf[EmailConnector]
 
   "EmailConnector" - {
-    "must return status as OK for valid email submission" in {
-
+    "must return status as OK for valid email submission" in
       forAll(arbitrary[EmailRequest]) { emailRequest =>
         stubResponse(OK)
 
         val result = connector.sendEmail(emailRequest)
         result.futureValue.status mustBe OK
       }
-    }
 
-    "must return status as BAD_REQUEST for invalid email submission" in {
-
+    "must return status as BAD_REQUEST for invalid email submission" in
       forAll(arbitrary[EmailRequest]) { emailRequest =>
         stubResponse(BAD_REQUEST)
 
         val result = connector.sendEmail(emailRequest)
         result.futureValue.status mustBe BAD_REQUEST
       }
-    }
 
-    "must return status as NOT_FOUND for invalid email submission" in {
-
+    "must return status as NOT_FOUND for invalid email submission" in
       forAll(arbitrary[EmailRequest]) { emailRequest =>
         stubResponse(NOT_FOUND)
 
         val result = connector.sendEmail(emailRequest)
         result.futureValue.status mustBe NOT_FOUND
       }
-    }
   }
 
   private def stubResponse(expectedStatus: Int): StubMapping =

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import tasks.StaleFileTask
 
 import java.time.{Clock, ZoneOffset}
 
-class Module() extends AbstractModule {
+class Module extends AbstractModule {
 
   override def configure(): Unit = {
     bind(classOf[UploadProgressTracker]).to(classOf[MongoBackedUploadProgressTracker])

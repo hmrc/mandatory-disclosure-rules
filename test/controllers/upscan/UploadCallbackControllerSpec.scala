@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,27 +20,29 @@ import base.SpecBase
 import matchers.JsonMatchers
 import models.upscan.CallbackBody
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.*
 import play.api.http.Status.OK
 import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.mvc.Result
+import play.api.test.Helpers.{defaultAwaitTimeout, status}
 import play.api.test.{FakeHeaders, FakeRequest}
 import services.upscan.UpScanCallbackDispatcher
-import play.api.test.Helpers.{defaultAwaitTimeout, status}
 
 import scala.concurrent.Future
 
 class UploadCallbackControllerSpec extends SpecBase with JsonMatchers {
-  val mockUpscanCallbackDispatcher = mock[UpScanCallbackDispatcher]
+  val mockUpscanCallbackDispatcher: UpScanCallbackDispatcher = mock[UpScanCallbackDispatcher]
 
-  val application = applicationBuilder()
+  val application: GuiceApplicationBuilder = applicationBuilder()
     .overrides(
       bind[UpScanCallbackDispatcher].toInstance(mockUpscanCallbackDispatcher)
     )
 
   "UploadCallback Controller" - {
     "must accept a callback and send to the dispatcher and return an ok" in {
-      val controller = application.injector.instanceOf[UploadCallbackController]
+      val controller = application.injector().instanceOf[UploadCallbackController]
 
       when(mockUpscanCallbackDispatcher.handleCallback(any[CallbackBody]()))
         .thenReturn(Future.successful(true))

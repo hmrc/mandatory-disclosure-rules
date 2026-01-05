@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package services.audit
 
 import base.SpecBase
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.inject.bind
@@ -41,7 +42,7 @@ class AuditServiceSpec extends SpecBase with BeforeAndAfterEach {
     )
     .build()
 
-  override def beforeEach: Unit =
+  override def beforeEach(): Unit =
     reset(mockAuditConnector)
 
   val auditService: AuditService = app.injector.instanceOf[AuditService]

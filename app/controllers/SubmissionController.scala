@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ class SubmissionController @Inject() (
           if (submission.fileSize > appConfig.maxNormalFileSize) {
             sdesService.fileNotify(submission) map {
               case Right(conversationId) => Ok(Json.toJson(conversationId))
-              case Left(e) =>
+              case Left(e)               =>
                 logger.warn(s"SDES notify ready error ${e.getMessage}")
                 InternalServerError(s"SDES notify error")
             }

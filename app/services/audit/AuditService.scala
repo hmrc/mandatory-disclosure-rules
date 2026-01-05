@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,20 +47,19 @@ class AuditService @Inject() (
         detail = detail,
         tags = AuditExtensions.auditHeaderCarrier(hc).toAuditDetails()
       )
-    ) map { auditResult: AuditResult =>
-      auditResult match {
-        case Failure(msg, _) =>
-          logger.warn(
-            s"The attempt to issue audit event $eventName failed with message : $msg"
-          )
-          auditResult
-        case Disabled =>
-          logger.warn(
-            s"The attempt to issue audit event $eventName was unsuccessful, as auditing is currently disabled in config"
-          ); auditResult
-        case _ =>
-          logger.info(s"Audit event $eventName issued successful.");
-          auditResult
-      }
+    ) map {
+      case auditResult @ Failure(msg, _) =>
+        logger.warn(
+          s"The attempt to issue audit event $eventName failed with message : $msg"
+        )
+        auditResult
+      case auditResult @ Disabled =>
+        logger.warn(
+          s"The attempt to issue audit event $eventName was unsuccessful, as auditing is currently disabled in config"
+        );
+        auditResult
+      case auditResult =>
+        logger.info(s"Audit event $eventName issued successful.");
+        auditResult
     }
 }

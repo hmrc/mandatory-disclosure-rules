@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,15 @@
 package controllers.upscan
 
 import base.SpecBase
-import models.upscan._
+import models.upscan.*
 import org.bson.types.ObjectId
+import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
 import play.api.Application
 import play.api.inject.bind
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import play.api.test.Helpers._
+import play.api.test.Helpers.*
 import repositories.upscan.UpScanSessionRepository
 import services.upscan.UploadProgressTracker
 
@@ -64,7 +65,7 @@ class UploadFormControllerSpec extends SpecBase with BeforeAndAfterEach {
     }
     "must return Bad_Request when invalid details sent" in {
 
-      val json = Json.parse("""{"aString": "a"}""")
+      val json    = Json.parse("""{"aString": "a"}""")
       val request =
         FakeRequest(POST, routes.UploadFormController.requestUpload.url).withJsonBody(json)
 

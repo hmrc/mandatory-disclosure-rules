@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,9 @@ import connectors.SubscriptionConnector
 import models.error.{ReadSubscriptionError, UpdateSubscriptionError}
 import models.subscription.{DisplaySubscriptionForMDRRequest, RequestDetailForUpdate, UpdateSubscriptionForMDRRequest}
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
-import play.api.http.Status._
+import play.api.http.Status.*
 import play.api.inject.bind
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
@@ -72,7 +73,7 @@ class SubscriptionServiceSpec extends SpecBase with BeforeAndAfterEach {
     val requestDetailForUpdate = requestDetailJson.as[RequestDetailForUpdate]
 
     "must correctly retrieve subscription from connector" in {
-      val service = application.injector.instanceOf[SubscriptionService]
+      val service                          = application.injector.instanceOf[SubscriptionService]
       val subscriptionResponseJson: String =
         """
           |{

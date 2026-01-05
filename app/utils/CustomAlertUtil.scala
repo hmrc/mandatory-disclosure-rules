@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,15 @@
 
 package utils
 
-import models.xml.FileErrorCode.{fileErrorCodesForProblemStatus, CustomError => FileCustomError}
+import models.xml.FileErrorCode.{fileErrorCodesForProblemStatus, CustomError as FileCustomError}
 import models.xml.RecordErrorCode.{CustomError, DocRefIDFormat}
-import models.xml.{FileErrorCode, FileErrors, RecordError, RecordErrorCode, ValidationErrors}
-import play.api.Logging
+import models.xml.*
+import play.api.{Logger, Logging}
 import utils.ErrorDetails.{errorList, error_details_910}
 
-class CustomAlertUtil extends Logging {
+import javax.inject.Inject
+
+class CustomAlertUtil @Inject() () extends Logging {
 
   private val expectedErrorCodes: Seq[String]       = FileErrorCode.values.map(_.code) ++ RecordErrorCode.values.map(_.code)
   private val problemsStatusErrorCodes: Seq[String] = fileErrorCodesForProblemStatus.map(_.code).:+(DocRefIDFormat.code)

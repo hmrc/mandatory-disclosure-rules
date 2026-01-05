@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 package models.upscan
 
-import play.api.libs.functional.syntax._
-import play.api.libs.json._
+import play.api.libs.functional.syntax.*
+import play.api.libs.json.*
 
 import java.time.Instant
 
@@ -109,7 +109,7 @@ object ReadyCallbackBody {
       "reference" -> Json.toJsFieldJsValueWrapper(
         readyCallbackBody.reference
       ),
-      "downloadUrl" -> readyCallbackBody.downloadUrl,
+      "downloadUrl"   -> readyCallbackBody.downloadUrl,
       "uploadDetails" -> Json.toJsFieldJsValueWrapper(
         readyCallbackBody.uploadDetails
       )

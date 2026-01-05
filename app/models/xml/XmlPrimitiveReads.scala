@@ -46,10 +46,10 @@ object XmlPrimitiveReads {
       }
     }
 
-  def enumReads[E <: Enumeration](enum: E): XmlReads[E#Value] =
+  def enumReads[E <: Enumeration](enumeration: E): XmlReads[enumeration.Value] =
     XmlReads.from { ns =>
       val txt = ns.text.trim
-      enum.values.find(_.toString == txt) match {
+      enumeration.values.find(_.toString == txt) match {
         case Some(v) => JsSuccess(v)
         case None    => JsError(s"error.enum.invalid: $txt")
       }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,15 @@ package services
 
 import base.SpecBase
 import connectors.SDESConnector
-import models.sdes._
-import models.submission._
+import models.error.ReadSubscriptionError
+import models.sdes.*
+import models.submission.*
 import models.subscription.{ContactInformation, OrganisationDetails, ResponseDetail}
 import models.upscan.UploadId
 import org.mockito.ArgumentMatchers.any
-import org.mockito.MockitoSugar
+import org.mockito.Mockito.*
 import org.scalatest.BeforeAndAfterEach
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, NO_CONTENT}
 import play.api.inject.bind
@@ -96,6 +98,7 @@ class SDESServiceSpec extends SpecBase with MockitoSugar with ScalaCheckDrivenPr
           verify(mockFileDetailsRepository, times(1)).insert(any[FileDetails])
         }
       }
+
       "must return a Left with an Exception for response statues other than 204" in {
         val responseDetail = ResponseDetail("subscriptionID",
                                             Some("tradingName"),
@@ -115,6 +118,27 @@ class SDESServiceSpec extends SpecBase with MockitoSugar with ScalaCheckDrivenPr
 
           verify(mockSDESConnector, times(1)).fileReady(any[FileTransferNotification])(any[HeaderCarrier], any[ExecutionContext])
           verify(mockFileDetailsRepository, times(0)).insert(any[FileDetails])
+        }
+      }
+
+      "must return a Left with an Exception when getContactInformation errors" in {
+        val responseDetail: ResponseDetail = ResponseDetail("subscriptionID",
+                                                            Some("tradingName"),
+                                                            isGBUser = true,
+                                                            ContactInformation(OrganisationDetails("orgName"), "email@test.com", None, None),
+                                                            None
+        )
+        when(mockSubscriptionService.getContactInformation(any[String])(any[HeaderCarrier], any[ExecutionContext]))
+          .thenReturn(Future.successful(Left(ReadSubscriptionError(500))))
+
+        val result = sdesService.fileNotify(submissionDetails)
+
+        whenReady(result) { result =>
+          result.isRight mustBe false
+          result.left.get.getMessage mustEqual "Error retrieving subscription details"
+
+          verifyNoInteractions(mockSDESConnector)
+          verifyNoInteractions(mockFileDetailsRepository)
         }
       }
     }

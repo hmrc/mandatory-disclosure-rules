@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ class SubscriptionService @Inject() (subscriptionConnector: SubscriptionConnecto
   )(implicit hc: HeaderCarrier, ex: ExecutionContext): Future[Either[UpdateSubscriptionError, Unit]] =
     subscriptionConnector.updateSubscription(UpdateSubscriptionForMDRRequest(requestDetailForUpdate)).map { res =>
       res.status match {
-        case OK => Right(())
+        case OK     => Right(())
         case status =>
           logger.warn(s"Update Subscription Got Status $status")
           Left(UpdateSubscriptionError(status))

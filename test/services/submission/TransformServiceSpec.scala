@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.scalatest.StreamlinedXmlEquality
 class TransformServiceSpec extends SpecBase with StreamlinedXmlEquality {
 
   "must transform an individual without a middle name" in {
-    val service = app.injector.instanceOf[TransformService]
+    val service    = app.injector.instanceOf[TransformService]
     val individual = IndividualDetails(
       firstName = "firstName",
       middleName = None,
@@ -40,7 +40,7 @@ class TransformServiceSpec extends SpecBase with StreamlinedXmlEquality {
   }
 
   "must transform an individual with a middle name" in {
-    val service = app.injector.instanceOf[TransformService]
+    val service    = app.injector.instanceOf[TransformService]
     val individual = IndividualDetails(
       firstName = "firstName",
       middleName = Some("middleName"),

@@ -13,7 +13,8 @@ object ScoverageSettings {
     "testOnly.*",
     ".*testOnlyDoNotUseInAppConf.*",
     ".*repositories.*",
-    "handlers.*"
+    "handlers.*",
+    "models.*"
   )
 
   val settings: Seq[Setting[_]] = Seq(

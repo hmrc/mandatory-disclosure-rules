@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,10 @@
 package services.submission
 
 import models.submission.{NamespaceForNode, SubmissionMetaData}
-import models.subscription._
+import models.subscription.*
 
 import javax.inject.Inject
-import scala.xml._
+import scala.xml.*
 
 class TransformService @Inject() () {
 
@@ -65,7 +65,7 @@ class TransformService @Inject() () {
   ): NodeSeq = {
 
     val contactType = contactInformation.contactType match {
-      case individual: IndividualDetails => Some(<individualDetails>{transformIndividual(individual)}</individualDetails>)
+      case individual: IndividualDetails     => Some(<individualDetails>{transformIndividual(individual)}</individualDetails>)
       case organisation: OrganisationDetails =>
         Some(<organisationDetails><organisationName>{organisation.organisationName}</organisationName></organisationDetails>)
     }

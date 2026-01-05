@@ -2,7 +2,7 @@ import uk.gov.hmrc.DefaultBuildSettings.{addTestReportOption, itSettings}
 
 val appName = "mandatory-disclosure-rules"
 
-ThisBuild / scalaVersion := "2.13.16"
+ThisBuild / scalaVersion := "3.3.6"
 ThisBuild / majorVersion := 0
 
 val silencerVersion = "1.7.6"
@@ -42,7 +42,9 @@ lazy val microservice = Project(appName, file("."))
       "-Wconf:cat=deprecation&msg=\\.*()\\.*:s",
       "-Wconf:cat=unused-imports&site=<empty>:s",
       "-Wconf:cat=unused&src=.*RoutesPrefix\\.scala:s",
-      "-Wconf:cat=unused&src=.*Routes\\.scala:s"
+      "-Wconf:cat=unused&src=.*Routes\\.scala:s",
+      "-Wconf:msg=unused import&src=html/.*:s",
+      "-Wconf:msg=Flag.*repeatedly:s"
     )
   )
   .settings(ScoverageSettings.settings: _*)

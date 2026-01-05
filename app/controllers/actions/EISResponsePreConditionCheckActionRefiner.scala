@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ class EISResponsePreConditionCheckActionRefiner @Inject() (validationService: XM
         request.headers.get("x-conversation-id") match {
           case Some(conversationId) =>
             validationService.validate(xml, appConfig.eisResponseXSDFilePath) match {
-              case Right(xml) => Future.successful(readXmlAsBREResponse(request, xml, conversationId))
+              case Right(xml)   => Future.successful(readXmlAsBREResponse(request, xml, conversationId))
               case Left(errors) =>
                 logger.warn(s"XML parsing failed with error: $errors")
                 Future.successful(Left(BadRequest))

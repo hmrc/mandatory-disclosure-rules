@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ class MessageSpecDataSpec extends SpecBase {
 
   "MessageSpecDataSpec" - {
     "must serialize MessageSpec" in {
-      val msd = MessageSpecData("XDSG111111", MDR401, 2, "OECD1", MultipleNewInformation)
+      val msd          = MessageSpecData("XDSG111111", MDR401, 2, "OECD1", MultipleNewInformation)
       val expectedJson =
         Json.parse(
           """{"messageRefId":"XDSG111111","messageTypeIndic":"MDR401","mdrBodyCount":2,"docTypeIndic":"OECD1","reportType":"MultipleNewInformation"}"""

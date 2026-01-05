@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,17 @@ package connectors
 import com.google.inject.Inject
 import config.AppConfig
 import models.subscription.{DisplaySubscriptionForMDRRequest, UpdateSubscriptionForMDRRequest}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import play.api.libs.json.Json
+import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
+import java.net.URI
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubscriptionConnector @Inject() (
   val config: AppConfig,
-  val http: HttpClient
+  val http: HttpClientV2
 ) {
 
   def readSubscriptionInformation(
@@ -43,23 +47,18 @@ class SubscriptionConnector @Inject() (
       .withAccept(Some("application/json"))
       .withEnvironment(Some(config.environment(serviceName)))
 
-    http.POST[DisplaySubscriptionForMDRRequest, HttpResponse](
-      config.serviceUrl(serviceName),
-      subscription,
-      headers = extraHeaders
-    )(
-      wts = DisplaySubscriptionForMDRRequest.format,
-      rds = httpReads,
-      hc = hc,
-      ec = ec
-    )
+    http
+      .post(new URI(config.serviceUrl(serviceName)).toURL)
+      .withBody(Json.toJson(subscription))
+      .setHeader(extraHeaders: _*)
+      .execute[HttpResponse]
   }
 
   def updateSubscription(
     updateSubscription: UpdateSubscriptionForMDRRequest
   )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] = {
 
-    val serviceName = "update-subscription"
+    val serviceName  = "update-subscription"
     val extraHeaders = Seq()
       .withBearerToken(s"${config.bearerToken(serviceName)}")
       .withXForwardedHost()
@@ -70,11 +69,10 @@ class SubscriptionConnector @Inject() (
       .withAccept(Some("application/json"))
       .withEnvironment(Some(config.environment(serviceName)))
 
-    http.POST[UpdateSubscriptionForMDRRequest, HttpResponse](config.serviceUrl(serviceName), updateSubscription, extraHeaders)(
-      wts = UpdateSubscriptionForMDRRequest.format,
-      rds = httpReads,
-      hc = hc,
-      ec = ec
-    )
+    http
+      .post(new URI(config.serviceUrl(serviceName)).toURL)
+      .withBody(Json.toJson(updateSubscription))
+      .setHeader(extraHeaders: _*)
+      .execute[HttpResponse]
   }
 }

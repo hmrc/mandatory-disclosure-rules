@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,9 @@ package repositories.upscan
 
 import base.SpecBase
 import config.AppConfig
-import models.upscan._
+import models.upscan.*
 import org.bson.types.ObjectId
+import org.mockito.Mockito.*
 import org.mongodb.scala.model.Filters
 import uk.gov.hmrc.mongo.test.DefaultPlayMongoRepositorySupport
 
@@ -44,7 +45,7 @@ class UpScanSessionRepositorySpec extends SpecBase with DefaultPlayMongoReposito
   private val mockAppConfig = mock[AppConfig]
   when(mockAppConfig.cacheTtl) thenReturn 1
 
-  override protected val repository = new UpScanSessionRepository(
+  override protected val repository: UpScanSessionRepository = new UpScanSessionRepository(
     mongoComponent = mongoComponent,
     appConfig = mockAppConfig,
     clock = stubClock

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,7 +65,7 @@ class UpscanResponseSpec extends SpecBase {
 
       "must serialize and deserialize PreparedUpload correctly" in {
         val json = Json.obj(
-          "reference" -> "file-reference",
+          "reference"     -> "file-reference",
           "uploadRequest" -> Json.obj(
             "href"   -> "upload-url",
             "fields" -> Json.obj("field1" -> "value1", "field2" -> "value2")
@@ -96,9 +96,9 @@ class UpscanResponseSpec extends SpecBase {
 
       "must parse JSON to the corresponding CallbackBody" in {
         val readyJson = Json.obj(
-          "fileStatus"  -> "READY",
-          "reference"   -> "file-reference",
-          "downloadUrl" -> "download-url",
+          "fileStatus"    -> "READY",
+          "reference"     -> "file-reference",
+          "downloadUrl"   -> "download-url",
           "uploadDetails" -> Json.obj(
             "uploadTimestamp" -> uploadTime,
             "checksum"        -> "checksum",
@@ -110,8 +110,8 @@ class UpscanResponseSpec extends SpecBase {
         Json.fromJson[CallbackBody](readyJson) mustBe JsSuccess(readyCallbackBody)
 
         val failedJson = Json.obj(
-          "fileStatus" -> "FAILED",
-          "reference"  -> "file-reference",
+          "fileStatus"     -> "FAILED",
+          "reference"      -> "file-reference",
           "failureDetails" -> Json.obj(
             "failureReason" -> "failure-reason",
             "message"       -> "message"
@@ -135,8 +135,8 @@ class UpscanResponseSpec extends SpecBase {
 
         "must serialize and deserialize ReadyCallbackBody correctly" in {
           val json = Json.obj(
-            "reference"   -> "file-reference",
-            "downloadUrl" -> "download-url",
+            "reference"     -> "file-reference",
+            "downloadUrl"   -> "download-url",
             "uploadDetails" -> Json.obj(
               "uploadTimestamp" -> uploadTime,
               "checksum"        -> "checksum",

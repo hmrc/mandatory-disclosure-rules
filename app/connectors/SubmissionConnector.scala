@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,19 +18,19 @@ package connectors
 
 import config.AppConfig
 import models.submission.ConversationId
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, HttpResponse}
+import play.api.libs.ws.*
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
+import java.net.URI
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 import scala.xml.NodeSeq
 
-class SubmissionConnector @Inject() (
-  val config: AppConfig,
-  http: HttpClient
-)(implicit ec: ExecutionContext) {
+class SubmissionConnector @Inject() (val config: AppConfig, http: HttpClientV2)(implicit ec: ExecutionContext) {
 
   def submitDisclosure(submission: NodeSeq, conversationId: ConversationId)(implicit hc: HeaderCarrier): Future[HttpResponse] = {
-    val serviceName = "submission"
+    val serviceName  = "submission"
     val extraHeaders = Seq()
       .withBearerToken(s"${config.bearerToken(serviceName)}")
       .withXForwardedHost()
@@ -41,7 +41,10 @@ class SubmissionConnector @Inject() (
       .withAccept(Some("application/xml"))
       .withEnvironment(Some(config.environment(serviceName)))
 
-    http.POSTString[HttpResponse](config.serviceUrl(serviceName), submission.mkString, extraHeaders)(implicitly, hc, ec)
+    http
+      .post(new URI(config.serviceUrl(serviceName)).toURL)
+      .setHeader(extraHeaders: _*)
+      .withBody(submission.mkString)
+      .execute[HttpResponse]
   }
-
 }

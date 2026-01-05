@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package models.xml
 
 import models.xml.GenericStatusMessage.xmlReads
-import models.xml.XmlPath._
-import models.xml.XmlPrimitiveReads._
+import models.xml.XmlPath.*
+import models.xml.XmlPrimitiveReads.*
 import play.api.libs.json.{Json, OWrites}
 
 case class BREResponse(regime: String, conversationID: String, genericStatusMessage: GenericStatusMessage)

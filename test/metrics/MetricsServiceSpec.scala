@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package metrics
 
 import base.SpecBase
 import uk.gov.hmrc.play.bootstrap.metrics.MetricsImpl
-import models.submission.{Accepted, Rejected}
+import models.submission.{Accepted, Rejected, RejectedSDES}
 import models.xml.ValidationErrors
 import org.scalacheck.Gen
 import org.scalatest.BeforeAndAfterEach
@@ -50,15 +50,27 @@ class MetricsServiceSpec extends SpecBase with Injecting with BeforeAndAfterEach
       val pendingCounter = metricsService.fileStatusPendingCounter
       pendingCounter.inc()
       pendingCounter.getCount mustBe 1
-
     }
 
     "processFileStatus" in {
       val status = Gen.oneOf(Seq(Accepted, Rejected(ValidationErrors(None, None)))).sample.value
       metricsService.processFileStatusMetrics(status)(Future(Some("test"))).map(_ => metricsService.getFileStatusCounter(status).getCount mustBe 1)
-
     }
 
+    "increment failure counter" in {
+      val failureCounter = metricsService.getFileStatusCounter(RejectedSDES)
+      failureCounter.inc(1)
+      failureCounter.getCount mustBe 1
+      failureCounter.dec()
+    }
+
+    "increment failure counter when exception occurs" in
+      whenReady(metricsService.processFileStatusMetrics(Accepted)(Future.successful(new RuntimeException("some random error")))) { result =>
+        metricsService.failureCounter.inc(1)
+        result.getMessage mustEqual "some random error"
+        metricsService.failureCounter.getCount mustEqual 1
+        metricsService.failureCounter.dec(1)
+      }
   }
 
 }

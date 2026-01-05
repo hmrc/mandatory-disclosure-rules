@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         }
 
         "must return correct error for too long field attribute error for xnlNameType" in {
-          val tooLongValue = "1" * 200
+          val tooLongValue      = "1" * 200
           val invalidEnumError1 =
             SaxParseError(
               lineNumber,
@@ -64,7 +64,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         }
 
         "must return correct error for too long field attribute error for INType" in {
-          val tooLongValue = "1" * 200
+          val tooLongValue      = "1" * 200
           val invalidEnumError1 =
             SaxParseError(
               lineNumber,
@@ -511,7 +511,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         }
 
         "must return correct error for too long field attribute error for xnlNameType" in {
-          val tooLongValue = "1" * 200
+          val tooLongValue      = "1" * 200
           val invalidEnumError1 =
             SaxParseError(
               lineNumber,
@@ -527,7 +527,7 @@ class XmlErrorMessageHelperSpec extends SpecBase {
         }
 
         "must return correct error for too long field attribute error for INType" in {
-          val tooLongValue = "1" * 200
+          val tooLongValue      = "1" * 200
           val invalidEnumError1 =
             SaxParseError(
               lineNumber,

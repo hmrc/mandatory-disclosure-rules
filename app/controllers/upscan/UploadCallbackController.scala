@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,7 +37,7 @@ class UploadCallbackController @Inject() (
     with I18nSupport {
 
   val callback: Action[JsValue] = Action.async(parse.json) { implicit request =>
-    withJsonBody[CallbackBody] { feedback: CallbackBody =>
+    withJsonBody[CallbackBody] { feedback =>
       upscanCallbackDispatcher
         .handleCallback(feedback)
         .map(_ => Ok)

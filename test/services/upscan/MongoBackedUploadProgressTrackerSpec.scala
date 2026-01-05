@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,17 +20,18 @@ import base.SpecBase
 import models.upscan.{InProgress, Reference, UploadId, UploadSessionDetails}
 import org.bson.types.ObjectId
 import org.mockito.ArgumentMatchers.any
+import org.mockito.Mockito.*
 import repositories.upscan.UpScanSessionRepository
-import scala.language.postfixOps
 
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
+import scala.language.postfixOps
 
 class MongoBackedUploadProgressTrackerSpec extends SpecBase {
 
   val mockUploadSessionRepository = mock[UpScanSessionRepository]
 
-  import scala.concurrent.ExecutionContext.Implicits._
+  import scala.concurrent.ExecutionContext.Implicits.*
 
   val sut = new MongoBackedUploadProgressTracker(mockUploadSessionRepository)
 
@@ -46,7 +47,7 @@ class MongoBackedUploadProgressTrackerSpec extends SpecBase {
     }
 
     "must find an upload" in {
-      val uploadId = UploadId("123")
+      val uploadId      = UploadId("123")
       val uploadDetails = UploadSessionDetails(
         ObjectId.get(),
         UploadId("123"),

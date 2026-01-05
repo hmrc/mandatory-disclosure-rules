@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -199,7 +199,7 @@ class XmlErrorMessageHelper extends SaxParseErrorRegExConstants {
       case genericInvalidErrorFormat(dateStr, attribute) if attribute == "date" || attribute == "dateTime" =>
         errorMessage2 match {
           case missingOrInvalidErrorFormat("", "BirthDate") => Some(Message("xml.optional.field.empty", Seq("BirthDate")))
-          case missingOrInvalidErrorFormat(_, element) =>
+          case missingOrInvalidErrorFormat(_, element)      =>
             Try {
               DateTimeFormatter.ISO_DATE.parse(dateStr)
             } match {

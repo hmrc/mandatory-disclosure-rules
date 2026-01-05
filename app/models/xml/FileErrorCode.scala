@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package models.xml
 
-import play.api.libs.json._
+import play.api.libs.json.*
 
 sealed abstract class FileErrorCode(val code: String)
 
@@ -65,7 +65,7 @@ object FileErrorCode {
     XmlReads.from { ns =>
       val txt = ns.text.trim
       byCode.get(txt) match {
-        case Some(value) => JsSuccess(value)
+        case Some(value)          => JsSuccess(value)
         case None if txt.nonEmpty =>
           try
             JsSuccess(UnknownFileErrorCode(Integer.parseInt(txt).toString))

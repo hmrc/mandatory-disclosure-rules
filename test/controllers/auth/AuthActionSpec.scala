@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,9 @@ package controllers.auth
 
 import org.apache.pekko.util.Timeout
 import org.mockito.ArgumentMatchers.any
-import org.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import org.mockito.Mockito.*
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.http.Status.{OK, UNAUTHORIZED}
 import play.api.inject.bind
@@ -33,7 +34,7 @@ import uk.gov.hmrc.auth.core.retrieve.Retrieval
 import uk.gov.hmrc.auth.core.{AuthConnector, MissingBearerToken}
 import uk.gov.hmrc.http.HeaderCarrier
 
-import scala.concurrent.duration._
+import scala.concurrent.duration.*
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
 

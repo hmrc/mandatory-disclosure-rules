@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,7 +45,7 @@ class SDESMetaDataService extends Logging {
 
   private def transformContactInformation(contactInformation: ContactInformation, contactType: String): Map[String, String] = {
     val contactName = contactInformation.contactType match {
-      case individual: IndividualDetails => transformIndividual(individual, contactType)
+      case individual: IndividualDetails     => transformIndividual(individual, contactType)
       case organisation: OrganisationDetails =>
         Map(
           s"requestAdditionalDetail/$contactType/organisationDetails/organisationName" -> organisation.organisationName
@@ -59,7 +59,7 @@ class SDESMetaDataService extends Logging {
   }
 
   private def transformIndividual(individual: IndividualDetails, contactType: String): Map[String, String] = {
-    val firstName = Some(Map(s"requestAdditionalDetail/$contactType/individualDetails/firstName" -> individual.firstName))
+    val firstName  = Some(Map(s"requestAdditionalDetail/$contactType/individualDetails/firstName" -> individual.firstName))
     val middleName =
       individual.middleName.map(middleName => Map(s"requestAdditionalDetail/$contactType/individualDetails/middleName" -> middleName))
     val lastName = Some(Map(s"requestAdditionalDetail/$contactType/individualDetails/lastName" -> individual.lastName))

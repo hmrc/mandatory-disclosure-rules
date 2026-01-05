@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ object ErrorDetails {
   val error_details_909  = "DocRefID format does not match the format as set out in the HMRC MDR user guide"
   val error_details_910  = "MessageRefID format does not match the format as set out in the HMRC MDR user guide"
   val error_details_911  = """TIN issuedby must be provided where a TIN has been reported. The only exception is where "NOTIN" has been reported"""
-  val error_details_912 =
+  val error_details_912  =
     "The top level of the structure chart must not include the elements: mdr:ownership and mdr:InvestAmount. These should only be provided in the  mdr:ListChilds tag"
 
   val errorList: Seq[String] = Seq(
