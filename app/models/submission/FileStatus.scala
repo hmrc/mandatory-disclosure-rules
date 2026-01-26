@@ -49,7 +49,7 @@ object FileStatus {
         case r: Rejected       => rejectedFormat.writes(r) + ("type" -> JsString("Rejected"))
       }
 
-      def reads(json: JsValue): JsResult[FileStatus] = {
+      def reads(json: JsValue): JsResult[FileStatus] =
         (json \ "type")
           .validate[String]
           .flatMap {
@@ -76,7 +76,6 @@ object FileStatus {
                 JsError("Unable to determine FileStatus")
             }
           }
-      }
     }
   }
 }
