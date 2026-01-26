@@ -3,8 +3,8 @@ import sbt.*
 
 object AppDependencies {
   val playVersion   = "play-30"
-  val bootstrap_ver = "10.4.0"
-  val mongo_ver     = "2.11.0"
+  val bootstrap_ver = "10.5.0"
+  val mongo_ver     = "2.12.0"
 
   val compile: Seq[ModuleID] = Seq(
     "uk.gov.hmrc"       %% s"bootstrap-backend-$playVersion" % bootstrap_ver,
@@ -21,6 +21,6 @@ object AppDependencies {
   ).map(_ % Test)
 
   val overrides: Seq[ModuleID] = Seq(
-    "com.fasterxml.jackson.core" % "jackson-core" % "2.20.1"
+    "com.fasterxml.jackson.core" % "jackson-core" % "2.21.0"
   )
 }
