@@ -50,14 +50,32 @@ object FileStatus {
       }
 
       def reads(json: JsValue): JsResult[FileStatus] =
-        (json \ "type").validate[String].flatMap {
-          case "Pending"           => JsSuccess(Pending)
-          case "Accepted"          => JsSuccess(Accepted)
-          case "RejectedSDES"      => JsSuccess(RejectedSDES)
-          case "RejectedSDESVirus" => JsSuccess(RejectedSDESVirus)
-          case "Rejected"          => rejectedFormat.reads(json)
-          case other               => JsError(s"Unknown FileStatus type: $other")
-        }
+        (json \ "type")
+          .validate[String]
+          .flatMap {
+            case "Pending"           => JsSuccess(Pending)
+            case "Accepted"          => JsSuccess(Accepted)
+            case "RejectedSDES"      => JsSuccess(RejectedSDES)
+            case "RejectedSDESVirus" => JsSuccess(RejectedSDESVirus)
+            case "Rejected"          => rejectedFormat.reads(json)
+            case other               => JsError(s"Unknown FileStatus type: $other")
+          }
+          .orElse {
+            json match {
+              case JsObject(fields) if fields.size == 1 =>
+                fields.head match {
+                  case ("Pending", _)           => JsSuccess(Pending)
+                  case ("Accepted", _)          => JsSuccess(Accepted)
+                  case ("RejectedSDES", _)      => JsSuccess(RejectedSDES)
+                  case ("RejectedSDESVirus", _) => JsSuccess(RejectedSDESVirus)
+                  case ("Rejected", value)      => rejectedFormat.reads(value)
+                  case (other, _)               => JsError(s"Unknown FileStatus key: $other")
+                }
+
+              case _ =>
+                JsError("Unable to determine FileStatus")
+            }
+          }
     }
   }
 }
