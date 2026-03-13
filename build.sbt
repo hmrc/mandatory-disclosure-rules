@@ -49,7 +49,6 @@ lazy val microservice = Project(appName, file("."))
   )
   .settings(ScoverageSettings.settings: _*)
   .settings(addTestReportOption(Test, "test-reports"))
-  .settings(resolvers += Resolver.jcenterRepo)
 
 lazy val it = project
   .enablePlugins(PlayScala)
